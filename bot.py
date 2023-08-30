@@ -16,7 +16,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 activitys = [
-    "with Cosmo the Cat",
+    "with Cosmo",
     ".cosmo",
 ]
 
