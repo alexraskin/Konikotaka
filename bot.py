@@ -16,7 +16,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 activitys = [
-    "with Cosmo the Cat",
+    "with Cosmo",
     ".cosmo",
 ]
 
@@ -48,11 +48,11 @@ async def ping(ctx):
 @bot.command(name='cosmo', help='Get a random Photo of Cosmo the Cat')
 async def get_cat_photo(ctx):
   logger.info(f'User {ctx.author} requested a photo of Cosmo the Cat.')
-  obj_key = await make_request("https://kyusvasxyjb4ilnhzqbvhkohdu0xcefn.lambda-url.us-east-1.on.aws/")
-  if obj_key is None:
+  url = await make_request("https://api.twizy.dev/cosmo")
+  if url is None:
     await ctx.send("Sorry, I couldn't find a photo of Cosmo the Cat.")
     return
-  await ctx.send(f"https://cosmo-the-cat.s3.amazonaws.com/{obj_key}")
+  await ctx.send(url)
   await ctx.add_reaction(":cosmo:1146224388220391434")
 
 @bot.event
