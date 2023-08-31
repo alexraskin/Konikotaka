@@ -52,7 +52,7 @@ async def get_cat_photo(ctx):
   if url is None:
     await ctx.send("Sorry, I couldn't find a photo of Cosmo the Cat.")
     return
-  await ctx.send(url)
+  await ctx.send(str(url).strip('"'))
   await ctx.add_reaction(":cosmo:1146224388220391434")
 
 @bot.event
