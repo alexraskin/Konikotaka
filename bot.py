@@ -5,6 +5,7 @@ import random
 
 import aiohttp
 import discord
+from discord import AllowedMentions
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
@@ -30,6 +31,7 @@ bot = commands.Bot(
     intents=discord.Intents.all(),
     help_command=help_command,
     description="The Wizard of Cosmo",
+    allowed_mentions=AllowedMentions(everyone=True, users=True, roles=True),
 )
 
 
@@ -129,7 +131,7 @@ async def get_cat_photo(ctx):
     if url is None:
         await ctx.send("Sorry, I couldn't find a photo of Cosmo the Cat.")
         return
-    await ctx.send(str(url).strip('"'))
+    await ctx.send(str(url.text()).strip('"'))
     await ctx.add_reaction(":cosmo:1146224388220391434")
 
 
