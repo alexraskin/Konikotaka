@@ -42,7 +42,7 @@ async def make_request(url: str, headers: dict = None, body: dict = None):
                 logger.info(
                     f"Made request to {url} with headers {headers} and body {body}"
                 )
-                return await response
+                return await response.json()
         except aiohttp.ClientError as e:
             logger.error(f"Error making request: {e}")
             return None
@@ -63,7 +63,7 @@ async def check_if_live() -> set:
         f"https://api.twitch.tv/helix/streams?user_login={streamer_name}",
         headers=headers,
     )
-    if len(stream_data["data"].json()) == 1:
+    if len(stream_data["data"]) == 1:
         if stream_data["data"][0]["type"] == "live":
             print(stream_data["data"][0])
             return (
@@ -131,7 +131,7 @@ async def get_cat_photo(ctx):
     if url is None:
         await ctx.send("Sorry, I couldn't find a photo of Cosmo the Cat.")
         return
-    await ctx.send(str(url.text()).strip('"'))
+    await ctx.send(url["photo_url"])
     await ctx.add_reaction(":cosmo:1146224388220391434")
 
 
