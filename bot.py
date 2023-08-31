@@ -20,7 +20,11 @@ activitys = [
     ".cosmo",
 ]
 
-bot = commands.Bot(command_prefix='.', intents=discord.Intents.all())
+help_command = commands.DefaultHelpCommand(
+    no_category = 'Commands'
+)
+
+bot = commands.Bot(command_prefix='.', intents=discord.Intents.all(), help_command=help_command, description="The Wizard of Cosmo")
 
 async def make_request(url):
     async with aiohttp.ClientSession() as session:
@@ -44,6 +48,11 @@ async def change_activity():
 async def ping(ctx):
     logger.info(f'User {ctx.author} pinged the bot.')
     await ctx.send(f'Pong! {round(bot.latency * 1000)}ms')
+
+@bot.command("website", help="See more photos of Cosmo!")
+async def website(ctx):
+    logger.info(f'User {ctx.author} requested the website.')
+    await ctx.send("https://cosmo.twizy.dev")
 
 @bot.command(name='cosmo', help='Get a random Photo of Cosmo the Cat')
 async def get_cat_photo(ctx):
