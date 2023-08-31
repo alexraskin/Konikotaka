@@ -63,6 +63,7 @@ async def check_if_live() -> set:
     )
     if len(stream_data["data"].json()) == 1:
         if stream_data["data"][0]["type"] == "live":
+            print(stream_data["data"][0])
             return (
                 True,
                 stream_data["data"][0]["game_name"],
