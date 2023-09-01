@@ -24,7 +24,9 @@ activities = [
     ".cosmo",
 ]
 
-help_command = commands.DefaultHelpCommand(no_category="Commands", )
+help_command = commands.DefaultHelpCommand(
+    no_category="Commands",
+)
 
 bot = commands.Bot(
     command_prefix=".",
@@ -35,45 +37,35 @@ bot = commands.Bot(
 )
 
 
-async def make_request(url: str, headers: dict = None, body: dict = None):
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.get(url, headers=headers, body=body) as response:
-                logger.info(
-                    f"Made request to {url} with headers {headers} and body {body}"
-                )
-                return await response.json()
-        except aiohttp.ClientError as e:
-            logger.error(f"Error making request: {e}")
-            return None
-
-
 async def check_if_live() -> set:
     body = {
         "client_id": twitch_client_id,
         "client_secret": twitch_client_secret,
         "grant_type": "client_credentials",
     }
-    keys = await make_request("https://id.twitch.tv/oauth2/token", body=body)
-    headers = {
-        "Client-ID": twitch_client_id,
-        "Authorization": "Bearer " + keys["access_token"],
-    }
-    stream_data = await make_request(
-        f"https://api.twitch.tv/helix/streams?user_login={streamer_name}",
-        headers=headers,
-    )
-    if len(stream_data["data"]) == 1:
-        if stream_data["data"][0]["type"] == "live":
-            print(stream_data["data"][0])
-            return (
-                True,
-                stream_data["data"][0]["game_name"],
-                stream_data["data"][0]["title"],
-                stream_data["data"][0]["thumbnail_url"],
-            )
-    else:
-        return False, None, None, None
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://id.twitch.tv/oauth2/token", body=body) as keys:
+            if keys.status == 200:
+                headers = {
+                    "Client-ID": twitch_client_id,
+                    "Authorization": "Bearer " + keys["access_token"],
+                }
+                async with session.get(
+                    f"https://api.twitch.tv/helix/streams?user_login={streamer_name}",
+                    headers=headers,
+                ) as stream_data:
+                    if len(stream_data["data"]) == 0:
+                        if stream_data["data"][0]["type"] == "live":
+                            print(stream_data["data"][0])
+                            return (
+                                True,
+                                stream_data["data"][0]["game_name"],
+                                stream_data["data"][0]["title"],
+                                stream_data["data"][0]["thumbnail_url"],
+                            )
+                        else:
+                            return False, None, None, None
 
 
 @tasks.loop(minutes=1)
@@ -127,12 +119,13 @@ async def website(ctx):
 @bot.command(name="cosmo", help="Get a random Photo of Cosmo the Cat")
 async def get_cat_photo(ctx):
     logger.info(f"User {ctx.author} requested a photo of Cosmo the Cat.")
-    url = await make_request("https://api.twizy.dev/cosmo")
-    if url is None:
-        await ctx.send("Sorry, I couldn't find a photo of Cosmo the Cat.")
-        return
-    await ctx.send(url["photo_url"])
-    await ctx.add_reaction(":cosmo:1146224388220391434")
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://api.twizy.dev/cosmo") as response:
+            if response.status == 200:
+                photo = await response.json()
+                await ctx.send(photo["photoUrl"])
+            else:
+                await ctx.send("Error getting photo of!")
 
 
 @bot.event
