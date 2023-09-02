@@ -56,7 +56,7 @@ class General(commands.Cog, name="General"):
     @commands.command("website", help="See more photos of Cosmo!")
     async def website(self, ctx):
         print(f"User {ctx.author} requested the website.")
-        await ctx.send("https://cosmo.twizy.dev")
+        await ctx.send("View more photos of Cosmo, here -> https://cosmo.twizy.dev")
 
     @commands.command(name="cosmo", help="Get a random Photo of Cosmo the Cat")
     async def get_cat_photo(self, ctx):
