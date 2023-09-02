@@ -1,4 +1,5 @@
 import os
+import platform
 
 from discord.ext import commands
 from discord import Embed
@@ -48,7 +49,7 @@ class General(commands.Cog, name="General"):
     @commands.command(name="ping", help="Returns the latency of the bot.")
     async def ping(self, ctx):
         self.client.logger.info(f"User {ctx.author} pinged the bot.")
-        await ctx.send(f"Pong! {round(self.client.latency * 1000)}ms")
+        await ctx.send(f"Pong! {round(self.client.latency * 1000)}ms\n**Node: {platform.node()}**\n**Python Version: {platform.python_version()}**")
 
     @commands.command("website", help="See more photos of Cosmo!")
     async def website(self, ctx):

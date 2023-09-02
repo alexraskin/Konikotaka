@@ -6,12 +6,16 @@ import time
 
 from aiohttp import ClientSession, ClientTimeout
 from discord import ActivityType, Game, Intents
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, DefaultHelpCommand
 from discord.ext import tasks
 from dotenv import load_dotenv
 
 load_dotenv()
 discord_token = os.getenv("DISCORD_TOKEN")
+
+logger = logging.getLogger("discord")
+logger.setLevel(logging.INFO)
+
 
 class WiseOldManBot(Bot):
     """
@@ -32,12 +36,10 @@ class WiseOldManBot(Bot):
         super().__init__(*args, **options)
         self.session = None
         self.start_time = None
-        self.logger = logging.getLogger("discord")
+        self.logger = logger
         self.start_time = time.time()
-        logging.info("WiseOldManBot is starting up...")
 
     async def start(self, *args, **kwargs) -> None:
-        logging.info("Starting WiseOldManBot...")
         self.session = ClientSession(
             timeout=ClientTimeout(total=30)
         )
@@ -49,7 +51,6 @@ class WiseOldManBot(Bot):
 
     async def setup_hook(self) -> None:
         startup_extensions = []
-        logging.info("Loading extensions...")
         for file in os.listdir(os.path.join(os.path.dirname(__file__), "cogs/")):
             filename, ext = os.path.splitext(file)
             if ".py" in ext:
@@ -57,11 +58,11 @@ class WiseOldManBot(Bot):
 
         for extension in reversed(startup_extensions):
             try:
-                self.logger.info(f"Loading: {extension}")
+                logger.info(f"Loading: {extension}")
                 await self.load_extension(f"{extension}")
             except Exception as error:
                 exc = f"{type(error).__name__}: {error}"
-                self.logger.error(f"Failed to load extension {extension}\n{exc}")
+                logger.error(f"Failed to load extension {extension}\n{exc}")
 
     def get_uptime(self) -> str:
         """Returns the uptime of the bot."""
@@ -74,9 +75,15 @@ class WiseOldManBot(Bot):
         return round(self.latency * 1000)
 
 
+help_command = DefaultHelpCommand(
+    no_category="Commands",
+)
+
 client = WiseOldManBot(
     command_prefix=".",
     intents=Intents.all(),
+    max_messages=10000,
+    help_command=help_command,
 )
 
 @tasks.loop(minutes=1)
@@ -102,9 +109,8 @@ async def change_activity():
 
 @client.event
 async def on_ready():
-    logging.info(f"{client.user.name} has connected to Discord!")
-    await client.setup_hook()
+    print(f"{client.user.name} has connected to Discord!")
     change_activity.start()
 
 client.run(token=discord_token, reconnect=True, log_handler=None)
-logging.info(f"{client.user.name} has disconnected from Discord!")
+client.logger.info(f"{client.user.name} has disconnected from Discord!")
