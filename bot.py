@@ -2,7 +2,6 @@ import datetime
 import logging
 import os
 import random
-from osrs_api import Hiscores
 
 import aiohttp
 import discord
