@@ -1,8 +1,8 @@
 import os
 import platform
 
-from discord.ext import commands
 from discord import Embed
+from discord.ext import commands
 
 
 class General(commands.Cog, name="General"):
@@ -48,17 +48,19 @@ class General(commands.Cog, name="General"):
 
     @commands.command(name="ping", help="Returns the latency of the bot.")
     async def ping(self, ctx):
-        self.client.logger.info(f"User {ctx.author} pinged the bot.")
-        await ctx.send(f"Pong! {round(self.client.latency * 1000)}ms\n**Node: {platform.node()}**\n**Python Version: {platform.python_version()}**")
+        print(f"User {ctx.author} pinged the bot.")
+        await ctx.send(
+            f"Pong!\n**Node: {platform.node()}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
+        )
 
     @commands.command("website", help="See more photos of Cosmo!")
     async def website(self, ctx):
-        self.client.logger.info(f"User {ctx.author} requested the website.")
+        print(f"User {ctx.author} requested the website.")
         await ctx.send("https://cosmo.twizy.dev")
 
     @commands.command(name="cosmo", help="Get a random Photo of Cosmo the Cat")
     async def get_cat_photo(self, ctx):
-        self.client.logger.info(
+        print(
             f"User {ctx.author} requested a photo of Cosmo the Cat."
         )
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
@@ -67,7 +69,7 @@ class General(commands.Cog, name="General"):
                 await ctx.send(photo["photoUrl"])
             else:
                 await ctx.send("Error getting photo of!")
-    
+
     @commands.command(
         name="uptime", aliases=["up"], description="Shows the uptime of the bot"
     )
@@ -89,20 +91,21 @@ class General(commands.Cog, name="General"):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
-            self.client.logger.error(
+            print(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct role."
             )
             await ctx.send("You do not have the correct role for this command.")
         elif isinstance(error, commands.errors.CommandNotFound):
-            self.client.logger.error(
+            print(
                 f"User {ctx.author} tried to run command {ctx.command} which does not exist."
             )
             await ctx.send("Command not found.")
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            self.client.logger.error(
+            print(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."
             )
             await ctx.send("Missing required argument.")
+
 
 async def setup(client):
     """

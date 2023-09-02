@@ -1,21 +1,16 @@
 import datetime
-import logging
 import os
 import random
 import time
 
 from aiohttp import ClientSession, ClientTimeout
 from discord import ActivityType, Game, Intents
-from discord.ext.commands import Bot, DefaultHelpCommand
 from discord.ext import tasks
+from discord.ext.commands import Bot, DefaultHelpCommand
 from dotenv import load_dotenv
 
 load_dotenv()
 discord_token = os.getenv("DISCORD_TOKEN")
-
-logger = logging.getLogger("discord")
-logger.setLevel(logging.INFO)
-
 
 class WiseOldManBot(Bot):
     """
@@ -36,13 +31,10 @@ class WiseOldManBot(Bot):
         super().__init__(*args, **options)
         self.session = None
         self.start_time = None
-        self.logger = logger
         self.start_time = time.time()
 
     async def start(self, *args, **kwargs) -> None:
-        self.session = ClientSession(
-            timeout=ClientTimeout(total=30)
-        )
+        self.session = ClientSession(timeout=ClientTimeout(total=30))
         await super().start(*args, **kwargs)
 
     async def close(self) -> None:
@@ -58,11 +50,11 @@ class WiseOldManBot(Bot):
 
         for extension in reversed(startup_extensions):
             try:
-                logger.info(f"Loading: {extension}")
+                print(f"Loading: {extension}")
                 await self.load_extension(f"{extension}")
             except Exception as error:
                 exc = f"{type(error).__name__}: {error}"
-                logger.error(f"Failed to load extension {extension}\n{exc}")
+                print(f"Failed to load extension {extension}\n{exc}")
 
     def get_uptime(self) -> str:
         """Returns the uptime of the bot."""
@@ -85,6 +77,7 @@ client = WiseOldManBot(
     max_messages=10000,
     help_command=help_command,
 )
+
 
 @tasks.loop(minutes=1)
 async def change_activity():
@@ -112,5 +105,6 @@ async def on_ready():
     print(f"{client.user.name} has connected to Discord!")
     change_activity.start()
 
+
 client.run(token=discord_token, reconnect=True, log_handler=None)
-client.logger.info(f"{client.user.name} has disconnected from Discord!")
+print(f"{client.user.name} has disconnected from Discord!")
