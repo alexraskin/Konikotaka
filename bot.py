@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import random
+from osrs_api import Hiscores
 
 import aiohttp
 import discord
@@ -22,6 +23,12 @@ streamer_name = "pr3daturd574"
 activities = [
     "with Cosmo",
     ".cosmo",
+    "RuneLite",
+    ".help",
+    "Fishing in Lumbridge",
+    "with the Grand Exchange",
+    "Smite",
+    "Overwatch 2",
 ]
 
 help_command = commands.DefaultHelpCommand(
@@ -43,52 +50,52 @@ async def check_if_live() -> set:
         "client_secret": twitch_client_secret,
         "grant_type": "client_credentials",
     }
-
+    logging.info("Getting Twitch API keys.")
     async with aiohttp.ClientSession() as session:
-        async with session.get("https://id.twitch.tv/oauth2/token", body=body) as keys:
-            if keys.status == 200:
-                headers = {
-                    "Client-ID": twitch_client_id,
-                    "Authorization": "Bearer " + keys["access_token"],
-                }
-                async with session.get(
-                    f"https://api.twitch.tv/helix/streams?user_login={streamer_name}",
-                    headers=headers,
-                ) as stream_data:
-                    if len(stream_data["data"]) == 0:
-                        if stream_data["data"][0]["type"] == "live":
-                            print(stream_data["data"][0])
-                            return (
-                                True,
-                                stream_data["data"][0]["game_name"],
-                                stream_data["data"][0]["title"],
-                                stream_data["data"][0]["thumbnail_url"],
-                            )
-                        else:
-                            return False, None, None, None
+        async with session.post("https://id.twitch.tv/oauth2/token", data=body) as response:
+            keys = await response.json()
+            headers = {
+                "Client-ID": twitch_client_id,
+                "Authorization": "Bearer " + keys["access_token"],
+            }
+            async with session.get(
+                f"https://api.twitch.tv/helix/streams?user_login={streamer_name}",
+                headers=headers,
+            ) as response:
+                stream_data = await response.json()
+                if len(stream_data["data"]) > 0:
+                    if stream_data["data"][0]["type"] == "live":
+                        print(stream_data["data"][0])
+                        return (
+                            True,
+                            stream_data["data"][0]["game_name"],
+                            stream_data["data"][0]["title"],
+                            stream_data["data"][0]["thumbnail_url"],
+                        )
+                else:
+                    logger.info(f"{streamer_name} is not live.")
+                    return False, None, None, None
 
 
 @tasks.loop(minutes=1)
 async def check_twitch():
-    await bot.wait_until_ready()
-    while not bot.is_closed():
-        is_live, game, title, thumbnail = await check_if_live()
-        if is_live:
-            message = f"Hey @everyone,{streamer_name} is live on Twitch! Come watch at https://twitch.tv/{streamer_name}!"
-            embed = discord.Embed(
-                title=title,
-                description=f"Playing {game}",
-                color=0x6441A5,
-                timestamp=datetime.datetime.utcnow(),
-            )
-            embed.set_image(
-                url=thumbnail.replace("{width}", "1920").replace("{height}", "1080")
-            )
-            embed.set_footer(
-                text=f"Live since {datetime.datetime.utcnow().strftime('%H:%M:%S')}"
-            )
-            channel = bot.fetch_channel(1145087802141315093)
-            await channel.send(message, embed=embed)
+      live = await check_if_live()
+      if live[0]:
+          message = f"Hey @everyone, {streamer_name} is live on Twitch! Come watch at https://twitch.tv/{streamer_name}!"
+          embed = discord.Embed(
+              title=live[2],
+              description=f"Playing {live[1]}",
+              color=0x6441A5,
+              timestamp=datetime.datetime.utcnow(),
+          )
+          embed.set_image(
+              url=live[3].replace("{width}", "1920").replace("{height}", "1080")
+          )
+          embed.set_footer(
+              text=f"Live since {datetime.datetime.utcnow().strftime('%H:%M:%S')}"
+          )
+          channel = bot.fetch_channel(1145087802141315093)
+          await channel.send(message, embed=embed)
 
 
 @tasks.loop(minutes=1)
@@ -131,6 +138,7 @@ async def get_cat_photo(ctx):
 @bot.event
 async def on_ready():
     change_activity.start()
+    check_twitch.start()
     logger.info(f"{bot.user.name} has connected to Discord!")
 
 
