@@ -84,7 +84,6 @@ class General(commands.Cog, name="General"):
     async def on_message(self, message):
         if message.author == self.client.user:
             return
-        await self.client.process_commands(message)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
