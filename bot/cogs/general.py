@@ -68,7 +68,18 @@ class General(commands.Cog, name="General"):
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
             else:
-                await ctx.send("Error getting photo of!")
+                await ctx.send("Error getting photo of Cosmo!")
+
+    @commands.command(name="cats", help="Get a random photo of Pat and Ash's cats")
+    async def get_cats_photo(self, ctx):
+        print(f"User {ctx.author} requested a photo of Pat and Ash's cats.")
+        async with self.client.session.get("https://api.twizy.dev/cats") as response:
+            if response.status == 200:
+                photo = await response.json()
+                await ctx.send(photo["photoUrl"])
+            else:
+                await ctx.send("Error getting photo of Pat and Ash's cats!")
+
 
     @commands.command(
         name="uptime", aliases=["up"], description="Shows the uptime of the bot"
