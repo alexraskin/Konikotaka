@@ -5,14 +5,15 @@ import random
 import time
 
 from aiohttp import ClientSession, ClientTimeout
-from discord import ActivityType, AllowedMentions, Game, Intents, Client
-from discord.ext import commands, tasks
+from discord import ActivityType, Game, Intents
+from discord.ext.commands import Bot
+from discord.ext import tasks
 from dotenv import load_dotenv
 
 load_dotenv()
 discord_token = os.getenv("DISCORD_TOKEN")
 
-class WiseOldManBot(Client):
+class WiseOldManBot(Bot):
     """
     The Bot class is a subclass of the AutoShardedBot class.
     """
@@ -30,14 +31,13 @@ class WiseOldManBot(Client):
         """
         super().__init__(*args, **options)
         self.session = None
-        self.db_client = None
         self.start_time = None
         self.logger = logging.getLogger("discord")
         self.start_time = time.time()
-        self.abs_path = os.listdir(os.path.join(os.path.dirname(__file__), "cogs/"))
-        self.help_command = commands.DefaultHelpCommand(no_category="Commands")
+        logging.info("WiseOldManBot is starting up...")
 
     async def start(self, *args, **kwargs) -> None:
+        logging.info("Starting WiseOldManBot...")
         self.session = ClientSession(
             timeout=ClientTimeout(total=30)
         )
@@ -49,8 +49,8 @@ class WiseOldManBot(Client):
 
     async def setup_hook(self) -> None:
         startup_extensions = []
-
-        for file in self.abs_path:
+        logging.info("Loading extensions...")
+        for file in os.listdir(os.path.join(os.path.dirname(__file__), "cogs/")):
             filename, ext = os.path.splitext(file)
             if ".py" in ext:
                 startup_extensions.append(f"cogs.{filename}")
@@ -76,12 +76,8 @@ class WiseOldManBot(Client):
 
 client = WiseOldManBot(
     command_prefix=".",
-    description="Hello, I am WiseOldManBot!",
-    max_messages=15000,
     intents=Intents.all(),
-    allowed_mentions=AllowedMentions(everyone=True, users=True, roles=True),
 )
-
 
 @tasks.loop(minutes=1)
 async def change_activity():
@@ -91,33 +87,24 @@ async def change_activity():
         "RuneLite",
         ".help",
         "Fishing in Lumbridge",
-        "with the Grand Exchange",
+        "Grand Exchange",
         "Smite",
         "Overwatch 2",
     ]
-    await client.wait_until_ready()
-    while not client.is_closed():
-        await client.change_presence(
-            activity=Game(
-                name=random.choice(list(activities)),
-                type=ActivityType.playing,
-                emoji=":cosmo:1146224388220391434",
-            )
+    await client.change_presence(
+        activity=Game(
+            name=random.choice(list(activities)),
+            type=ActivityType.playing,
+            emoji=":cosmo:1146224388220391434",
         )
+    )
 
 
 @client.event
-async def on_ready() -> bool:
-    """
-    The on_ready function specifically accomplishes the following:
-        - Sets up a status task that changes the bot's status every 60 seconds.
-        - Sets up a clean_dir task that cleans out old files in the cache directory every 5 minutes.
-
-    :return: a string with the details of our main guild.
-    """
-    logging.info(f"{client.user.name} started successfully")
+async def on_ready():
+    logging.info(f"{client.user.name} has connected to Discord!")
+    await client.setup_hook()
     change_activity.start()
-    return True
 
 client.run(token=discord_token, reconnect=True, log_handler=None)
 logging.info(f"{client.user.name} has disconnected from Discord!")
