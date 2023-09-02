@@ -16,4 +16,4 @@ printf "Local python environment setup complete🏁\n"
 
 printf "Starting the Bot....🚀\n"
 
-python3 bot.py
+python3 bot/bot.py
