@@ -2,6 +2,7 @@ import datetime
 import os
 import random
 import time
+import logging
 
 from aiohttp import ClientSession, ClientTimeout
 from discord import ActivityType, Game, Intents
