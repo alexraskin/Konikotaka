@@ -3,6 +3,7 @@ import platform
 
 from discord import Embed
 from discord.ext import commands
+import urllib.parse
 
 
 class General(commands.Cog, name="General"):
@@ -66,7 +67,7 @@ class General(commands.Cog, name="General"):
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send(photo["photoUrl"])
+                await ctx.send(urllib.parse.quote(str(photo["photoUrl"]).join(" ")))
             else:
                 await ctx.send("Error getting photo of Cosmo!")
 
@@ -76,7 +77,7 @@ class General(commands.Cog, name="General"):
         async with self.client.session.get("https://api.twizy.dev/cats") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send(photo["photoUrl"])
+                await ctx.send(urllib.parse.quote(str(photo["photoUrl"]).join(" ")))
             else:
                 await ctx.send("Error getting photo of Pat and Ash's cats!")
 
