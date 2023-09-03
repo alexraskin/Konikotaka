@@ -1,112 +1,63 @@
-from models.db import Base, engine, async_session
+import os
 
-from discord.ext import commands, tasks
 from discord import Embed
+from discord.ext import commands
+from models.db import Base
+from models.pet import Pet
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from models.db_helper import DBHelper
 
 
-class Pets(commands.Cog, name='Feed Cats'):
-  def __init__(self, client: commands.Bot):
-    self.client = client
-    self.init_database.start()
+class Pets(commands.Cog, name="Pets"):
+    def __init__(self, client: commands.Bot):
+        self.client = client
+        self.engine = create_engine(os.getenv("MYSQL_URL"))
+        self.Session = sessionmaker(bind=self.engine)
+        self.session = self.Session()
+        Base.metadata.create_all(self.engine)
+        self.pets = self.session.query(Pet).all()
 
-  @tasks.loop(count=1)
-  async def init_database(self):
-      async with engine.begin() as conn:
-         await conn.run_sync(Base.metadata.create_all)
 
-  @commands.command(name="create")
-  async def create(self, ctx: commands.Context, pet_name: str):
-    """Create a pet"""
-    async with async_session() as session:
-      async with session.begin():
-        db_helper = DBHelper(session)
-        pet = await db_helper.get_user_pet(ctx.author.id)
-        if pet is not None:
-          await ctx.send("You already have a pet.")
-          return
-        await db_helper.add_new_user_pet(ctx.author.id, pet_name)
-        await ctx.send(f"Your pet {pet_name} has been created.")
-
-  @commands.command(name="feed")
-  async def feed(self, ctx: commands.Context):
-    """Feed your pet"""
-    async with async_session() as session:
-      async with session.begin():
-        db_helper = DBHelper(session)
-        pet = await db_helper.get_user_pet(ctx.author.id)
-        if pet is None:
-          await ctx.send("You don't have a pet. Use `pets create` to create one.")
-          return
-        if pet.hunger >= 100:
-          await ctx.send(f"{pet.pet_name} is full.")
-          return
-        pet.hunger += 10
-        await session.commit()
-        await ctx.send(f"You fed {pet.pet_name}.")
-
-  @commands.command(name="play")
-  async def play(self, ctx: commands.Context):
-    """Play with your pet"""
-    async with async_session() as session:
-      async with session.begin():
-        db_helper = DBHelper(session)
-        pet = await db_helper.get_user_pet(ctx.author.id)
-        if pet is None:
-          await ctx.send("You don't have a pet. Use `pets create` to create one.")
-          return
-        if pet.happiness >= 100:
-          await ctx.send(f"{pet.pet_name} is happy.")
-          return
-        pet.happiness += 10
-        await session.commit()
-        await ctx.send(f"You played with {pet.pet_name}.")
-  
-  @commands.command(name="treat")
-  async def treat(self, ctx: commands.Context):
-    """Give your pet a treat"""
-    async with async_session() as session:
-      async with session.begin():
-        db_helper = DBHelper(session)
-        pet = await db_helper.get_user_pet(ctx.author.id)
-        if pet is None:
-          await ctx.send("You don't have a pet. Use `pets create` to create one.")
-          return
-        pet.treat_count += 1
-        await session.commit()
-        await ctx.send(f"You gave {pet.pet_name} a treat.")
-
-  @commands.command(name="stats")
-  async def stats(self, ctx: commands.Context):
-    """Display your pet's stats"""
-    async with async_session() as session:
-      async with session.begin():
-        db_helper = DBHelper(session)
-        pet = await db_helper.get_user_pet(ctx.author.id)
-        if pet is None:
-          await ctx.send("You don't have a pet. Use `pets create` to create one.")
-          return
-        embed = Embed(title=f"{pet.pet_name}'s Stats")
-        embed.add_field(name="Hunger", value=f"{pet.hunger}/100")
-        embed.add_field(name="Happiness", value=f"{pet.happiness}/100")
-        embed.add_field(name="Treats", value=f"{pet.treat_count}")
-        await ctx.send(embed=embed)
+    @commands.command(name="create")
+    async def create(self, ctx: commands.Context, pet_name: str):
+        """Create a pet"""
+        try:
+            # Check if the user already has a pet
+            existing_pet = self.session.query(Pet).filter(Pet.discord_id == ctx.author.id).first()
+            
+            if existing_pet:
+                await ctx.send("You already have a pet.")
+            else:
+                
+                pet = Pet(discord_id=ctx.author.id, pet_name=pet_name)
+                self.session.add(pet)
+                self.session.commit()
+                await ctx.send(f"Created pet {pet_name}.")
+        except Exception as e:
+            # Handle exceptions, e.g., database errors
+            self.session.rollback()  # Rollback the transaction in case of an error
+            await ctx.send("An error occurred while creating your pet.")
+            print(f"Error: {e}")
       
-  @commands.command(name="leaderboard")
-  async def leaderboard(self, ctx: commands.Context):
-    """Display the leaderboard"""
-    async with async_session() as session:
-      async with session.begin():
-        db_helper = DBHelper(session)
-        pets = await db_helper.get_all_pets()
-        embed = Embed(title="Pet Leaderboard")
-        embed.add_field(name="Hunger", value="\n".join([f"{pet.pet_name}: {pet.hunger}/100" for pet in pets]))
-        embed.add_field(name="Happiness", value="\n".join([f"{pet.pet_name}: {pet.happiness}/100" for pet in pets]))
-        embed.add_field(name="Treats", value="\n".join([f"{pet.pet_name}: {pet.treat_count}" for pet in pets]))
-        await ctx.send(embed=embed)
+    @commands.command(name="feed")
+    async def feed(self, ctx: commands.Context, pet_name: str, quantity: int = 1):
+        """Feed your pet"""
+        try:
+            # Check if the user already has a pet
+            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
+            
+            if pet:
+                pet.hunger += quantity
+                self.session.commit()
+                await ctx.send(f"Your pet {pet_name} has been fed {quantity} treats.")
+            else:
+                await ctx.send(f"You don't have a pet named {pet_name}.")
+        except Exception as e:
+            await ctx.send("An error occurred while feeding your pet.")
+            self.session.rollback()
+
 
 async def setup(client: commands.Bot):
-  cog = Pets(client)
-  await cog.init_database()
-  await client.add_cog(cog)
+    cog = Pets(client)
+    await client.add_cog(cog)
