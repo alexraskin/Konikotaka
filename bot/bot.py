@@ -91,7 +91,7 @@ async def change_activity():
         "Smite",
         "Overwatch 2",
         ".cats",
-        "with Bartholomew",
+        "with Bartholomeow",
     ]
     await client.change_presence(
         activity=Game(
