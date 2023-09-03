@@ -1,9 +1,9 @@
 import os
 import platform
+import urllib.parse
 
 from discord import Embed
 from discord.ext import commands
-import urllib.parse
 
 
 class General(commands.Cog, name="General"):

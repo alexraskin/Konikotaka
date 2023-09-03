@@ -1,7 +1,7 @@
 import os
 import random
 
-from discord import Embed, app_commands, Interaction
+from discord import Embed, Interaction, app_commands
 from discord.ext import commands, tasks
 from models.db import Base
 from models.pet import Pet
@@ -17,15 +17,7 @@ class Pets(commands.Cog, name="Pets"):
         self.session = self.Session()
         Base.metadata.create_all(self.engine)
         self.pets = self.session.query(Pet).all()
-        self.add_treat.start()
         self.remove_hunger.start()
-
-    @tasks.loop(minutes=120)
-    async def add_treat(self):
-        for pet in self.pets:
-            r_treat = random.randint(1, 10)
-            pet.treat_count += r_treat
-        self.session.commit()
 
     @tasks.loop(minutes=30)
     async def remove_hunger(self):
@@ -108,6 +100,40 @@ class Pets(commands.Cog, name="Pets"):
             print(f"Error: {e}")
             self.session.rollback()
 
+    @app_commands.command(name="gettreats")
+    async def get_treats(self, interaction: Interaction, pet_name: str):
+        """Get treats for your pet"""
+        try:
+            owned_pet = (
+                self.session.query(Pet)
+                .filter(Pet.discord_id == interaction.user.id)
+                .first()
+            )
+            if not owned_pet:
+                await interaction.response.send_message(
+                    "You don't have a pet! Use `/newpet <pet_name>` to create one."
+                )
+                return
+            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
+            if pet:
+                quantity = random.randint(1, 10)
+                pet.treat_count += quantity
+                self.session.commit()
+                await interaction.response.send_message(
+                    f"You got **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
+                )
+            else:
+                await interaction.response.send_message(
+                    f"You don't have a pet named **{str(pet_name).capitalize()}**!"
+                )
+        except Exception as e:
+            await interaction.response.send_message(
+                "An error occurred while getting treats for your pet (check your pet's name).",
+                ephemeral=True,
+            )
+            print(f"Error: {e}")
+            self.session.rollback()
+
     @app_commands.command(name="checkhunger")
     async def check_hunger(self, interaction: Interaction, pet_name: str):
         """Check your pet's hunger"""
@@ -168,20 +194,22 @@ class Pets(commands.Cog, name="Pets"):
             print(f"Error: {e}")
             self.session.rollback()
 
-    @app_commands.command(name="mypets")
-    async def get_all_pets(self, interaction: Interaction):
-        """Get all pets"""
+    @app_commands.command(name="mypet")
+    async def get_all_pet(self, interaction: Interaction):
+        """Get all pet"""
         try:
             pets = (
                 self.session.query(Pet)
                 .filter(Pet.discord_id == interaction.user.id)
                 .all()
             )
-            embed = Embed(title="All Pets <:catboypepe:1146225949315182612>", color=0x00FF00)
+            embed = Embed(
+                title="All Pets <:catboypepe:1146225949315182612>", color=0x00FF00
+            )
             if not pets:
                 embed.add_field(
-                    name="No Pets <:susspongebob:1145087128087302164>",
-                    value="You don't have any pets! Use `/newpet <pet_name>` to create one.",
+                    name="No Pet <:susspongebob:1145087128087302164>",
+                    value="You don't have a pet! Use `/newpet <pet_name>` to create one.",
                     inline=False,
                 )
                 await interaction.response.send_message(embed=embed)
