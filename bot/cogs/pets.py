@@ -178,10 +178,18 @@ class Pets(commands.Cog, name="Pets"):
                 .all()
             )
             embed = Embed(title="All Pets <:catboypepe:1146225949315182612>", color=0x00FF00)
+            if not pets:
+                embed.add_field(
+                    name="No Pets <:susspongebob:1145087128087302164>",
+                    value="You don't have any pets! Use `/newpet <pet_name>` to create one.",
+                    inline=False,
+                )
+                await interaction.response.send_message(embed=embed)
+                return
             for pet in pets:
                 embed.add_field(
-                    name=f"{pet.pet_name}",
-                    value=f"Hunger: **{pet.hunger}** | Treats: **{pet.treat_count}**",
+                    name=f"{str(pet.pet_name).capitalize()}",
+                    value=f"Hunger: **{pet.hunger}** | Treats: **{pet.treat_count}** | Happiness: **{pet.happiness}**",
                     inline=False,
                 )
             await interaction.response.send_message(embed=embed)
