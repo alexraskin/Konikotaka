@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from db.config import Base
+from models.db import Base
 
 
 class Pet(Base):

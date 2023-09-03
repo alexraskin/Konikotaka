@@ -9,18 +9,14 @@ from models.db_helper import DBHelper
 class Pets(commands.Cog, name='Feed Cats'):
   def __init__(self, client: commands.Bot):
     self.client = client
+    self.init_database.start()
 
   @tasks.loop(count=1)
   async def init_database(self):
       async with engine.begin() as conn:
          await conn.run_sync(Base.metadata.create_all)
 
-  @commands.group(name="pets", invoke_without_command=True)
-  async def pets(self, ctx: commands.Context):
-    """Pets commands"""
-    await ctx.send_help(ctx.command)
-
-  @pets.command(name="createpet")
+  @commands.command(name="create")
   async def create(self, ctx: commands.Context, pet_name: str):
     """Create a pet"""
     async with async_session() as session:
@@ -33,7 +29,7 @@ class Pets(commands.Cog, name='Feed Cats'):
         await db_helper.add_new_user_pet(ctx.author.id, pet_name)
         await ctx.send(f"Your pet {pet_name} has been created.")
 
-  @pets.command(name="feed")
+  @commands.command(name="feed")
   async def feed(self, ctx: commands.Context):
     """Feed your pet"""
     async with async_session() as session:
@@ -50,7 +46,7 @@ class Pets(commands.Cog, name='Feed Cats'):
         await session.commit()
         await ctx.send(f"You fed {pet.pet_name}.")
 
-  @pets.command(name="play")
+  @commands.command(name="play")
   async def play(self, ctx: commands.Context):
     """Play with your pet"""
     async with async_session() as session:
@@ -67,7 +63,7 @@ class Pets(commands.Cog, name='Feed Cats'):
         await session.commit()
         await ctx.send(f"You played with {pet.pet_name}.")
   
-  @pets.command(name="treat")
+  @commands.command(name="treat")
   async def treat(self, ctx: commands.Context):
     """Give your pet a treat"""
     async with async_session() as session:
@@ -81,7 +77,7 @@ class Pets(commands.Cog, name='Feed Cats'):
         await session.commit()
         await ctx.send(f"You gave {pet.pet_name} a treat.")
 
-  @pets.command(name="stats")
+  @commands.command(name="stats")
   async def stats(self, ctx: commands.Context):
     """Display your pet's stats"""
     async with async_session() as session:
@@ -97,7 +93,7 @@ class Pets(commands.Cog, name='Feed Cats'):
         embed.add_field(name="Treats", value=f"{pet.treat_count}")
         await ctx.send(embed=embed)
       
-  @pets.command(name="leaderboard")
+  @commands.command(name="leaderboard")
   async def leaderboard(self, ctx: commands.Context):
     """Display the leaderboard"""
     async with async_session() as session:
@@ -113,4 +109,4 @@ class Pets(commands.Cog, name='Feed Cats'):
 async def setup(client: commands.Bot):
   cog = Pets(client)
   await cog.init_database()
-  client.add_cog(cog)
+  await client.add_cog(cog)
