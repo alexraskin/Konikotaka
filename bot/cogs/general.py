@@ -67,7 +67,7 @@ class General(commands.Cog, name="General"):
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send((str(photo["photoUrl"])))
+                await ctx.send(photo["photoUrl"])
             else:
                 await ctx.send("Error getting photo of Cosmo!")
 
@@ -77,7 +77,7 @@ class General(commands.Cog, name="General"):
         async with self.client.session.get("https://api.twizy.dev/cats") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send((str(photo["photoUrl"])))
+                await ctx.send(photo["photoUrl"])
             else:
                 await ctx.send("Error getting photo of Pat and Ash's cats!")
 
