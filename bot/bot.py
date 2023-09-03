@@ -90,6 +90,8 @@ async def change_activity():
         "Grand Exchange",
         "Smite",
         "Overwatch 2",
+        ".cats",
+        "with Bartholomew",
     ]
     await client.change_presence(
         activity=Game(
