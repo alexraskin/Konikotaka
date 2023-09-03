@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 discord_token = os.getenv("DISCORD_TOKEN")
 
+
 class WiseOldManBot(Bot):
     """
     The Bot class is a subclass of the AutoShardedBot class.
