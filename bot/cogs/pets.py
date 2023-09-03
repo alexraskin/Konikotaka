@@ -33,6 +33,15 @@ class Pets(commands.Cog, name="Pets"):
             pet.hunger -= 1
         self.session.commit()
 
+    @tasks.loop(minutes=1)
+    async def update_happiness(self):
+        for pet in self.pets:
+            if pet.hunger > 5:
+                pet.happiness += 1
+            else:
+                pet.happiness -= 1
+        self.session.commit()
+
     @app_commands.command(name="newpet")
     async def create(self, interaction: Interaction, pet_name: str):
         """Create a new pet"""
@@ -56,7 +65,7 @@ class Pets(commands.Cog, name="Pets"):
         except Exception as e:
             self.session.rollback()
             await interaction.response.send_message(
-                "An error occurred while creating your pet."
+                "An error occurred while creating your pet.", ephemeral=True
             )
             print(f"Error: {e}")
 
@@ -93,8 +102,10 @@ class Pets(commands.Cog, name="Pets"):
                 )
         except Exception as e:
             await interaction.response.send_message(
-                "An error occurred while feeding your pet (check your pet's name)."
+                "An error occurred while feeding your pet (check your pet's name).",
+                ephemeral=True,
             )
+            print(f"Error: {e}")
             self.session.rollback()
 
     @app_commands.command(name="checkhunger")
@@ -122,11 +133,65 @@ class Pets(commands.Cog, name="Pets"):
                 )
         except Exception as e:
             await interaction.response.send_message(
-                "An error occurred while checking your pet's hunger."
+                "An error occurred while checking your pet's hunger.", ephemeral=True
             )
+            print(f"Error: {e}")
+            self.session.rollback()
+
+    @app_commands.command(name="checktreats")
+    async def check_treats(self, interaction: Interaction, pet_name: str):
+        """Check your pet's treats"""
+        try:
+            owned_pet = (
+                self.session.query(Pet)
+                .filter(Pet.discord_id == interaction.user.id)
+                .first()
+            )
+            if not owned_pet:
+                await interaction.response.send_message(
+                    "You don't have a pet! Use `/newpet <pet_name>` to create one."
+                )
+                return
+            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
+            if pet:
+                await interaction.response.send_message(
+                    f"Your pet, **{str(pet_name).capitalize()}** has **{pet.treat_count}** treat{'s' if pet.treat_count > 1 else ''}! <:wiseoldman:1147920787471347732>"
+                )
+            else:
+                await interaction.response.send_message(
+                    f"You don't have a pet named **{str(pet_name).capitalize()}**! <:susspongebob:1145087128087302164>"
+                )
+        except Exception as e:
+            await interaction.response.send_message(
+                "An error occurred while checking your pet's treats.", ephemeral=True
+            )
+            print(f"Error: {e}")
+            self.session.rollback()
+
+    @app_commands.command(name="mypets")
+    async def get_all_pets(self, interaction: Interaction):
+        """Get all pets"""
+        try:
+            pets = (
+                self.session.query(Pet)
+                .filter(Pet.discord_id == interaction.user.id)
+                .all()
+            )
+            embed = Embed(title="All Pets <:catboypepe:1146225949315182612>", color=0x00FF00)
+            for pet in pets:
+                embed.add_field(
+                    name=f"{pet.pet_name}",
+                    value=f"Hunger: **{pet.hunger}** | Treats: **{pet.treat_count}**",
+                    inline=False,
+                )
+            await interaction.response.send_message(embed=embed)
+        except Exception as e:
+            await interaction.response.send_message(
+                "An error occurred while getting all pets.", ephemeral=True
+            )
+            print(f"Error: {e}")
             self.session.rollback()
 
 
 async def setup(client: commands.Bot):
-    cog = Pets(client)
-    await client.add_cog(cog)
+    await client.add_cog(Pets(client))
