@@ -70,6 +70,11 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
+            if int(owned_pet.discord_id) != interaction.user.id:
+                await interaction.response.send_message(
+                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
+                )
+                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
@@ -109,6 +114,11 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
+            if int(owned_pet.discord_id) != interaction.user.id:
+                await interaction.response.send_message(
+                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
+                )
+                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
@@ -143,6 +153,11 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
+            if int(owned_pet.discord_id) != interaction.user.id:
+                await interaction.response.send_message(
+                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
+                )
+                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
@@ -173,6 +188,11 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
+            if int(owned_pet.discord_id) != interaction.user.id:
+                await interaction.response.send_message(
+                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
+                )
+                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
@@ -194,15 +214,20 @@ class Pets(commands.Cog, name="Pets"):
             print(f"Error: {e}")
             self.session.rollback()
 
-    @app_commands.command(name="mypet")
+    @app_commands.command(name="petinfo")
     async def get_all_pet(self, interaction: Interaction):
-        """Get all pet"""
+        """Get info about your pet!"""
         try:
             pets = (
                 self.session.query(Pet)
                 .filter(Pet.discord_id == interaction.user.id)
                 .all()
             )
+            if int(pets.discord_id) != interaction.user.id:
+                await interaction.response.send_message(
+                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
+                )
+                return
             embed = Embed(
                 title="All Pets <:catboypepe:1146225949315182612>", color=0x00FF00
             )
