@@ -87,12 +87,12 @@ class Pets(commands.Cog, name="Pets"):
                 f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
             )
         except Exception as e:
-          await interaction.response.send_message(
-              "An error occurred while feeding your pet (check your pet's name).",
-              ephemeral=True,
+            await interaction.response.send_message(
+                "An error occurred while feeding your pet (check your pet's name).",
+                ephemeral=True,
             )
-          print(f"Error: {e}")
-          self.session.rollback()
+            print(f"Error: {e}")
+            self.session.rollback()
 
     @app_commands.command(name="buytreats")
     async def get_treats(self, interaction: Interaction):
@@ -113,14 +113,14 @@ class Pets(commands.Cog, name="Pets"):
             self.session.commit()
             await interaction.response.send_message(
                 f"You bought **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(owned_pet.pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
-              )
+            )
         except Exception as e:
-          await interaction.response.send_message(
-              "An error occurred while getting treats for your pet (check your pet's name).",
-              ephemeral=True,
-          )
-          print(f"Error: {e}")
-          self.session.rollback()
+            await interaction.response.send_message(
+                "An error occurred while getting treats for your pet (check your pet's name).",
+                ephemeral=True,
+            )
+            print(f"Error: {e}")
+            self.session.rollback()
 
     @app_commands.command(name="pethunger")
     async def check_hunger(self, interaction: Interaction):
@@ -180,7 +180,8 @@ class Pets(commands.Cog, name="Pets"):
                 .all()
             )
             embed = Embed(
-                title="Pet Information <:catboypepe:1146225949315182612>", color=0x00FF00
+                title="Pet Information <:catboypepe:1146225949315182612>",
+                color=0x00FF00,
             )
             if not owned_pet:
                 embed.add_field(
