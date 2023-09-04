@@ -6,6 +6,7 @@ from discord.ext import commands, tasks
 from models.pet import Pet
 from models.db import Base
 
+
 class Pets(commands.Cog, name="Pets"):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -182,17 +183,19 @@ class Pets(commands.Cog, name="Pets"):
                 .all()
             )
             if not owned_pet:
-                await interaction.response.send_message("You don't have a pet! Get one with `/newpet <pet_name>`.")
+                await interaction.response.send_message(
+                    "You don't have a pet! Get one with `/newpet <pet_name>`."
+                )
                 return
             embed = Embed(
                 title=f"Information about {str(owned_pet.pet_name).capitalize()} <:catboypepe:1146225949315182612>",
                 color=0x00FF00,
             )
             embed.add_field(
-                  name=f"{str(owned_pet.pet_name).capitalize()}",
-                  value=f"Hunger: **{owned_pet.hunger}** | Treats: **{owned_pet.treat_count}** | Happiness: **{owned_pet.happiness}** | Last Fed: **{owned_pet.last_fed}**",
-                  inline=False,
-              )
+                name=f"{str(owned_pet.pet_name).capitalize()}",
+                value=f"Hunger: **{owned_pet.hunger}** | Treats: **{owned_pet.treat_count}** | Happiness: **{owned_pet.happiness}** | Last Fed: **{owned_pet.last_fed}**",
+                inline=False,
+            )
             await interaction.response.send_message(embed=embed)
         except Exception as e:
             await interaction.response.send_message(

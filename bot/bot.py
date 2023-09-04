@@ -62,7 +62,7 @@ help_command = DefaultHelpCommand(
 )
 
 client = WiseOldManBot(
-    command_prefix=".",
+    command_prefix="?",
     intents=Intents.all(),
     max_messages=10000,
     help_command=help_command,
