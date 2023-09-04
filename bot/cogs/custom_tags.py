@@ -44,6 +44,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             await ctx.send("An error occurred while adding the tag.", ephemeral=True)
 
     @commands.command(name="deltag", description="Delete a tag")
+    @commands.has_permissions(manage_messages=True)
     async def del_tag(self, ctx: commands.Context, tag_name: str):
         try:
             tag = (
