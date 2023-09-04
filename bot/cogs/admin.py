@@ -35,7 +35,7 @@ class Admin(commands.Cog, name="Admin"):
             )
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
-    
+
     @commands.command(name="sync", hidden=True)
     async def sync(self, ctx: commands.Context):
         await self.client.tree.sync()
@@ -47,19 +47,19 @@ class Admin(commands.Cog, name="Admin"):
             timestamp=ctx.message.created_at,
         )
         await ctx.send(embed=embed)
-    
+
     @commands.command(name="purge", hidden=True)
     async def purge(self, ctx: commands.Context, amount: int, reason: str = None):
         if amount <= 0:
             await ctx.send("Please specify a positive number of messages to delete.")
             return
         try:
-          amount += 1
-          await ctx.channel.purge(limit=amount, reason=reason)
+            amount += 1
+            await ctx.channel.purge(limit=amount, reason=reason)
         except Exception as e:
-          print(f"Error: {e}")
-          await ctx.send("An error occurred while purging messages.", ephemeral=True)
-          return
+            print(f"Error: {e}")
+            await ctx.send("An error occurred while purging messages.", ephemeral=True)
+            return
         message = await ctx.send("I have purged those messages for you.")
         await message.delete(delay=3)
 

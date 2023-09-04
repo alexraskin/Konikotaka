@@ -1,5 +1,6 @@
 import os
 import random
+import datetime
 
 from discord import Embed, Interaction, app_commands
 from discord.ext import commands, tasks
@@ -25,7 +26,7 @@ class Pets(commands.Cog, name="Pets"):
             pet.hunger -= 1
         self.session.commit()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=120)
     async def update_happiness(self):
         for pet in self.pets:
             if pet.hunger > 5:
@@ -48,7 +49,14 @@ class Pets(commands.Cog, name="Pets"):
                     f"You already have a pet! Use `/givetreat <pet_name>` to feed it. <:susspongebob:1145087128087302164>"
                 )
             else:
-                pet = Pet(discord_id=interaction.user.id, pet_name=pet_name)
+                pet = Pet(
+                    discord_id=interaction.user.id,
+                    pet_name=pet_name,
+                    hunger=50,
+                    treat_count=20,
+                    happiness=50,
+                    last_fed=datetime.datetime.utcnow(),
+                )
                 self.session.add(pet)
                 self.session.commit()
                 await interaction.response.send_message(
@@ -82,6 +90,7 @@ class Pets(commands.Cog, name="Pets"):
                 )
                 return
             owned_pet.hunger += quantity
+            owned_pet.last_fed = datetime.datetime.utcnow()
             self.session.commit()
             await interaction.response.send_message(
                 f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
@@ -194,7 +203,7 @@ class Pets(commands.Cog, name="Pets"):
             for pet in owned_pet:
                 embed.add_field(
                     name=f"{str(pet.pet_name).capitalize()}",
-                    value=f"Hunger: **{pet.hunger}** | Treats: **{pet.treat_count}** | Happiness: **{pet.happiness}**",
+                    value=f"Hunger: **{pet.hunger}** | Treats: **{pet.treat_count}** | Happiness: **{pet.happiness}** | Last Fed: **{pet.last_fed}**",
                     inline=False,
                 )
             await interaction.response.send_message(embed=embed)

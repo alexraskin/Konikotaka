@@ -1,5 +1,4 @@
 import datetime
-import logging
 import os
 import random
 import time
@@ -96,7 +95,7 @@ async def change_activity():
         ".cats",
         "with Bartholomeow",
         "With Snad's Mom",
-        "Annoying Seaira"
+        "Annoying Seaira",
     ]
     await client.change_presence(
         activity=Game(
