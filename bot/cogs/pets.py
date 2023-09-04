@@ -45,7 +45,7 @@ class Pets(commands.Cog, name="Pets"):
             )
             if existing_pet:
                 await interaction.response.send_message(
-                    f"You already have a pet! Use `/pets feed <pet_name>` to feed it. <:susspongebob:1145087128087302164>"
+                    f"You already have a pet! Use `/givetreat <pet_name>` to feed it. <:susspongebob:1145087128087302164>"
                 )
             else:
                 pet = Pet(discord_id=interaction.user.id, pet_name=pet_name)
@@ -62,7 +62,7 @@ class Pets(commands.Cog, name="Pets"):
             print(f"Error: {e}")
 
     @app_commands.command(name="givetreat")
-    async def feed(self, interaction: Interaction, pet_name: str):
+    async def feed(self, interaction: Interaction):
         """Feed your pet"""
         try:
             owned_pet = (
@@ -70,43 +70,32 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
-            if int(owned_pet.discord_id) != interaction.user.id:
-                await interaction.response.send_message(
-                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
-                )
-                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
                 )
                 return
-            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
-            if pet:
-                quantity = random.randint(1, 10)
-                if quantity > pet.treat_count:
-                    await interaction.response.send_message(
-                        f"You don't have enough treats to feed **{str(pet_name).capitalize()}**! <:susspongebob:1145087128087302164>"
-                    )
-                    return
-                pet.hunger += quantity
-                self.session.commit()
+            quantity = random.randint(1, 10)
+            if quantity > owned_pet.treat_count:
                 await interaction.response.send_message(
-                    f"Your pet **{str(pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
+                    f"You don't have enough treats to feed **{str(owned_pet.pet_name).capitalize()}**! <:susspongebob:1145087128087302164>"
                 )
-            else:
-                await interaction.response.send_message(
-                    f"You don't have a pet named **{str(pet_name).capitalize()}**!"
-                )
-        except Exception as e:
+                return
+            owned_pet.hunger += quantity
+            self.session.commit()
             await interaction.response.send_message(
-                "An error occurred while feeding your pet (check your pet's name).",
-                ephemeral=True,
+                f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
             )
-            print(f"Error: {e}")
-            self.session.rollback()
+        except Exception as e:
+          await interaction.response.send_message(
+              "An error occurred while feeding your pet (check your pet's name).",
+              ephemeral=True,
+            )
+          print(f"Error: {e}")
+          self.session.rollback()
 
-    @app_commands.command(name="gettreats")
-    async def get_treats(self, interaction: Interaction, pet_name: str):
+    @app_commands.command(name="buytreats")
+    async def get_treats(self, interaction: Interaction):
         """Get treats for your pet"""
         try:
             owned_pet = (
@@ -114,38 +103,27 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
-            if int(owned_pet.discord_id) != interaction.user.id:
-                await interaction.response.send_message(
-                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
-                )
-                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
                 )
                 return
-            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
-            if pet:
-                quantity = random.randint(1, 10)
-                pet.treat_count += quantity
-                self.session.commit()
-                await interaction.response.send_message(
-                    f"You got **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
-                )
-            else:
-                await interaction.response.send_message(
-                    f"You don't have a pet named **{str(pet_name).capitalize()}**!"
-                )
-        except Exception as e:
+            quantity = random.randint(1, 10)
+            owned_pet.treat_count += quantity
+            self.session.commit()
             await interaction.response.send_message(
-                "An error occurred while getting treats for your pet (check your pet's name).",
-                ephemeral=True,
-            )
-            print(f"Error: {e}")
-            self.session.rollback()
+                f"You bought **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(owned_pet.pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
+              )
+        except Exception as e:
+          await interaction.response.send_message(
+              "An error occurred while getting treats for your pet (check your pet's name).",
+              ephemeral=True,
+          )
+          print(f"Error: {e}")
+          self.session.rollback()
 
-    @app_commands.command(name="checkhunger")
-    async def check_hunger(self, interaction: Interaction, pet_name: str):
+    @app_commands.command(name="pethunger")
+    async def check_hunger(self, interaction: Interaction):
         """Check your pet's hunger"""
         try:
             owned_pet = (
@@ -153,25 +131,14 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
-            if int(owned_pet.discord_id) != interaction.user.id:
-                await interaction.response.send_message(
-                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
-                )
-                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
                 )
                 return
-            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
-            if pet:
-                await interaction.response.send_message(
-                    f"Your pet, **{str(pet_name).capitalize()}** is at **{pet.hunger}** hunger! <:wiseoldman:1147920787471347732>"
-                )
-            else:
-                await interaction.response.send_message(
-                    f"You don't have a pet named **{str(pet_name).capitalize()}**! <:susspongebob:1145087128087302164>"
-                )
+            await interaction.response.send_message(
+                f"Your pet, **{str(owned_pet.pet_name).capitalize()}** is at **{owned_pet.hunger}** hunger! <:wiseoldman:1147920787471347732>"
+            )
         except Exception as e:
             await interaction.response.send_message(
                 "An error occurred while checking your pet's hunger.", ephemeral=True
@@ -179,8 +146,8 @@ class Pets(commands.Cog, name="Pets"):
             print(f"Error: {e}")
             self.session.rollback()
 
-    @app_commands.command(name="checktreats")
-    async def check_treats(self, interaction: Interaction, pet_name: str):
+    @app_commands.command(name="treatcount")
+    async def check_treats(self, interaction: Interaction):
         """Check your pet's treats"""
         try:
             owned_pet = (
@@ -188,25 +155,14 @@ class Pets(commands.Cog, name="Pets"):
                 .filter(Pet.discord_id == interaction.user.id)
                 .first()
             )
-            if int(owned_pet.discord_id) != interaction.user.id:
-                await interaction.response.send_message(
-                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
-                )
-                return
             if not owned_pet:
                 await interaction.response.send_message(
                     "You don't have a pet! Use `/newpet <pet_name>` to create one."
                 )
                 return
-            pet = self.session.query(Pet).filter(Pet.pet_name == pet_name).first()
-            if pet:
-                await interaction.response.send_message(
-                    f"Your pet, **{str(pet_name).capitalize()}** has **{pet.treat_count}** treat{'s' if pet.treat_count > 1 else ''}! <:wiseoldman:1147920787471347732>"
-                )
-            else:
-                await interaction.response.send_message(
-                    f"You don't have a pet named **{str(pet_name).capitalize()}**! <:susspongebob:1145087128087302164>"
-                )
+            await interaction.response.send_message(
+                f"Your pet, **{str(owned_pet.pet_name).capitalize()}** has **{owned_pet.treat_count}** treat{'s' if owned_pet.treat_count > 1 else ''}! <:wiseoldman:1147920787471347732>"
+            )
         except Exception as e:
             await interaction.response.send_message(
                 "An error occurred while checking your pet's treats.", ephemeral=True
@@ -215,23 +171,18 @@ class Pets(commands.Cog, name="Pets"):
             self.session.rollback()
 
     @app_commands.command(name="petinfo")
-    async def get_all_pet(self, interaction: Interaction):
+    async def get_all_info(self, interaction: Interaction):
         """Get info about your pet!"""
         try:
-            pets = (
+            owned_pet = (
                 self.session.query(Pet)
                 .filter(Pet.discord_id == interaction.user.id)
                 .all()
             )
-            if int(pets.discord_id) != interaction.user.id:
-                await interaction.response.send_message(
-                    "This pet doesn't belong to you! <:cat_hehe:1145087066825306263>"
-                )
-                return
             embed = Embed(
-                title="All Pets <:catboypepe:1146225949315182612>", color=0x00FF00
+                title="Pet Information <:catboypepe:1146225949315182612>", color=0x00FF00
             )
-            if not pets:
+            if not owned_pet:
                 embed.add_field(
                     name="No Pet <:susspongebob:1145087128087302164>",
                     value="You don't have a pet! Use `/newpet <pet_name>` to create one.",
@@ -239,7 +190,7 @@ class Pets(commands.Cog, name="Pets"):
                 )
                 await interaction.response.send_message(embed=embed)
                 return
-            for pet in pets:
+            for pet in owned_pet:
                 embed.add_field(
                     name=f"{str(pet.pet_name).capitalize()}",
                     value=f"Hunger: **{pet.hunger}** | Treats: **{pet.treat_count}** | Happiness: **{pet.happiness}**",
