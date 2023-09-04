@@ -7,7 +7,10 @@ from aiohttp import ClientSession, ClientTimeout
 from discord import ActivityType, Game, Intents
 from discord.ext import tasks
 from discord.ext.commands import Bot, DefaultHelpCommand
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+from models.db import Base
 
 load_dotenv()
 discord_token = os.getenv("DISCORD_TOKEN")
@@ -33,6 +36,9 @@ class WiseOldManBot(Bot):
         self.session = None
         self.start_time = None
         self.start_time = time.time()
+        self.engine = create_engine(os.getenv("MYSQL_URL"))
+        self.DB_Session = sessionmaker(bind=self.engine)
+        self.db_session = self.DB_Session()
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
