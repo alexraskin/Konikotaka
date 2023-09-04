@@ -13,14 +13,14 @@ class Admin(commands.Cog, name="Admin"):
                 await self.client.unload_extension(cog)
                 await self.client.load_extension(cog)
                 print(f"Reload Command Executed by {ctx.author}")
-                embed = Embed(
-                    title="Cog Reload 🔃",
-                    description="I have reloaded all the cogs successfully ✅",
-                    color=0x00FF00,
-                    timestamp=ctx.message.created_at,
-                )
-                embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
-                await ctx.send(embed=embed)
+            embed = Embed(
+                title="Cog Reload 🔃",
+                description="I have reloaded all the cogs successfully ✅",
+                color=0x00FF00,
+                timestamp=ctx.message.created_at,
+            )
+            embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
+            await ctx.send(embed=embed)
         else:
             print(
                 f"Reloaded: {str(extension).upper()} COG - Command Executed by {ctx.author}"
