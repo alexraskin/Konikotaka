@@ -1,6 +1,5 @@
 import os
 import platform
-import urllib.parse
 
 from discord import Embed
 from discord.ext import commands
