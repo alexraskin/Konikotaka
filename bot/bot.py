@@ -78,6 +78,7 @@ client = WiseOldManBot(
     intents=Intents.all(),
     max_messages=10000,
     help_command=help_command,
+    description="Hello, I am WiseOldManBot!",
 )
 
 
