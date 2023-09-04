@@ -46,7 +46,7 @@ class Pets(commands.Cog, name="Pets"):
             )
             if existing_pet:
                 await interaction.response.send_message(
-                    f"You already have a pet! Use `/givetreat <pet_name>` to feed it. <:susspongebob:1145087128087302164>"
+                    f"You already have a pet named {existing_pet.pet_name}! Use `/givetreat` to feed it. <:susspongebob:1145087128087302164>"
                 )
             else:
                 pet = Pet(
