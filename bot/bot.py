@@ -95,6 +95,8 @@ async def change_activity():
         "Overwatch 2",
         ".cats",
         "with Bartholomeow",
+        "With Snad's Mom",
+        "Annoying Seaira"
     ]
     await client.change_presence(
         activity=Game(
