@@ -22,7 +22,6 @@ class General(commands.Cog, name="General"):
         self.channel = self.client.get_channel(os.getenv("GENERAL_CHANNEL_ID"))
         Base.metadata.create_all(self.client.engine, checkfirst=True)
         # self.check_events.start()
-        self.create_users_in_db.start()
 
     # @tasks.loop(minutes=1)
     # async def check_events(self):
