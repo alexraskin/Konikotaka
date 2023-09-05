@@ -14,37 +14,6 @@ class General(commands.Cog, name="General"):
         :return: the object of the class.
         """
         self.client = client
-        self.streamer_name = "pr3daturd574"
-        self.body = {
-            "client_id": os.getenv("TWITCH_CLIENT_ID"),
-            "client_secret": os.getenv("TWITCH_CLIENT_SECRET"),
-            "grant_type": "client_credentials",
-        }
-
-    async def check_if_live(self) -> set:
-        async with self.client.session.post(
-            "https://id.twitch.tv/oauth2/token", data=self.body
-        ) as response:
-            keys = await response.json()
-            headers = {
-                "Client-ID": self.client.config.twitch_client_id,
-                "Authorization": "Bearer " + keys["access_token"],
-            }
-        async with self.client.session.get(
-            f"https://api.twitch.tv/helix/streams?user_login={self.streamer_name}",
-            headers=headers,
-        ) as response:
-            stream_data = await response.json()
-            if len(stream_data["data"]) == 1:
-                if stream_data["data"][0]["type"] == "live":
-                    return (
-                        True,
-                        stream_data["data"][0]["game_name"],
-                        stream_data["data"][0]["title"],
-                        stream_data["data"][0]["thumbnail_url"],
-                    )
-            else:
-                return False, None, None, None
 
     @commands.command(name="ping", help="Returns the latency of the bot.")
     async def ping(self, ctx):
@@ -90,6 +59,16 @@ class General(commands.Cog, name="General"):
         )
 
         await ctx.send(embed=embed)
+    
+    @commands.command(name="meme", help="Get a random meme!")
+    async def get_meme(self, ctx):
+        print(f"User {ctx.author} requested a meme.")
+        async with self.client.session.get("https://meme-api.com/gimme") as response:
+            if response.status == 200:
+                meme = await response.json()
+                await ctx.send(meme["url"])
+            else:
+                await ctx.send("Error getting meme!")
 
     @commands.Cog.listener()
     async def on_message(self, message):
