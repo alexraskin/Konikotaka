@@ -97,23 +97,6 @@ class General(commands.Cog, name="General"):
         if message.author == self.client.user:
             return
 
-        if 'cosmo' in message.content.lower():
-            m = await message.channel.send("Meow!")
-            await m.add_reaction("🐈")
-
-        if 'pat' in message.content.lower():
-            m = await message.channel.send("Pat is the best!")
-            await m.add_reaction("👍")
-
-        if 'snad' in message.content.lower():
-            m = await message.channel.send("Snad is dumb!")
-            await m.add_reaction("🤡")
-
-        if 'seaira' in message.content.lower():
-            m = await message.channel.send("Seaira is the queen of the world!")
-            await m.add_reaction("👑")
-            await m.add_reaction("🌎")
-
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):

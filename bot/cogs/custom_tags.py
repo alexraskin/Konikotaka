@@ -18,13 +18,16 @@ class Tags(commands.Cog, name="Custom Tags"):
                 .filter(CustomTags.name == tag_name)
                 .first()
             )
-            if tag:
-                add_one = int(tag.called) + 1
-                tag.called = add_one
-                self.client.db_session.commit()
-                await ctx.send(tag.content)
+            if tag.discord_id == ctx.author.id:
+              if tag:
+                  add_one = int(float(tag.called)) + 1
+                  tag.called = add_one
+                  self.client.db_session.commit()
+                  await ctx.send(tag.content)
+              else:
+                  await ctx.send(f"Tag `{tag_name}` not found.")
             else:
-                await ctx.send(f"Tag `{tag_name}` not found.")
+              await ctx.send("You are not the owner of this tag.")
         except Exception as e:
             print(e)
             await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
@@ -63,14 +66,15 @@ class Tags(commands.Cog, name="Custom Tags"):
                 .filter(CustomTags.name == tag_name)
                 .first()
             )
-            if tag.discord_id != ctx.author.id:
-                return await ctx.send("You are not the owner of this tag.")
-            if tag:
-                tag.content = tag_content
-                self.client.db_session.commit()
-                await ctx.send(f"Tag `{tag_name}` edited!")
+            if tag.discord_id == ctx.author.id:
+              if tag:
+                  tag.content = tag_content
+                  self.client.db_session.commit()
+                  await ctx.send(f"Tag `{tag_name}` edited!")
+              else:
+                  await ctx.send(f"Tag `{tag_name}` not found.")
             else:
-                await ctx.send(f"Tag `{tag_name}` not found.")
+              await ctx.send("You are not the owner of this tag.")
         except Exception as e:
             print(e)
             self.client.db_session.rollback()
