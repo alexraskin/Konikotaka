@@ -19,8 +19,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                 .first()
             )
             if tag:
-                add_one = int(float(tag.called)) + 1
-                tag.called = add_one
+                tag.called = int(str(tag.called).strip()) + 1
                 self.client.db_session.commit()
                 await ctx.send(tag.content)
             else:
@@ -63,7 +62,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                 .filter(CustomTags.name == tag_name)
                 .first()
             )
-            if tag.discord_id == ctx.author.id:
+            if int(str(tag.discord_id).strip()) == ctx.author.id:
               if tag:
                   tag.content = tag_content
                   self.client.db_session.commit()
@@ -105,7 +104,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                 .filter(CustomTags.name == tag_name)
                 .first()
             )
-            if tag.discord_id != ctx.author.id:
+            if int(str(tag.discord_id).strip()) != ctx.author.id:
                 return await ctx.send("You are not the owner of this tag.")
             if tag:
                 self.client.db_session.delete(tag)
