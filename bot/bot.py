@@ -4,7 +4,7 @@ import random
 import time
 
 from aiohttp import ClientSession, ClientTimeout
-from discord import ActivityType, Game, Intents
+from discord import Intents, Game
 from discord.ext import tasks
 from discord.ext.commands import Bot, DefaultHelpCommand
 from sqlalchemy import create_engine
@@ -79,18 +79,19 @@ async def change_activity():
         ".help",
         "Fishing in Lumbridge",
         "Grand Exchange",
-        "Smite",
+        "SMITE",
         "Overwatch 2",
         ".cats",
         "with Bartholomeow",
         "With Snad's Mom",
         "Annoying Seaira",
+        "/newpet"
     ]
     await client.change_presence(
         activity=Game(
             name=random.choice(list(activities)),
-            type=ActivityType.playing,
-            emoji=":cosmo:1146224388220391434",
+            emoji="<:cosmo:1146224388220391434>",
+            
         )
     )
 

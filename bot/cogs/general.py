@@ -1,9 +1,8 @@
 import os
 import platform
-from datetime import datetime, timedelta, timezone
 
 from discord import Embed
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 from models.db import Base
 from models.users import DiscordUser
@@ -21,18 +20,6 @@ class General(commands.Cog, name="General"):
         self.guild = os.getenv("GUILD_ID")
         self.channel = self.client.get_channel(os.getenv("GENERAL_CHANNEL_ID"))
         Base.metadata.create_all(self.client.engine, checkfirst=True)
-        # self.check_events.start()
-
-    # @tasks.loop(minutes=1)
-    # async def check_events(self):
-    #     guild = await self.client.fetch_guild(self.guild)
-    #     events = await guild.fetch_scheduled_events()
-    #     channel = await self.client.fetch_channel(os.getenv("GENERAL_CHANNEL_ID"))
-    #     for event in events:
-    #         time_difference = datetime.fromisoformat(str(event.start_time)) - datetime.now(timezone.utc)
-    #         if time_difference < timedelta(hours=1):
-    #             await channel.send(f"**{event.name}** is starting soon!\n{event.url}")
-
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member):
@@ -146,11 +133,4 @@ class General(commands.Cog, name="General"):
 
 
 async def setup(client):
-    """
-    The setup function is used to register the commands that will be used in the bot.
-    This function is run when you load a cog, and it allows you to use commands in your cogs.
-
-    :param client: Used to pass in the client object.
-    :return: a dictionary that contains the following keys:.
-    """
     await client.add_cog(General(client))
