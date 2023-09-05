@@ -1,8 +1,9 @@
 import os
 import platform
+from datetime import datetime, timedelta, timezone
 
 from discord import Embed
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 
 class General(commands.Cog, name="General"):
@@ -14,6 +15,18 @@ class General(commands.Cog, name="General"):
         :return: the object of the class.
         """
         self.client = client
+        self.guild = os.getenv("GUILD_ID")
+        # self.check_events.start()
+
+    # @tasks.loop(minutes=1)
+    # async def check_events(self):
+    #     guild = await self.client.fetch_guild(self.guild)
+    #     events = await guild.fetch_scheduled_events()
+    #     channel = await self.client.fetch_channel(os.getenv("GENERAL_CHANNEL_ID"))
+    #     for event in events:
+    #         time_difference = datetime.fromisoformat(str(event.start_time)) - datetime.now(timezone.utc)
+    #         if time_difference < timedelta(hours=1):
+    #             await channel.send(f"**{event.name}** is starting soon!\n{event.url}")
 
     @commands.command(name="ping", help="Returns the latency of the bot.")
     async def ping(self, ctx):
