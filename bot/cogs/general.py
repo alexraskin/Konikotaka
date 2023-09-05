@@ -34,26 +34,22 @@ class General(commands.Cog, name="General"):
     #         if time_difference < timedelta(hours=1):
     #             await channel.send(f"**{event.name}** is starting soon!\n{event.url}")
 
-    @tasks.loop(count=1)
-    async def create_users_in_db(self):
-        guild = await self.client.fetch_guild(self.guild)
-        async for member in guild.fetch_members(limit=None):
-            try:
-                member = DiscordUser(
-                    discord_id=member.id,
-                    username=member.name,
-                    joined=member.joined_at
-                )
-                print("Adding member to db", member)
-                self.client.db_session.add(member)
-                self.client.db_session.commit()
-            except Exception as e:
-                print(e)
-                self.client.db_session.rollback()
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member):
-        self.channel.send(f"Welcome {member.mention}, to {self.guild.name}!\nI hope you enjoy your stay!")
+        try:
+            user = DiscordUser(
+                discord_id=member.id,
+                username=member.name,
+                joined=member.joined_at,
+            )
+            self.client.db_session.add(user)
+            self.client.db_session.commit()
+        except Exception as e:
+            print(e)
+            self.client.db_session.rollback()
+        message = self.channel.send(f"Welcome {member.mention}, to {self.guild.name}!\nI hope you enjoy your stay!")
+        await message.add_reaction("👋")
 
     @commands.command(name="ping", help="Returns the latency of the bot.")
     async def ping(self, ctx):
