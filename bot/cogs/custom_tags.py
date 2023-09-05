@@ -44,7 +44,8 @@ class Tags(commands.Cog, name="Custom Tags"):
             )
             self.client.db_session.add(tag)
             self.client.db_session.commit()
-            await ctx.send(f"Tag `{tag_name}` added!")
+            message = await ctx.send(f"Tag `{tag_name}` added!")
+            await message.add_reaction("👍")
         except Exception as e:
             print(e)
             self.client.db_session.rollback()
