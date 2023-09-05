@@ -37,7 +37,10 @@ class Tags(commands.Cog, name="Custom Tags"):
             return await ctx.send("Tag content is too long.")
         try:
             tag = CustomTags(
-                name=tag_name.strip(), content=tag_content, discord_id=ctx.author.id, date_added=ctx.message.created_at
+                name=tag_name.strip(),
+                content=tag_content,
+                discord_id=ctx.author.id,
+                date_added=ctx.message.created_at.strftime('%Y-%m-%d %H:%M:%S %Z%z')
             )
             self.client.db_session.add(tag)
             self.client.db_session.commit()
