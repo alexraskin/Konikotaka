@@ -12,7 +12,7 @@ class Admin(commands.Cog, name="Admin"):
             for cog in self.client.extensions.copy():
                 await self.client.unload_extension(cog)
                 await self.client.load_extension(cog)
-                print(f"Reload Command Executed by {ctx.author}")
+            print(f"Reload Command Executed by {ctx.author}")
             embed = Embed(
                 title="Cog Reload 🔃",
                 description="I have reloaded all the cogs successfully ✅",
