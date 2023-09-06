@@ -1,11 +1,14 @@
 import random
 import datetime
+import logging
 
 from discord import Embed, Interaction, app_commands
 from discord.ext import commands, tasks
 from models.pet import Pet
 from models.db import Base
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 class Pets(commands.Cog, name="Pets"):
     def __init__(self, client: commands.Bot):
@@ -56,12 +59,13 @@ class Pets(commands.Cog, name="Pets"):
                 await interaction.response.send_message(
                     f"Your pet **{str(pet_name).capitalize()}** has been created! <:wiseoldman:1147920787471347732>"
                 )
+                log.info(f"User {interaction.user} created a pet named {pet_name}.")
         except Exception as e:
             self.client.db_session.rollback()
             await interaction.response.send_message(
                 "An error occurred while creating your pet.", ephemeral=True
             )
-            print(f"Error: {e}")
+            log.error(f"Error: {e}")
 
     @app_commands.command(name="givetreat")
     async def feed(self, interaction: Interaction):
@@ -94,7 +98,7 @@ class Pets(commands.Cog, name="Pets"):
                 "An error occurred while feeding your pet (check your pet's name).",
                 ephemeral=True,
             )
-            print(f"Error: {e}")
+            log.info(f"Error: {e}")
             self.client.db_session.rollback()
 
     @app_commands.command(name="buytreats")
@@ -117,12 +121,13 @@ class Pets(commands.Cog, name="Pets"):
             await interaction.response.send_message(
                 f"You bought **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(owned_pet.pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
             )
+            lo
         except Exception as e:
             await interaction.response.send_message(
                 "An error occurred while getting treats for your pet (check your pet's name).",
                 ephemeral=True,
             )
-            print(f"Error: {e}")
+            log.error(f"Error: {e}")
             self.client.db_session.rollback()
 
     @app_commands.command(name="pethunger")

@@ -1,5 +1,6 @@
 import os
 import platform
+import logging
 
 from discord import Embed
 from discord.ext import commands
@@ -7,15 +8,11 @@ from discord.ext import commands
 from models.db import Base
 from models.users import DiscordUser
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 class General(commands.Cog, name="General"):
     def __init__(self, client: commands.Bot):
-        """
-        General commands
-        :param self: Used to refer to the object itself.
-        :param client: Used to pass the client object to the class.
-        :return: the object of the class.
-        """
         self.client = client
         self.guild = os.getenv("GUILD_ID")
         self.channel = self.client.get_channel(os.getenv("GENERAL_CHANNEL_ID"))
@@ -32,26 +29,28 @@ class General(commands.Cog, name="General"):
             self.client.db_session.add(user)
             self.client.db_session.commit()
         except Exception as e:
-            print(e)
+            log.error(e)
             self.client.db_session.rollback()
-        message = self.channel.send(f"Welcome {member.mention}, to {self.guild.name}!\nI hope you enjoy your stay!")
+        message = self.channel.send(
+            f"Welcome {member.mention}, to {self.guild.name}!\nI hope you enjoy your stay!"
+        )
         await message.add_reaction("👋")
 
-    @commands.command(name="ping", help="Returns the latency of the bot.")
+    @commands.hybrid_command(name="ping", help="Returns the latency of the bot.", with_app_command=True)
     async def ping(self, ctx):
-        print(f"User {ctx.author} pinged the bot.")
+        log.info(f"User {ctx.author} pinged the bot.")
         await ctx.send(
             f"Pong!\n**Node: {platform.node()}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
         )
 
-    @commands.command("website", help="See more photos of Cosmo!")
+    @commands.hybrid_command("website", help="See more photos of Cosmo!", with_app_command=True)
     async def website(self, ctx):
-        print(f"User {ctx.author} requested the website.")
+        log.info(f"User {ctx.author} requested the website.")
         await ctx.send("View more photos of Cosmo, here -> https://cosmo.twizy.dev")
 
-    @commands.command(name="cosmo", help="Get a random Photo of Cosmo the Cat")
+    @commands.hybrid_command(name="cosmo", help="Get a random Photo of Cosmo the Cat", with_app_command=True)
     async def get_cat_photo(self, ctx):
-        print(f"User {ctx.author} requested a photo of Cosmo the Cat.")
+        log.info(f"User {ctx.author} requested a photo of Cosmo the Cat.")
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
@@ -59,9 +58,9 @@ class General(commands.Cog, name="General"):
             else:
                 await ctx.send("Error getting photo of Cosmo!")
 
-    @commands.command(name="cats", help="Get a random photo of Pat and Ash's cats")
+    @commands.hybrid_command(name="cats", help="Get a random photo of Pat and Ash's cats", with_app_command=True)
     async def get_cats_photo(self, ctx):
-        print(f"User {ctx.author} requested a photo of Pat and Ash's cats.")
+        log.info(f"User {ctx.author} requested a photo of Pat and Ash's cats.")
         async with self.client.session.get("https://api.twizy.dev/cats") as response:
             if response.status == 200:
                 photo = await response.json()
@@ -69,8 +68,8 @@ class General(commands.Cog, name="General"):
             else:
                 await ctx.send("Error getting photo of Pat and Ash's cats!")
 
-    @commands.command(
-        name="uptime", aliases=["up"], description="Shows the uptime of the bot"
+    @commands.hybrid_command(
+        name="uptime", aliases=["up"], description="Shows the uptime of the bot", with_app_command=True
     )
     async def uptime(self, ctx):
         embed = Embed(
@@ -81,10 +80,10 @@ class General(commands.Cog, name="General"):
         )
 
         await ctx.send(embed=embed)
-    
-    @commands.command(name="meme", help="Get a random meme!")
+
+    @commands.hybrid_command(name="meme", help="Get a random meme!", with_app_command=True)
     async def get_meme(self, ctx):
-        print(f"User {ctx.author} requested a meme.")
+        log.info(f"User {ctx.author} requested a meme.")
         async with self.client.session.get("https://meme-api.com/gimme") as response:
             if response.status == 200:
                 meme = await response.json()

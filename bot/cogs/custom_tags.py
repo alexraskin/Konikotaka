@@ -1,16 +1,19 @@
 from discord.ext import commands
 from discord import Embed
+import logging
 
 from models.tags import CustomTags
 from models.db import Base
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 class Tags(commands.Cog, name="Custom Tags"):
     def __init__(self, client) -> None:
         self.client = client
         Base.metadata.create_all(self.client.engine, checkfirst=True)
 
-    @commands.command(name="tag", description="Lookup a tag")
+    @commands.hybrid_command(name="tag", description="Lookup a tag", with_app_command=True)
     async def tag(self, ctx: commands.Context, tag_name: str):
         try:
             tag = (
@@ -25,10 +28,10 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
         except Exception as e:
-            print(e)
+            log.error(e)
             await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
 
-    @commands.command(name="addtag", description="Add a new tag")
+    @commands.hybrid_command(name="addtag", description="Add a new tag", with_app_command=True)
     async def add_tag(self, ctx: commands.Context, tag_name: str, *, tag_content: str):
         if len(tag_name) > 255:
             return await ctx.send("Tag name is too long.")
@@ -39,18 +42,21 @@ class Tags(commands.Cog, name="Custom Tags"):
                 name=tag_name.strip(),
                 content=tag_content,
                 discord_id=ctx.author.id,
-                date_added=ctx.message.created_at.strftime('%Y-%m-%d %H:%M:%S %Z%z')
+                date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
             )
             self.client.db_session.add(tag)
             self.client.db_session.commit()
             message = await ctx.send(f"Tag `{tag_name}` added!")
             await message.add_reaction("👍")
+            log.info(
+                f"User {ctx.author} added a tag named {tag_name}"
+            )
         except Exception as e:
-            print(e)
+            log.error(e)
             self.client.db_session.rollback()
             await ctx.send("An error occurred while adding the tag.", ephemeral=True)
-    
-    @commands.command(name="edittag", description="Edit a tag")
+
+    @commands.hybrid_command(name="edittag", description="Edit a tag", with_app_command=True)
     async def edit_tag(self, ctx: commands.Context, tag_name: str, *, tag_content: str):
         if len(tag_name) > 255:
             return await ctx.send("Tag name is too long.")
@@ -63,20 +69,20 @@ class Tags(commands.Cog, name="Custom Tags"):
                 .first()
             )
             if int(str(tag.discord_id).strip()) == ctx.author.id:
-              if tag:
-                  tag.content = tag_content
-                  self.client.db_session.commit()
-                  await ctx.send(f"Tag `{tag_name}` edited!")
-              else:
-                  await ctx.send(f"Tag `{tag_name}` not found.")
+                if tag:
+                    tag.content = tag_content
+                    self.client.db_session.commit()
+                    await ctx.send(f"Tag `{tag_name}` edited!")
+                else:
+                    await ctx.send(f"Tag `{tag_name}` not found.")
             else:
-              await ctx.send("You are not the owner of this tag.")
+                await ctx.send("You are not the owner of this tag.")
         except Exception as e:
-            print(e)
+            log.error(e)
             self.client.db_session.rollback()
             await ctx.send("An error occurred while editing the tag.", ephemeral=True)
-      
-    @commands.command(name="taginfo", description="Get info about a tag")
+
+    @commands.hybrid_command(name="taginfo", description="Get info about a tag", with_app_command=True)
     async def tag_info(self, ctx: commands.Context, tag_name: str):
         try:
             tag = (
@@ -93,10 +99,10 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
         except Exception as e:
-            print(e)
+            log.error(e)
             await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
 
-    @commands.command(name="deltag", description="Delete a tag")
+    @commands.hybrid_command(name="deltag", description="Delete a tag", with_app_command=True)
     async def del_tag(self, ctx: commands.Context, tag_name: str):
         try:
             tag = (
@@ -113,7 +119,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
         except Exception as e:
-            print(e)
+            log.error(e)
             self.client.db_session.rollback()
             await ctx.send("An error occurred while deleting the tag.", ephemeral=True)
 

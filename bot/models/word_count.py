@@ -1,6 +1,7 @@
 from models.db import Base
 from sqlalchemy import Column, Integer, VARCHAR, BIGINT
 
+
 class WordCount(Base):
     __tablename__ = "word_count"
     id = Column(Integer, primary_key=True)

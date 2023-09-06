@@ -1,18 +1,23 @@
 from discord import Embed
 from discord.ext import commands
+import logging
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 
 class Admin(commands.Cog, name="Admin"):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.command(name="reload", hidden=True)
+    @commands.hybrid_command(name="reload", hidden=True, with_app_command=True)
+    @commands.is_owner()
     async def reload(self, ctx, extension=None):
         if extension is None:
             for cog in self.client.extensions.copy():
                 await self.client.unload_extension(cog)
                 await self.client.load_extension(cog)
-            print(f"Reload Command Executed by {ctx.author}")
+            log.info(f"Reload Command Executed by {ctx.author}")
             embed = Embed(
                 title="Cog Reload 🔃",
                 description="I have reloaded all the cogs successfully ✅",
@@ -22,7 +27,7 @@ class Admin(commands.Cog, name="Admin"):
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
         else:
-            print(
+            log.info(
                 f"Reloaded: {str(extension).upper()} COG - Command Executed by {ctx.author}"
             )
             await self.client.unload_extension(f"cogs.{extension}")
@@ -36,10 +41,11 @@ class Admin(commands.Cog, name="Admin"):
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
 
-    @commands.command(name="sync", hidden=True)
+    @commands.hybrid_command(name="sync", hidden=True, with_app_command=True)
+    @commands.is_owner()
     async def sync(self, ctx: commands.Context):
         await self.client.tree.sync()
-        print(f"Sync Command Executed by {ctx.author}")
+        log.info(f"Sync Command Executed by {ctx.author}")
         embed = Embed(
             title="Command Sync 🌳",
             description="Successfully Synced Commands ✅",
@@ -48,7 +54,8 @@ class Admin(commands.Cog, name="Admin"):
         )
         await ctx.send(embed=embed)
 
-    @commands.command(name="purge", hidden=True)
+    @commands.hybrid_command(name="purge", hidden=True)
+    @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx: commands.Context, amount: int, reason: str = None):
         if amount <= 0:
             await ctx.send("Please specify a positive number of messages to delete.")

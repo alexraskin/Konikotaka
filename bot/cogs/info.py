@@ -1,15 +1,18 @@
 import platform
+import logging
 
 from discord import Embed
 from discord import __version__ as discord_version
 from discord.ext import commands
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 class Info(commands.Cog, name="Info"):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.command(name="info", help="Get info about the bot")
+    @commands.hybrid_command(name="info", help="Get info about the bot", with_app_command=True)
     async def get_info(self, ctx):
         embed = Embed(
             title="WiseOldManBot",
@@ -26,8 +29,13 @@ class Info(commands.Cog, name="Info"):
         embed.set_thumbnail(
             url="https://i.gyazo.com/5ebe2c95171d17d96f83822de0366974.jpg"
         )
-        print(f"User {ctx.author} requested info about the bot.")
+        log.info(f"User {ctx.author} requested info about the bot.")
         await ctx.send(embed=embed)
+
+    @get_info.error
+    async def get_info_error(self, ctx, error):
+        log.error(f"Error getting info about the bot: {error}")
+        await ctx.send("Error getting info about the bot.", delete_after=5)
 
 
 async def setup(client):
