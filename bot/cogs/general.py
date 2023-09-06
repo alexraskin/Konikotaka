@@ -36,13 +36,6 @@ class General(commands.Cog, name="General"):
         )
         await message.add_reaction("👋")
 
-    @commands.hybrid_command(name="ping", help="Returns the latency of the bot.", with_app_command=True)
-    async def ping(self, ctx):
-        log.info(f"User {ctx.author} pinged the bot.")
-        await ctx.send(
-            f"Pong!\n**Node: {platform.node()}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
-        )
-
     @commands.hybrid_command("website", help="See more photos of Cosmo!", with_app_command=True)
     async def website(self, ctx):
         log.info(f"User {ctx.author} requested the website.")
@@ -67,19 +60,6 @@ class General(commands.Cog, name="General"):
                 await ctx.send(photo["photoUrl"])
             else:
                 await ctx.send("Error getting photo of Pat and Ash's cats!")
-
-    @commands.hybrid_command(
-        name="uptime", aliases=["up"], description="Shows the uptime of the bot", with_app_command=True
-    )
-    async def uptime(self, ctx):
-        embed = Embed(
-            title="Bot Uptime",
-            description=f"Uptime: {self.client.get_uptime()}",
-            color=0x42F56C,
-            timestamp=ctx.message.created_at,
-        )
-
-        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="meme", help="Get a random meme!", with_app_command=True)
     async def get_meme(self, ctx):

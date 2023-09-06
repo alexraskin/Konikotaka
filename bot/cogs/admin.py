@@ -41,7 +41,7 @@ class Admin(commands.Cog, name="Admin"):
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
 
-    @commands.hybrid_command(name="sync", hidden=True, with_app_command=True)
+    @commands.command(name="sync", hidden=True)
     @commands.is_owner()
     async def sync(self, ctx: commands.Context):
         await self.client.tree.sync()
