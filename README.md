@@ -1,6 +1,7 @@
 # OldWiseDiscordBot
 
-![icon](https://i.gyazo.com/5ebe2c95171d17d96f83822de0366974.jpg)
+<a href="https://gyazo.com/b44411736275628586cc8b3ff4239789"><img src="https://i.gyazo.com/b44411736275628586cc8b3ff4239789.jpg" alt="Image from Gyazo" width="200"/></a>
+
 ## Description
 A fun bot I wrote for my discord server.
 
