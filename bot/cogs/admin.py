@@ -17,7 +17,7 @@ class Admin(commands.Cog, name="Admin"):
             for cog in self.client.extensions.copy():
                 await self.client.unload_extension(cog)
                 await self.client.load_extension(cog)
-            log.info(f"Reload Command Executed by {ctx.author}")
+            self.client.log.info(f"Reload Command Executed by {ctx.author}")
             embed = Embed(
                 title="Cog Reload 🔃",
                 description="I have reloaded all the cogs successfully ✅",
@@ -27,7 +27,7 @@ class Admin(commands.Cog, name="Admin"):
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
         else:
-            log.info(
+            self.client.log.info(
                 f"Reloaded: {str(extension).upper()} COG - Command Executed by {ctx.author}"
             )
             await self.client.unload_extension(f"cogs.{extension}")
@@ -45,7 +45,7 @@ class Admin(commands.Cog, name="Admin"):
     @commands.is_owner()
     async def sync(self, ctx: commands.Context):
         await self.client.tree.sync()
-        log.info(f"Sync Command Executed by {ctx.author}")
+        self.client.log.info(f"Sync Command Executed by {ctx.author}")
         embed = Embed(
             title="Command Sync 🌳",
             description="Successfully Synced Commands ✅",
@@ -64,7 +64,7 @@ class Admin(commands.Cog, name="Admin"):
             amount += 1
             await ctx.channel.purge(limit=amount, reason=reason)
         except Exception as e:
-            print(f"Error: {e}")
+            self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while purging messages.", ephemeral=True)
             return
         message = await ctx.send("I have purged those messages for you.")

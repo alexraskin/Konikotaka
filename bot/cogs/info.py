@@ -1,5 +1,6 @@
-import platform
+import os
 import logging
+import platform
 
 from discord import Embed
 from discord import __version__ as discord_version
@@ -20,7 +21,7 @@ class Info(commands.Cog, name="Info"):
             color=0x42F56C,
             timestamp=ctx.message.created_at,
         )
-        embed.add_field(name="Node Name", value=platform.node())
+        embed.add_field(name="Node Name", value=os.getenv("NODE_NAME"))
         embed.add_field(name="Uptime", value=self.client.get_uptime())
         embed.add_field(name="Bot Version", value="1.0.0")
         embed.add_field(name="Python Version", value=platform.python_version())
@@ -41,7 +42,7 @@ class Info(commands.Cog, name="Info"):
     async def ping(self, ctx):
         log.info(f"User {ctx.author} pinged the bot.")
         await ctx.send(
-            f"Pong!\n**Node: {platform.node()}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
+            f"Pong!\n**Node: {os.getenv('NODE_NAME')}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
         )
     
     @ping.error

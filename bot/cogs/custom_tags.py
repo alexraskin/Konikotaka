@@ -28,7 +28,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
         except Exception as e:
-            log.error(e)
+            self.client.log.error(e)
             await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
 
     @commands.hybrid_command(name="addtag", description="Add a new tag", with_app_command=True)
@@ -48,11 +48,11 @@ class Tags(commands.Cog, name="Custom Tags"):
             self.client.db_session.commit()
             message = await ctx.send(f"Tag `{tag_name}` added!")
             await message.add_reaction("👍")
-            log.info(
+            self.client.log.info(
                 f"User {ctx.author} added a tag named {tag_name}"
             )
         except Exception as e:
-            log.error(e)
+            self.client.log.error(e)
             self.client.db_session.rollback()
             await ctx.send("An error occurred while adding the tag.", ephemeral=True)
 
@@ -78,7 +78,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send("You are not the owner of this tag.")
         except Exception as e:
-            log.error(e)
+            self.client.log.error(e)
             self.client.db_session.rollback()
             await ctx.send("An error occurred while editing the tag.", ephemeral=True)
 
@@ -99,7 +99,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
         except Exception as e:
-            log.error(e)
+            self.client.log.error(e)
             await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
 
     @commands.hybrid_command(name="deltag", description="Delete a tag", with_app_command=True)
@@ -119,7 +119,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
         except Exception as e:
-            log.error(e)
+            self.client.log.error(e)
             self.client.db_session.rollback()
             await ctx.send("An error occurred while deleting the tag.", ephemeral=True)
 

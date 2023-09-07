@@ -28,8 +28,9 @@ class General(commands.Cog, name="General"):
             )
             self.client.db_session.add(user)
             self.client.db_session.commit()
+            self.client.log.info(f"User {member} joined the server.")
         except Exception as e:
-            log.error(e)
+            self.client.log.error(e)
             self.client.db_session.rollback()
         message = self.channel.send(
             f"Welcome {member.mention}, to {self.guild.name}!\nI hope you enjoy your stay!"
@@ -79,16 +80,16 @@ class General(commands.Cog, name="General"):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
-            print(
+            self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct role."
             )
             await ctx.send("You do not have the correct role for this command.")
         elif isinstance(error, commands.errors.CommandNotFound):
-            print(
+            self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} which does not exist."
             )
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            print(
+            self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."
             )
             await ctx.send("Missing required argument.")
