@@ -1,6 +1,6 @@
 import os
-import platform
 import logging
+import upsidedown
 
 from discord import Embed
 from discord.ext import commands
@@ -71,6 +71,13 @@ class General(commands.Cog, name="General"):
                 await ctx.send(meme["url"])
             else:
                 await ctx.send("Error getting meme!")
+
+    @commands.hybrid_command(name="gcattalk", help="Be able to speak with G Cat", with_app_command=True)
+    async def gcat_talk(self, ctx, *, message: str):
+        log.info(f"User {ctx.author} sent a message to G Cat.")
+        up_down = upsidedown.transform(message)
+        await ctx.send(up_down)
+    
 
     @commands.Cog.listener()
     async def on_message(self, message):

@@ -15,4 +15,5 @@ python-dotenv==1.0.0
 python-osrsapi==0.0.5
 SQLAlchemy==2.0.20
 typing_extensions==4.7.1
+upsidedown==0.4
 yarl==1.9.2

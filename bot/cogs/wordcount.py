@@ -28,8 +28,10 @@ class WordCounter(commands.Cog, name="Word Count"):
         for word in self.word_list:
             if word.word in message.content.lower():
                 word.count += 1
-                await channel.send(f"Word `{str(word.word).capitalize()}` has been said {word.count} times.")
-                self.client.db_session.commit()
+                if message.guild.id == self.client.comso_guild:
+                  if message.channel.id != 1149054364795805779:
+                      await channel.send(f"Word `{str(word.word).capitalize()}` has been said {word.count} times.")
+                      self.client.db_session.commit()
 
     @commands.hybrid_command(
         name="addword", description="Add a new word to track the amount of times it has been said.", with_app_command=True
