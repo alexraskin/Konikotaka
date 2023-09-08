@@ -200,7 +200,7 @@ class Pets(commands.Cog, name="Pets"):
             await interaction.response.send_message(embed=embed)
         except Exception as e:
             await interaction.response.send_message(
-                "An error occurred while getting all pets.", ephemeral=True
+                "An error occurred while getting your pets information", ephemeral=True
             )
             self.client.log.error(f"Error: {e}")
             self.client.db_session.rollback()

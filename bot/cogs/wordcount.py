@@ -28,7 +28,7 @@ class WordCounter(commands.Cog, name="Word Count"):
         for word in self.word_list:
             if word.word in message.content.lower():
                 word.count += 1
-                if message.guild.id == self.client.comso_guild:
+                if message.guild.id == self.client.cosmo_guild:
                   if message.channel.id != 1149054364795805779:
                       await channel.send(f"Word `{str(word.word).capitalize()}` has been said {word.count} times.")
                       self.client.db_session.commit()

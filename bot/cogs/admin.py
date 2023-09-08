@@ -55,7 +55,7 @@ class Admin(commands.Cog, name="Admin"):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="purge", hidden=True)
-    @commands.has_permissions(manage_messages=True)
+    @commands.is_owner()
     async def purge(self, ctx: commands.Context, amount: int, reason: str = None):
         if amount <= 0:
             await ctx.send("Please specify a positive number of messages to delete.")
@@ -69,6 +69,15 @@ class Admin(commands.Cog, name="Admin"):
             return
         message = await ctx.send("I have purged those messages for you.")
         await message.delete(delay=3)
+
+    @purge.error
+    async def purge_error(self, ctx: commands.Context, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You do not have permission to use this command.", ephemeral=True)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Please specify the amount of messages to delete.", ephemeral=True)
+        else:
+            await ctx.send("An error occurred while purging messages.", ephemeral=True)
 
 
 async def setup(client):

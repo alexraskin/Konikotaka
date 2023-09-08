@@ -30,7 +30,7 @@ class WiseOldManBot(Bot):
         self.db_session = None
         self.start_time = time.time()
         self.log = log
-        self.comso_guild = 1020830000104099860
+        self.cosmo_guild = 1020830000104099860
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
