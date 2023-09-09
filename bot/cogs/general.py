@@ -41,15 +41,20 @@ class General(commands.Cog, name="General"):
             )
             embed.set_thumbnail(url=member.avatar_url)
             await guild.system_channel.send(embed=embed)
+    
+    @commands.command(name="source", help="Get the source code for the bot.")
+    async def source(self, ctx):
+        self.client.log.info(f"User {ctx.author} requested the source code.")
+        await ctx.send("https://github.com/alexraskin/WiseOldManBot")
 
     @commands.hybrid_command("website", help="See more photos of Cosmo!", with_app_command=True)
     async def website(self, ctx):
-        log.info(f"User {ctx.author} requested the website.")
+        self.client.log.info(f"User {ctx.author} requested the website.")
         await ctx.send("View more photos of Cosmo, here -> https://cosmo.twizy.dev")
 
     @commands.hybrid_command(name="cosmo", help="Get a random Photo of Cosmo the Cat", with_app_command=True)
     async def get_cat_photo(self, ctx):
-        log.info(f"User {ctx.author} requested a photo of Cosmo the Cat.")
+        self.client.log.info(f"User {ctx.author} requested a photo of Cosmo the Cat.")
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
@@ -59,7 +64,7 @@ class General(commands.Cog, name="General"):
 
     @commands.hybrid_command(name="cats", help="Get a random photo of Pat and Ash's cats", with_app_command=True)
     async def get_cats_photo(self, ctx):
-        log.info(f"User {ctx.author} requested a photo of Pat and Ash's cats.")
+        self.client.log.info(f"User {ctx.author} requested a photo of Pat and Ash's cats.")
         async with self.client.session.get("https://api.twizy.dev/cats") as response:
             if response.status == 200:
                 photo = await response.json()
@@ -69,7 +74,7 @@ class General(commands.Cog, name="General"):
 
     @commands.hybrid_command(name="meme", help="Get a random meme!", with_app_command=True)
     async def get_meme(self, ctx):
-        log.info(f"User {ctx.author} requested a meme.")
+        self.client.log.info(f"User {ctx.author} requested a meme.")
         async with self.client.session.get("https://meme-api.com/gimme") as response:
             if response.status == 200:
                 meme = await response.json()
@@ -79,7 +84,7 @@ class General(commands.Cog, name="General"):
 
     @commands.hybrid_command(name="gcattalk", help="Be able to speak with G Cat", with_app_command=True)
     async def gcat_talk(self, ctx, *, message: str):
-        log.info(f"User {ctx.author} sent a message to G Cat.")
+        self.client.log.info(f"User {ctx.author} sent a message to G Cat.")
         up_down = upsidedown.transform(message)
         await ctx.send(up_down)
     
