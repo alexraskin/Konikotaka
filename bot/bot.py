@@ -39,6 +39,7 @@ class WiseOldManBot(Bot):
 
     async def close(self) -> None:
         await self.session.close()
+        await self.engine.dispose()
         await super().close()
 
     async def on_ready(self):

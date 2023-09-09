@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 
 import upsidedown
 from discord import Embed, DMChannel
@@ -7,7 +8,7 @@ from discord.ext import commands, tasks
 from models.db import Base
 from models.users import DiscordUser
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 log = logging.getLogger(__name__)
 
 
@@ -30,8 +31,9 @@ class General(commands.Cog, name="General"):
             joined=member.joined_at,
         )
         async with self.client.async_session() as session:
-            await session.add(user)
             try:
+                session.add(user)
+                await session.flush()
                 await session.commit()
             except Exception as e:
                 self.client.log.error(e)
@@ -54,7 +56,7 @@ class General(commands.Cog, name="General"):
         await ctx.send("https://github.com/alexraskin/WiseOldManBot")
 
     @commands.hybrid_command(
-        "website", help="See more photos of Cosmo!", with_app_command=True
+        name="website", help="See more photos of Cosmo!", with_app_command=True
     )
     async def website(self, ctx):
         self.client.log.info(f"User {ctx.author} requested the website.")
@@ -110,6 +112,12 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        gif_list = [
+            "https://media.tenor.com/0He0W1M2LFcAAAAC/lost-gnome.gif",
+            "https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif",
+            "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif"
+
+        ]
         if message.author == self.client.user:
             return
 
@@ -124,7 +132,7 @@ class General(commands.Cog, name="General"):
             if message.content.startswith("https://discordapp.com/invite/"):
                 await message.channel.send("No.")
                 return
-            await message.channel.send("https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif")
+            await message.channel.send(random.choice(list(gif_list)))
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):

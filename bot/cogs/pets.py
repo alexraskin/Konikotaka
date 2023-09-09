@@ -34,8 +34,8 @@ class Pets(commands.Cog, name="Pets"):
             for pet in self.pets:
                 pet.hunger -= 1
                 try:
-                    await session.commit()
                     await session.flush()
+                    await session.commit()
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
@@ -49,8 +49,8 @@ class Pets(commands.Cog, name="Pets"):
                 else:
                     pet.happiness -= 1
                 try:
-                    await session.commit()
                     await session.flush()
+                    await session.commit()
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
@@ -77,9 +77,9 @@ class Pets(commands.Cog, name="Pets"):
                     last_fed=datetime.datetime.utcnow(),
                 )
                 try:
-                    await session.add(pet)
-                    await session.commit()
+                    session.add(pet)
                     await session.flush()
+                    await session.commit()
                 except Exception as e:
                     self.client.log.error(e)
                     session.rollback()
@@ -112,8 +112,8 @@ class Pets(commands.Cog, name="Pets"):
             owned_pet.hunger += quantity
             owned_pet.last_fed = datetime.datetime.utcnow()
             try:
-                await session.commit()
                 await session.flush()
+                await session.commit()
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
@@ -137,8 +137,8 @@ class Pets(commands.Cog, name="Pets"):
             quantity = random.randint(1, 10)
             owned_pet.treat_count += quantity
             try:
-                await session.commit()
                 await session.flush()
+                await session.commit()
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()

@@ -30,23 +30,16 @@ class Tags(commands.Cog, name="Custom Tags"):
         async with self.client.async_session() as session:
             query = await session.execute(select(CustomTags).filter(CustomTags.name == tag_name))
             tag = query.scalar_one_or_none()
-            if tag is None:
-                query = await session.query(select(CustomTags)).filter(CustomTags.name.like(f"%{tag_name}%"))
-                similar_tags = [row[0] for row in query.scalars()]
-                if len(similar_tags) > 0:
-                    await ctx.send("Did you mean one of these tags?\n" + "\n".join([f"`{tag.name}`" for tag in similar_tags]))
-                    return
-
             if tag:
                 tag.called = int(str(tag.called).strip()) + 1
+                await ctx.send(str(tag.content))
                 try:
-                  await session.commit()
                   await session.flush()
+                  await session.commit()
                 except Exception as e:
                   self.client.log.error(e)
                   await session.rollback()
                   await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
-                await ctx.send(tag.content)
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
@@ -62,23 +55,23 @@ class Tags(commands.Cog, name="Custom Tags"):
             return await ctx.send("Tag name is too long.")
         if len(tag_content) > 1000:
             return await ctx.send("Tag content is too long.")
-        tag = CustomTags(
-            name=tag_name.strip(),
-            content=tag_content,
-            discord_id=ctx.author.id,
-            date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
-        )
         async with self.client.async_session() as session:
-            try:
-                await session.add(tag)
-                await session.commit()
-                await self.db_session.flush()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-        message = await ctx.send(f"Tag `{tag_name}` added!")
-        await message.add_reaction("👍")
-        self.client.log.info(f"User {ctx.author} added a tag named {tag_name}")
+          tag = CustomTags(
+              name=tag_name.strip(),
+              content=tag_content,
+              discord_id=ctx.author.id,
+              date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z")
+            )
+          try:
+              session.add(tag)
+              await session.flush()
+              await session.commit()
+              message = await ctx.send(f"Tag `{tag_name}` added!")
+              await message.add_reaction("👍")
+              self.client.log.info(f"User {ctx.author} added a tag named {tag_name}")
+          except Exception as e:
+              self.client.log.error(e)
+              await session.rollback()
 
     @tag.command(aliases=["edit"])
     @commands.guild_only()
@@ -100,8 +93,8 @@ class Tags(commands.Cog, name="Custom Tags"):
                     return await ctx.send("You are not the owner of this tag.")
                 tag.content = tag_content
                 try:
-                    await session.commit()
                     await session.flush()
+                    await session.commit()
                 except Exception as e:
                     await ctx.send(
                         "An error occurred while editing the tag.", ephemeral=True
@@ -150,10 +143,10 @@ class Tags(commands.Cog, name="Custom Tags"):
             if int(str(tag.discord_id).strip()) != ctx.author.id:
                 return await ctx.send("You are not the owner of this tag.")
             if tag:
-                await session.delete(tag)
                 try:
-                  await session.commit()
+                  session.delete(tag)
                   await session.flush()
+                  await session.commit()
                 except Exception as e:
                   self.client.log.error(e)
                   await session.rollback()
