@@ -2,7 +2,7 @@ import os
 import logging
 import upsidedown
 
-from discord import Embed
+from discord import Embed, DMChannel
 from discord.ext import commands
 
 from models.db import Base
@@ -32,10 +32,15 @@ class General(commands.Cog, name="General"):
         except Exception as e:
             self.client.log.error(e)
             self.client.db_session.rollback()
-        message = self.channel.send(
-            f"Welcome {member.mention}, to {self.guild.name}!\nI hope you enjoy your stay!"
-        )
-        await message.add_reaction("👋")
+        guild = member.guild
+        if guild.system_channel is not None:
+            embed = Embed(
+                title="Welcome!",
+                description=f"Welcome {member.mention} to {guild.name}!",
+                color=0x00FF00,
+            )
+            embed.set_thumbnail(url=member.avatar_url)
+            await guild.system_channel.send(embed=embed)
 
     @commands.hybrid_command("website", help="See more photos of Cosmo!", with_app_command=True)
     async def website(self, ctx):
@@ -83,6 +88,19 @@ class General(commands.Cog, name="General"):
     async def on_message(self, message):
         if message.author == self.client.user:
             return
+
+        if isinstance(message.channel, DMChannel):
+            self.client.log.info(f"User {message.author} sent a DM.")
+            if message.content.startswith("https://discord.gg/"):
+                await message.channel.send("No.")
+                return
+            if message.content.startswith("https://discord.com/invite/"):
+                await message.channel.send("No.")
+                return
+            if message.content.startswith("https://discordapp.com/invite/"):
+                await message.channel.send("No.")
+                return
+            await message.channel.send("https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
