@@ -1,21 +1,19 @@
+import datetime
+import logging
 import os
 import random
-import logging
-import datetime
 import time
 
-from aiohttp import ClientSession, ClientTimeout
-from discord import Intents, Game
 import discord
-from discord.utils import utcnow
+from aiohttp import ClientSession, ClientTimeout
 from discord.ext import tasks
 from discord.ext.commands import Bot, DefaultHelpCommand
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from discord.utils import utcnow
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
-discord_token = os.getenv("DISCORD_TOKEN")
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("Discord")
@@ -23,19 +21,20 @@ log = logging.getLogger("Discord")
 
 class WiseOldManBot(Bot):
     bot_app_info: discord.AppInfo
+
     def __init__(self, *args, **options) -> None:
         super().__init__(*args, **options)
         self.session = None
-        self.engine = create_engine(os.getenv("MYSQL_URL"))
-        self.db_session = None
+        self.engine = create_async_engine(os.getenv("MYSQL_URL"), echo=True, future=True)
         self.start_time = time.time()
         self.log = log
         self.cosmo_guild = 1020830000104099860
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
-        self.DB_Session = sessionmaker(bind=self.engine)
-        self.db_session = self.DB_Session()
+        self.async_session = sessionmaker(
+            self.engine, expire_on_commit=False, class_=AsyncSession
+        )
         await super().start(*args, **kwargs)
 
     async def close(self) -> None:
@@ -79,7 +78,7 @@ help_command = DefaultHelpCommand(
 
 client = WiseOldManBot(
     command_prefix="?",
-    intents=Intents.all(),
+    intents=discord.Intents.all(),
     max_messages=10000,
     help_command=help_command,
     description="Hello, I am WiseOldManBot!",
@@ -104,9 +103,9 @@ async def change_activity():
         "Annoying Seaira",
         "/newpet",
     ]
-    r_choice = random.choice(list(activities))
-    await client.change_presence(activity=Game(name=r_choice))
-    client.log.info(f"Changed activity to {r_choice}.")
+    await client.change_presence(
+        activity=discord.Game(name=random.choice(list(activities)))
+    )
 
 
 @client.event
@@ -115,5 +114,5 @@ async def on_ready():
     change_activity.start()
 
 
-client.run(token=discord_token, reconnect=True, log_handler=None)
+client.run(token=os.getenv("DISCORD_TOKEN"), reconnect=True, log_handler=None)
 client.log.info(f"{client.user.name} has disconnected from Discord!")
