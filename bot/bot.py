@@ -25,7 +25,7 @@ class WiseOldManBot(Bot):
     def __init__(self, *args, **options) -> None:
         super().__init__(*args, **options)
         self.session = None
-        self.engine = create_async_engine(os.getenv("MYSQL_URL"), echo=True)
+        self.engine = create_async_engine(os.getenv("MYSQL_URL"), echo=True, future=True)
         self.start_time = time.time()
         self.log = log
         self.cosmo_guild = 1020830000104099860

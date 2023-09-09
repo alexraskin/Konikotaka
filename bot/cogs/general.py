@@ -1,6 +1,5 @@
 import logging
 import os
-import time
 
 import upsidedown
 from discord import Embed
@@ -31,12 +30,12 @@ class General(commands.Cog, name="General"):
             joined=member.joined_at,
         )
         async with self.client.async_session() as session:
-            session.add(user)
+            await session.add(user)
             try:
-                session.commit()
+                await session.commit()
             except Exception as e:
                 self.client.log.error(e)
-                session.rollback()
+                await session.rollback()
             self.client.log.info(f"User {member} joined the server.")
         guild = member.guild
         if guild.system_channel is not None:
