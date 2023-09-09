@@ -2,7 +2,7 @@ import logging
 import os
 
 import upsidedown
-from discord import Embed
+from discord import Embed, DMChannel
 from discord.ext import commands, tasks
 from models.db import Base
 from models.users import DiscordUser
