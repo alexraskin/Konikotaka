@@ -113,6 +113,19 @@ class General(commands.Cog, name="General"):
         if message.author == self.client.user:
             return
 
+        if isinstance(message.channel, DMChannel):
+            self.client.log.info(f"User {message.author} sent a DM.")
+            if message.content.startswith("https://discord.gg/"):
+                await message.channel.send("No.")
+                return
+            if message.content.startswith("https://discord.com/invite/"):
+                await message.channel.send("No.")
+                return
+            if message.content.startswith("https://discordapp.com/invite/"):
+                await message.channel.send("No.")
+                return
+            await message.channel.send("https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif")
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
