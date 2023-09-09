@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import Column, Integer, DATETIME, VARCHAR
+from sqlalchemy import DATETIME, VARCHAR, Column, Integer
 
 
 class DiscordUser(Base):

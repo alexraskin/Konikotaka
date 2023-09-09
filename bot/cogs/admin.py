@@ -1,6 +1,7 @@
+import logging
+
 from discord import Embed
 from discord.ext import commands
-import logging
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -73,9 +74,13 @@ class Admin(commands.Cog, name="Admin"):
     @purge.error
     async def purge_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
-            await ctx.send("You do not have permission to use this command.", ephemeral=True)
+            await ctx.send(
+                "You do not have permission to use this command.", ephemeral=True
+            )
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Please specify the amount of messages to delete.", ephemeral=True)
+            await ctx.send(
+                "Please specify the amount of messages to delete.", ephemeral=True
+            )
         else:
             await ctx.send("An error occurred while purging messages.", ephemeral=True)
 

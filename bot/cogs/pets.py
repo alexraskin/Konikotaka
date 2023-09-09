@@ -1,43 +1,66 @@
-import random
 import datetime
-import logging
+import random
 
 from discord import Embed, Interaction, app_commands
 from discord.ext import commands, tasks
-from models.pet import Pet
 from models.db import Base
+from models.pet import Pet
+
 
 class Pets(commands.Cog, name="Pets"):
     def __init__(self, client: commands.Bot):
         self.client = client
-        Base.metadata.create_all(self.client.engine, checkfirst=True)
-        self.pets = self.client.db_session.query(Pet).all()
         self.remove_hunger.start()
+        self.update_happiness.start()
+        self.init_database.start()
+
+    @tasks.loop(count=1)
+    async def init_database(self):
+        async with self.client.engine.begin() as session:
+            await session.run_sync(Base.metadata.create_all)
+
+    @tasks.loop(minutes=1)
+    async def get_pets(self):
+        async with self.client.async_session() as session:
+            self.pets = (
+                (await session.execute(session.query(Pet).all())).scalars().all()
+            )
+            self.pets = [pet for pet in self.pets]
 
     @tasks.loop(minutes=30)
     async def remove_hunger(self):
-        for pet in self.pets:
-            pet.hunger -= 1
-        self.client.db_session.commit()
+        async with self.client.async_session() as session:
+            for pet in self.pets:
+                pet.hunger -= 1
+                try:
+                    session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    session.rollback()
 
     @tasks.loop(minutes=120)
     async def update_happiness(self):
-        for pet in self.pets:
-            if pet.hunger > 5:
-                pet.happiness += 1
-            else:
-                pet.happiness -= 1
-        self.client.db_session.commit()
+        async with self.client.async_session() as session:
+            for pet in self.pets:
+                if pet.hunger > 5:
+                    pet.happiness += 1
+                else:
+                    pet.happiness -= 1
+                try:
+                    session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    session.rollback()
 
     @app_commands.command(name="newpet")
     async def create(self, interaction: Interaction, pet_name: str):
         """Create a new pet"""
-        try:
+        with self.client.async_session() as session:
             existing_pet = (
-                self.client.db_session.query(Pet)
-                .filter(Pet.discord_id == interaction.user.id)
-                .first()
-            )
+                await session.execute(
+                    session.query(Pet).filter(Pet.discord_id == interaction.user.id)
+                )
+            ).scalar_one_or_none()
             if existing_pet:
                 await interaction.response.send_message(
                     f"You already have a pet named {existing_pet.pet_name}! Use `/givetreat` to feed it. <:susspongebob:1145087128087302164>"
@@ -51,27 +74,25 @@ class Pets(commands.Cog, name="Pets"):
                     happiness=50,
                     last_fed=datetime.datetime.utcnow(),
                 )
-                self.client.db_session.add(pet)
-                self.client.db_session.commit()
+                try:
+                    session.add(pet)
+                    session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    session.rollback()
                 await interaction.response.send_message(
                     f"Your pet **{str(pet_name).capitalize()}** has been created! <:wiseoldman:1147920787471347732>"
                 )
-                self.client.log.info(f"User {interaction.user} created a pet named {pet_name}.")
-        except Exception as e:
-            self.client.db_session.rollback()
-            await interaction.response.send_message(
-                "An error occurred while creating your pet.", ephemeral=True
-            )
-            self.client.log.error(f"Error: {e}")
+                self.client.log.info(
+                    f"User {interaction.user} created a pet named {pet_name}."
+                )
 
     @app_commands.command(name="givetreat")
     async def feed(self, interaction: Interaction):
         """Feed your pet"""
-        try:
-            owned_pet = (
-                self.client.db_session.query(Pet)
-                .filter(Pet.discord_id == interaction.user.id)
-                .first()
+        with self.client.async_session() as session:
+            owned_pet = await session.execute(
+                session.query(Pet).filter(Pet.discord_id == interaction.user.id).first()
             )
             if not owned_pet:
                 await interaction.response.send_message(
@@ -86,17 +107,14 @@ class Pets(commands.Cog, name="Pets"):
                 return
             owned_pet.hunger += quantity
             owned_pet.last_fed = datetime.datetime.utcnow()
-            self.client.db_session.commit()
+            try:
+                session.commit()
+            except Exception as e:
+                self.client.log.error(e)
+                session.rollback()
             await interaction.response.send_message(
                 f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
             )
-        except Exception as e:
-            await interaction.response.send_message(
-                "An error occurred while feeding your pet (check your pet's name).",
-                ephemeral=True,
-            )
-            self.client.log.error(f"Error: {e}")
-            self.client.db_session.rollback()
 
     @app_commands.command(name="buytreats")
     async def get_treats(self, interaction: Interaction):
