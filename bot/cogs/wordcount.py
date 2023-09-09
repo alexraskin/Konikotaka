@@ -38,7 +38,6 @@ class WordCounter(commands.Cog, name="Word Count"):
                         await channel.send(
                             f"Word `{str(word.word).capitalize()}` has been said {word.count} times."
                         )
-                        self.client.db_session.commit()
 
     @commands.hybrid_command(
         name="addword",
@@ -56,11 +55,10 @@ class WordCounter(commands.Cog, name="Word Count"):
             discord_id=ctx.author.id,
         )
         async with self.client.async_session() as session:
-            await session.add(new_word)
-
             try:
-                await session.commit()
+                session.add(new_word)
                 await session.flush()
+                await session.commit()
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
@@ -84,10 +82,10 @@ class WordCounter(commands.Cog, name="Word Count"):
             query = await session.execute(select(WordCount).filter(WordCount.word == word))
             word_ = query.scalar_one_or_none()
             if word_:
-                await session.delete(word_)
                 try:
-                    await session.commit()
+                    session.delete(word_)
                     await session.flush()
+                    await session.commit()
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
