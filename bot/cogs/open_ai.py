@@ -22,6 +22,8 @@ class OpenAI(commands.Cog, name="Open AI"):
         """
         Generate an image using OpenAI's image API
         """
+        if ctx.guild.id != self.client.cosmo_guild:
+            return await ctx.send("This command is not available in this server.")
         message = await ctx.send("Generating image...")
         image_resp = openai.Image.create(prompt=prompt, n=1, size="512x512")
         await message.edit(content=image_resp['data'][0]['url'])
@@ -35,6 +37,8 @@ class OpenAI(commands.Cog, name="Open AI"):
         """
         Generate text using OpenAI's text API
         """
+        if ctx.guild.id != self.client.cosmo_guild:
+            return await ctx.send("This command is not available in this server.")
         message = await ctx.send("Generating text...")
         text_resp = openai.Completion.create(engine="davinci", prompt=prompt, max_tokens=100)
         await message.edit(content=text_resp['choices'][0]['text'])
