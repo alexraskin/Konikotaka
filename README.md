@@ -9,10 +9,11 @@ OldWiseManBot: A mystical Discord companion, weaving enchanting wisdom and magic
 
 ## Installation
 
-Creat an `.env` file: 
-```
-DISCORD_TOKEN=""
-MYSQL_URL=""
+Creat an `.env` file:
+```bash
+DISCORD_TOKEN=
+MYSQL_URL=
+OPENAI_API_KEY=
 GUILD_ID=
 GENERAL_CHANNEL_ID=
 BOT_CHANNEL_ID=
