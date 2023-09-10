@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 
 from discord import Embed, app_commands
@@ -6,8 +5,6 @@ from discord.ext import commands, tasks
 from models.db import Base
 from models.tags import CustomTags
 from sqlalchemy.future import select
-
-logging.basicConfig(level=logging.INFO)
 
 
 class Tags(commands.Cog, name="Custom Tags"):
@@ -22,6 +19,7 @@ class Tags(commands.Cog, name="Custom Tags"):
 
     @commands.hybrid_group(fallback="get")
     @commands.guild_only()
+    @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get")
     async def tag(self, ctx: commands.Context, tag_name: str):
         """
@@ -45,6 +43,7 @@ class Tags(commands.Cog, name="Custom Tags"):
 
     @commands.hybrid_group(fallback="add")
     @commands.guild_only()
+    @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to add")
     @app_commands.describe(tag_content="The content of the tag")
     async def tagadd(self, ctx: commands.Context, tag_name: str, *, tag_content: str):
@@ -66,8 +65,8 @@ class Tags(commands.Cog, name="Custom Tags"):
               session.add(tag)
               await session.flush()
               await session.commit()
-              message = await ctx.send(f"Tag `{tag_name}` added!")
-              await message.add_reaction("👍")
+              await ctx.send(f"Tag `{tag_name}` added!")
+              await ctx.message.add_reaction("👍")
               self.client.log.info(f"User {ctx.author} added a tag named {tag_name}")
           except Exception as e:
               self.client.log.error(e)
@@ -75,6 +74,7 @@ class Tags(commands.Cog, name="Custom Tags"):
 
     @tag.command(aliases=["edit"])
     @commands.guild_only()
+    @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to edit")
     @app_commands.describe(tag_content="The new content of the tag")
     async def tagedit(self, ctx: commands.Context, tag_name: str, *, tag_content: str):
@@ -95,18 +95,21 @@ class Tags(commands.Cog, name="Custom Tags"):
                 try:
                     await session.flush()
                     await session.commit()
+                    await ctx.send(f"Tag `{tag_name}` edited!")
+                    await ctx.message.add_reaction("👍")
+                    self.client.log.info(f"User {ctx.author} edited a tag named {tag_name}")
                 except Exception as e:
                     await ctx.send(
                         "An error occurred while editing the tag.", ephemeral=True
                     )
                     self.client.log.error(e)
                     await session.rollback()
-                await ctx.send(f"Tag `{tag_name}` edited!")
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
     @tag.command(aliases=["info"])
     @commands.guild_only()
+    @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get info on")
     async def stats(self, ctx: commands.Context, tag_name: str):
        async with self.client.async_session() as session:
@@ -122,16 +125,9 @@ class Tags(commands.Cog, name="Custom Tags"):
           else:
               await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @stats.error
-    async def stats_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Missing required argument: `tag_name`")
-        else:
-            self.client.log.error(error)
-            await ctx.send("An error occurred while fetching the tag.", ephemeral=True)
-
     @tag.command(aliases=["delete"])
     @commands.guild_only()
+    @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to remove")
     async def tagdel(self, ctx: commands.Context, tag_name: str):
         """
@@ -147,11 +143,13 @@ class Tags(commands.Cog, name="Custom Tags"):
                   session.delete(tag)
                   await session.flush()
                   await session.commit()
+                  await ctx.send(f"Tag `{tag_name}` deleted!")
+                  await ctx.message.add_reaction("👍")
+                  self.client.log.info(f"User {ctx.author} deleted a tag named {tag_name}")
                 except Exception as e:
                   self.client.log.error(e)
                   await session.rollback()
                   await ctx.send("An error occurred while deleting the tag.", ephemeral=True)
-                await ctx.send(f"Tag `{tag_name}` deleted!")
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
