@@ -1,15 +1,11 @@
-import logging
 import os
 import random
 
 import upsidedown
-from discord import Embed, DMChannel
+from discord import Embed, DMChannel, app_commands
 from discord.ext import commands, tasks
 from models.db import Base
 from models.users import DiscordUser
-
-logging.basicConfig(level=logging.ERROR)
-log = logging.getLogger(__name__)
 
 
 class General(commands.Cog, name="General"):
@@ -65,6 +61,8 @@ class General(commands.Cog, name="General"):
     @commands.hybrid_command(
         name="cosmo", help="Get a random Photo of Cosmo the Cat", with_app_command=True
     )
+    @commands.guild_only()
+    @app_commands.guild_only()
     async def get_cat_photo(self, ctx):
         self.client.log.info(f"User {ctx.author} requested a photo of Cosmo the Cat.")
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
@@ -79,6 +77,8 @@ class General(commands.Cog, name="General"):
         help="Get a random photo of Pat and Ash's cats",
         with_app_command=True,
     )
+    @commands.guild_only()
+    @app_commands.guild_only()
     async def get_cats_photo(self, ctx):
         self.client.log.info(
             f"User {ctx.author} requested a photo of Pat and Ash's cats."
@@ -93,6 +93,7 @@ class General(commands.Cog, name="General"):
     @commands.hybrid_command(
         name="meme", help="Get a random meme!", with_app_command=True
     )
+    @commands.guild_only()
     async def get_meme(self, ctx):
         self.client.log.info(f"User {ctx.author} requested a meme.")
         async with self.client.session.get("https://meme-api.com/gimme") as response:
@@ -105,6 +106,8 @@ class General(commands.Cog, name="General"):
     @commands.hybrid_command(
         name="gcattalk", help="Be able to speak with G Cat", with_app_command=True
     )
+    @commands.guild_only()
+    @app_commands.guild_only()
     async def gcat_talk(self, ctx, *, message: str):
         self.client.log.info(f"User {ctx.author} sent a message to G Cat.")
         up_down = upsidedown.transform(message)

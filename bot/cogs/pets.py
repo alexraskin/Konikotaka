@@ -11,10 +11,10 @@ from sqlalchemy.future import select
 class Pets(commands.Cog, name="Pets"):
     def __init__(self, client: commands.Bot):
         self.client = client
-        self.remove_hunger.start()
-        self.update_happiness.start()
         self.init_database.start()
         self.get_pets.start()
+        self.remove_hunger.start()
+        self.update_happiness.start()
         self.pets = []
 
     @tasks.loop(count=1)
@@ -56,6 +56,7 @@ class Pets(commands.Cog, name="Pets"):
                     await session.rollback()
 
     @app_commands.command(name="newpet")
+    @app_commands.guild_only()
     async def create(self, interaction: Interaction, pet_name: str):
         """Create a new pet"""
         with self.client.async_session() as session:
@@ -80,17 +81,16 @@ class Pets(commands.Cog, name="Pets"):
                     session.add(pet)
                     await session.flush()
                     await session.commit()
+                    await interaction.response.send_message(
+                        f"Your pet **{str(pet_name).capitalize()}** has been created! <:wiseoldman:1147920787471347732>"
+                      )
+                    self.client.log.info(f"User {interaction.user} created a pet named {pet_name}.")
                 except Exception as e:
                     self.client.log.error(e)
                     session.rollback()
-                await interaction.response.send_message(
-                    f"Your pet **{str(pet_name).capitalize()}** has been created! <:wiseoldman:1147920787471347732>"
-                )
-                self.client.log.info(
-                    f"User {interaction.user} created a pet named {pet_name}."
-                )
 
     @app_commands.command(name="givetreat")
+    @app_commands.guild_only()
     async def feed(self, interaction: Interaction):
         """Feed your pet"""
         with self.client.async_session() as session:
@@ -114,14 +114,15 @@ class Pets(commands.Cog, name="Pets"):
             try:
                 await session.flush()
                 await session.commit()
+                await interaction.response.send_message(
+                    f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
+                  )
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-            await interaction.response.send_message(
-                f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
-            )
 
     @app_commands.command(name="buytreats")
+    @commands.guild_only()
     async def get_treats(self, interaction: Interaction):
         """Get treats for your pet"""
         async with self.client.async_session() as session:
@@ -139,14 +140,15 @@ class Pets(commands.Cog, name="Pets"):
             try:
                 await session.flush()
                 await session.commit()
+                await interaction.response.send_message(
+                    f"You bought **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(owned_pet.pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
+                  )
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-            await interaction.response.send_message(
-                f"You bought **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(owned_pet.pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
-            )
 
     @app_commands.command(name="pethunger")
+    @app_commands.guild_only()
     async def check_hunger(self, interaction: Interaction):
         """Check your pet's hunger"""
         async with self.client.async_session() as session:
@@ -164,6 +166,7 @@ class Pets(commands.Cog, name="Pets"):
             )
 
     @app_commands.command(name="treatcount")
+    @app_commands.guild_only()
     async def check_treats(self, interaction: Interaction):
         """Check your pet's treats"""
         async with self.client.async_session() as session:

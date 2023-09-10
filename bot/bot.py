@@ -29,6 +29,11 @@ class WiseOldManBot(Bot):
         self.start_time = time.time()
         self.log = log
         self.cosmo_guild = 1020830000104099860
+        self.channel_ignore = [
+            1149054364795805779,
+            1145101773074354287,
+            1145086136142811249
+        ]
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
