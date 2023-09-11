@@ -13,7 +13,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         self.init_database.start()
 
     @tasks.loop(count=1)
-    async def init_database(self):
+    async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
@@ -21,7 +21,7 @@ class Tags(commands.Cog, name="Custom Tags"):
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get")
-    async def tag(self, ctx: commands.Context, tag_name: str):
+    async def tag(self, ctx: commands.Context, tag_name: str) -> None:
         """
         Get a tag
         """
@@ -46,7 +46,7 @@ class Tags(commands.Cog, name="Custom Tags"):
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to add")
     @app_commands.describe(tag_content="The content of the tag")
-    async def tagadd(self, ctx: commands.Context, tag_name: str, *, tag_content: str):
+    async def tagadd(self, ctx: commands.Context, tag_name: str, *, tag_content: str) -> None:
         """
         Add a new tag
         """
@@ -77,7 +77,7 @@ class Tags(commands.Cog, name="Custom Tags"):
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to edit")
     @app_commands.describe(tag_content="The new content of the tag")
-    async def tagedit(self, ctx: commands.Context, tag_name: str, *, tag_content: str):
+    async def tagedit(self, ctx: commands.Context, tag_name: str, *, tag_content: str) -> None:
         """
         Edit a tag
         """
@@ -111,7 +111,7 @@ class Tags(commands.Cog, name="Custom Tags"):
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get info on")
-    async def stats(self, ctx: commands.Context, tag_name: str):
+    async def stats(self, ctx: commands.Context, tag_name: str) -> None:
        async with self.client.async_session() as session:
           query = await session.execute(select(CustomTags).filter(CustomTags.name == tag_name))
           tag = query.scalar_one_or_none()     
@@ -129,7 +129,7 @@ class Tags(commands.Cog, name="Custom Tags"):
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to remove")
-    async def tagdel(self, ctx: commands.Context, tag_name: str):
+    async def tagdel(self, ctx: commands.Context, tag_name: str) -> None:
         """
         Delete a tag
         """

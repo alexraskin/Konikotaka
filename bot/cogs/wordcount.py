@@ -1,6 +1,7 @@
 import os
+from typing import List
 
-from discord import app_commands
+from discord import app_commands, Message
 from discord.ext import commands, tasks
 from models.db import Base
 from models.word_count import WordCount
@@ -13,21 +14,21 @@ class WordCounter(commands.Cog, name="Word Count"):
         self.get_words.start()
         self.init_database.start()
         self.bot_channel = os.getenv("BOT_CHANNEL_ID")
-        self.word_list = []
+        self.word_list: List[str] = []
 
     @tasks.loop(count=1)
-    async def init_database(self):
+    async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
     
     @tasks.loop(minutes=1)
-    async def get_words(self):
+    async def get_words(self) -> None:
         async with self.client.async_session() as session:
             query = await session.execute(select(WordCount))
             self.word_list = query.scalars().all()
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: Message) -> None:
         channel = await self.client.fetch_channel(self.bot_channel)
         if message.author.bot:
             return
@@ -48,7 +49,7 @@ class WordCounter(commands.Cog, name="Word Count"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def add_word(self, ctx: commands.Context, word: str):
+    async def add_word(self, ctx: commands.Context, word: str) -> None:
         """
         Add a new word to track the amount of times it has been said.
         """
@@ -65,11 +66,10 @@ class WordCounter(commands.Cog, name="Word Count"):
                 await session.commit()
                 await ctx.send(f"Word `{word}` added!")
                 await ctx.message.add_reaction("👍")
+                self.client.log.info(f"Word {word} added by {ctx.author}")
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-
-        self.client.log.info(f"Word {word} added by {ctx.author}")
 
     @commands.hybrid_command(
         name="removeword",
@@ -78,7 +78,7 @@ class WordCounter(commands.Cog, name="Word Count"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def remove_word(self, ctx: commands.Context, word: str):
+    async def remove_word(self, ctx: commands.Context, word: str) -> None:
         """
         Add a new word to track the amount of times it has been said.
         """
@@ -94,6 +94,7 @@ class WordCounter(commands.Cog, name="Word Count"):
                     await session.commit()
                     await ctx.send(f"Word `{word}` removed!")
                     await ctx.message.add_reaction("👍")
+                    self.client.log.info(f"Word {word} removed by {ctx.author}")
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()

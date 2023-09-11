@@ -29,7 +29,7 @@ class Pets(commands.Cog, name="Pets"):
             self.pets = query.scalars().all()
 
     @tasks.loop(minutes=30)
-    async def remove_hunger(self):
+    async def remove_hunger(self) -> None:
         async with self.client.async_session() as session:
             for pet in self.pets:
                 pet.hunger -= 1
@@ -41,7 +41,7 @@ class Pets(commands.Cog, name="Pets"):
                     await session.rollback()
 
     @tasks.loop(minutes=120)
-    async def update_happiness(self):
+    async def update_happiness(self) -> None:
         async with self.client.async_session() as session:
             for pet in self.pets:
                 if pet.hunger > 5:
@@ -57,7 +57,7 @@ class Pets(commands.Cog, name="Pets"):
 
     @app_commands.command(name="newpet")
     @app_commands.guild_only()
-    async def create(self, interaction: Interaction, pet_name: str):
+    async def create(self, interaction: Interaction, pet_name: str) -> None:
         """Create a new pet"""
         with self.client.async_session() as session:
             query = await session.execute(
@@ -91,7 +91,7 @@ class Pets(commands.Cog, name="Pets"):
 
     @app_commands.command(name="givetreat")
     @app_commands.guild_only()
-    async def feed(self, interaction: Interaction):
+    async def feed(self, interaction: Interaction) -> None:
         """Feed your pet"""
         with self.client.async_session() as session:
             query = await session.execute(
@@ -123,7 +123,7 @@ class Pets(commands.Cog, name="Pets"):
 
     @app_commands.command(name="buytreats")
     @commands.guild_only()
-    async def get_treats(self, interaction: Interaction):
+    async def get_treats(self, interaction: Interaction) -> None:
         """Get treats for your pet"""
         async with self.client.async_session() as session:
             query = await session.execute(
@@ -149,7 +149,7 @@ class Pets(commands.Cog, name="Pets"):
 
     @app_commands.command(name="pethunger")
     @app_commands.guild_only()
-    async def check_hunger(self, interaction: Interaction):
+    async def check_hunger(self, interaction: Interaction) -> None:
         """Check your pet's hunger"""
         async with self.client.async_session() as session:
             query = await session.execute(
@@ -167,7 +167,7 @@ class Pets(commands.Cog, name="Pets"):
 
     @app_commands.command(name="treatcount")
     @app_commands.guild_only()
-    async def check_treats(self, interaction: Interaction):
+    async def check_treats(self, interaction: Interaction) -> None:
         """Check your pet's treats"""
         async with self.client.async_session() as session:
             query = await session.execute(

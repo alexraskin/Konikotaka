@@ -2,25 +2,26 @@ import os
 import random
 
 import upsidedown
-from discord import Embed, DMChannel, app_commands
+from discord import Embed, DMChannel, app_commands, Message, Member
 from discord.ext import commands, tasks
+from discord.abc import GuildChannel
 from models.db import Base
 from models.users import DiscordUser
 
 
 class General(commands.Cog, name="General"):
     def __init__(self, client: commands.Bot):
-        self.client = client
-        self.guild = os.getenv("GUILD_ID")
-        self.channel = self.client.get_channel(os.getenv("GENERAL_CHANNEL_ID"))
+        self.client: commands.Bot = client
+        self.guild: str = os.getenv("GUILD_ID")
+        self.channel: GuildChannel = self.client.get_channel(os.getenv("GENERAL_CHANNEL_ID"))
 
     @tasks.loop(count=1)
-    async def init_database(self):
+    async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
     @commands.Cog.listener()
-    async def on_memeber_join(self, member):
+    async def on_memeber_join(self, member: Member) -> None:
         user = DiscordUser(
             discord_id=member.id,
             username=member.name,
@@ -34,27 +35,16 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-            self.client.log.info(f"User {member} joined the server.")
-        guild = member.guild
-        if guild.system_channel is not None:
-            embed = Embed(
-                title="Welcome!",
-                description=f"Welcome {member.mention} to {guild.name}!",
-                color=0x00FF00,
-            )
-            embed.set_thumbnail(url=member.avatar_url)
-            embed.set_footer(text=f"User joined at {member.joined_at}")
-            await guild.system_channel.send(embed=embed)
 
     @commands.hybrid_command(name="source", help="Get the source code for the bot.")
-    async def source(self, ctx):
+    async def source(self, ctx: commands.Context) -> None:
         self.client.log.info(f"User {ctx.author} requested the source code.")
         await ctx.send("https://github.com/alexraskin/WiseOldManBot")
 
     @commands.hybrid_command(
         name="website", help="See more photos of Cosmo!", with_app_command=True
     )
-    async def website(self, ctx):
+    async def website(self, ctx: commands.Context) -> None:
         self.client.log.info(f"User {ctx.author} requested the website.")
         await ctx.send("View more photos of Cosmo, here -> https://cosmo.twizy.dev")
 
@@ -63,7 +53,7 @@ class General(commands.Cog, name="General"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def get_cat_photo(self, ctx):
+    async def get_cat_photo(self, ctx: commands.Context) -> None:
         self.client.log.info(f"User {ctx.author} requested a photo of Cosmo the Cat.")
         async with self.client.session.get("https://api.twizy.dev/cosmo") as response:
             if response.status == 200:
@@ -79,7 +69,7 @@ class General(commands.Cog, name="General"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def get_cats_photo(self, ctx):
+    async def get_cats_photo(self, ctx: commands.Context) -> None:
         self.client.log.info(
             f"User {ctx.author} requested a photo of Pat and Ash's cats."
         )
@@ -94,7 +84,7 @@ class General(commands.Cog, name="General"):
         name="meme", help="Get a random meme!", with_app_command=True
     )
     @commands.guild_only()
-    async def get_meme(self, ctx):
+    async def get_meme(self, ctx: commands.Context) -> None:
         self.client.log.info(f"User {ctx.author} requested a meme.")
         async with self.client.session.get("https://meme-api.com/gimme") as response:
             if response.status == 200:
@@ -108,18 +98,17 @@ class General(commands.Cog, name="General"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def gcat_talk(self, ctx, *, message: str):
+    async def gcat_talk(self, ctx: commands.Context, *, message: str) -> None:
         self.client.log.info(f"User {ctx.author} sent a message to G Cat.")
         up_down = upsidedown.transform(message)
         await ctx.send(up_down)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: Message):
         gif_list = [
             "https://media.tenor.com/0He0W1M2LFcAAAAC/lost-gnome.gif",
             "https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif",
             "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif"
-
         ]
         if message.author == self.client.user:
             return
@@ -138,7 +127,7 @@ class General(commands.Cog, name="General"):
             await message.channel.send(random.choice(list(gif_list)))
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error: commands.errors) -> None:
         if isinstance(error, commands.errors.CheckFailure):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct role."
@@ -155,5 +144,5 @@ class General(commands.Cog, name="General"):
             await ctx.send("Missing required argument.")
 
 
-async def setup(client):
+async def setup(client) -> None:
     await client.add_cog(General(client))

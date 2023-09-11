@@ -1,10 +1,8 @@
 import logging
+from typing import Literal, Optional
 
-from discord import Embed
+from discord import Embed, Object, HTTPException
 from discord.ext import commands
-
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger(__name__)
 
 
 class Admin(commands.Cog, name="Admin"):
@@ -13,7 +11,7 @@ class Admin(commands.Cog, name="Admin"):
 
     @commands.hybrid_command(name="reload", hidden=True, with_app_command=True)
     @commands.is_owner()
-    async def reload(self, ctx, extension=None):
+    async def reload(self, ctx: commands.Context, extension: Optional[str] = None) -> None:
         if extension is None:
             for cog in self.client.extensions.copy():
                 await self.client.unload_extension(cog)
@@ -43,21 +41,41 @@ class Admin(commands.Cog, name="Admin"):
             await ctx.send(embed=embed)
 
     @commands.command(name="sync", hidden=True)
+    @commands.guild_only()
     @commands.is_owner()
-    async def sync(self, ctx: commands.Context):
-        await self.client.tree.sync()
-        self.client.log.info(f"Sync Command Executed by {ctx.author}")
-        embed = Embed(
-            title="Command Sync 🌳",
-            description="Successfully Synced Commands ✅",
-            color=0x00FF00,
-            timestamp=ctx.message.created_at,
-        )
-        await ctx.send(embed=embed)
+    async def sync(ctx: commands.Context, guilds: commands.Greedy[Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+        if not guilds:
+            if spec == "~":
+                synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            elif spec == "*":
+                ctx.bot.tree.copy_global_to(guild=ctx.guild)
+                synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            elif spec == "^":
+                ctx.bot.tree.clear_commands(guild=ctx.guild)
+                await ctx.bot.tree.sync(guild=ctx.guild)
+                synced = []
+            else:
+                synced = await ctx.bot.tree.sync()
+
+            await ctx.send(
+                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            )
+            return
+
+        ret = 0
+        for guild in guilds:
+            try:
+                await ctx.bot.tree.sync(guild=guild)
+            except HTTPException:
+                pass
+            else:
+                ret += 1
+
+        await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
     @commands.hybrid_command(name="purge", hidden=True)
     @commands.is_owner()
-    async def purge(self, ctx: commands.Context, amount: int, reason: str = None):
+    async def purge(self, ctx: commands.Context, amount: int, reason: Optional[str] = None):
         if amount <= 0:
             await ctx.send("Please specify a positive number of messages to delete.")
             return
