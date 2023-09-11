@@ -43,19 +43,20 @@ class Admin(commands.Cog, name="Admin"):
     @commands.command(name="sync", hidden=True)
     @commands.guild_only()
     @commands.is_owner()
-    async def sync(ctx: commands.Context, guilds: commands.Greedy[Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    async def sync(self, ctx: commands.Context, guilds: commands.Greedy[Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
         if not guilds:
             if spec == "~":
-                synced = await ctx.bot.tree.sync(guild=ctx.guild)
+                synced = await self.client.tree.sync(guild=ctx.guild)
+
             elif spec == "*":
-                ctx.bot.tree.copy_global_to(guild=ctx.guild)
-                synced = await ctx.bot.tree.sync(guild=ctx.guild)
+                self.client.tree.copy_global_to(guild=ctx.guild)
+                synced = await self.client.tree.sync(guild=ctx.guild)
             elif spec == "^":
-                ctx.bot.tree.clear_commands(guild=ctx.guild)
-                await ctx.bot.tree.sync(guild=ctx.guild)
+                self.client.tree.clear_commands(guild=ctx.guild)
+                await self.client.tree.sync(guild=ctx.guild)
                 synced = []
             else:
-                synced = await ctx.bot.tree.sync()
+                synced = await self.client.tree.sync()
 
             await ctx.send(
                 f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
@@ -65,7 +66,7 @@ class Admin(commands.Cog, name="Admin"):
         ret = 0
         for guild in guilds:
             try:
-                await ctx.bot.tree.sync(guild=guild)
+                await self.client.tree.sync(guild=guild)
             except HTTPException:
                 pass
             else:
