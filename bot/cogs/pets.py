@@ -9,8 +9,8 @@ from sqlalchemy.future import select
 
 
 class Pets(commands.Cog, name="Pets"):
-    def __init__(self, client: commands.Bot):
-        self.client = client
+    def __init__(self, client: commands.Bot) -> None:
+        self.client: commands.Bot = client
         self.init_database.start()
         self.get_pets.start()
         self.remove_hunger.start()
@@ -83,8 +83,10 @@ class Pets(commands.Cog, name="Pets"):
                     await session.commit()
                     await interaction.response.send_message(
                         f"Your pet **{str(pet_name).capitalize()}** has been created! <:wiseoldman:1147920787471347732>"
-                      )
-                    self.client.log.info(f"User {interaction.user} created a pet named {pet_name}.")
+                    )
+                    self.client.log.info(
+                        f"User {interaction.user} created a pet named {pet_name}."
+                    )
                 except Exception as e:
                     self.client.log.error(e)
                     session.rollback()
@@ -116,7 +118,7 @@ class Pets(commands.Cog, name="Pets"):
                 await session.commit()
                 await interaction.response.send_message(
                     f"Your pet **{str(owned_pet.pet_name).capitalize()}** has been fed **{quantity}** treat{'s' if quantity > 1 else ''}! <:wiseoldman:1147920787471347732>"
-                  )
+                )
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
@@ -142,7 +144,7 @@ class Pets(commands.Cog, name="Pets"):
                 await session.commit()
                 await interaction.response.send_message(
                     f"You bought **{quantity}** treat{'s' if quantity > 1 else ''} for **{str(owned_pet.pet_name).capitalize()}**! <:wiseoldman:1147920787471347732>"
-                  )
+                )
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()

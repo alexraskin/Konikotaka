@@ -3,6 +3,10 @@ from sqlalchemy import VARCHAR, Column, Integer, String
 
 
 class CustomTags(Base):
+    """
+    Custom Tags Model
+    """
+
     __tablename__ = "tags"
     id = Column(Integer, primary_key=True)
     discord_id = Column(VARCHAR(25), nullable=False)

@@ -3,6 +3,10 @@ from sqlalchemy import BIGINT, VARCHAR, Column, Integer
 
 
 class WordCount(Base):
+    """
+    Word Count Model
+    """
+
     __tablename__ = "word_count"
     id = Column(Integer, primary_key=True)
     word = Column(VARCHAR(255), nullable=False)

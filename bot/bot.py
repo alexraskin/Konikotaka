@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import time
+from typing import List
 
 import discord
 from aiohttp import ClientSession, ClientTimeout
@@ -25,14 +26,16 @@ class WiseOldManBot(Bot):
     def __init__(self, *args, **options) -> None:
         super().__init__(*args, **options)
         self.session = None
-        self.engine = create_async_engine(os.getenv("MYSQL_URL"), echo=True, future=True)
+        self.engine: create_async_engine = create_async_engine(
+            os.getenv("MYSQL_URL"), echo=True, future=True
+        )
         self.start_time = time.time()
         self.log = log
-        self.cosmo_guild = 1020830000104099860
-        self.channel_ignore = [
+        self.cosmo_guild: int = 1020830000104099860
+        self.channel_ignore: List[int] = [
             1149054364795805779,
             1145101773074354287,
-            1145086136142811249
+            1145086136142811249,
         ]
 
     async def start(self, *args, **kwargs) -> None:
@@ -47,7 +50,7 @@ class WiseOldManBot(Bot):
         await self.engine.dispose()
         await super().close()
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         if not hasattr(self, "uptime"):
             self.uptime = utcnow()
 
@@ -69,6 +72,9 @@ class WiseOldManBot(Bot):
                 self.log.error(f"Failed to load extension {extension}\n{exc}")
 
     def get_bot_latency(self) -> float:
+        """
+        Returns the websocket latency in seconds.
+        """
         return round(self.latency * 1000)
 
     def get_uptime(self) -> str:
@@ -78,22 +84,18 @@ class WiseOldManBot(Bot):
         )
 
 
-help_command = DefaultHelpCommand(
-    no_category="Commands",
-)
-
 client = WiseOldManBot(
     command_prefix="?",
     intents=discord.Intents.all(),
     max_messages=10000,
-    help_command=help_command,
+    help_command=DefaultHelpCommand(no_category="Commands"),
     description="Hello, I am WiseOldManBot!",
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )
 
 
 @tasks.loop(minutes=1)
-async def change_activity():
+async def change_activity() -> None:
     activities = [
         "with Cosmo",
         ".cosmo",
@@ -115,7 +117,7 @@ async def change_activity():
 
 
 @client.event
-async def on_ready():
+async def on_ready() -> None:
     client.log.info(f"{client.user.name} has connected to Discord!")
     change_activity.start()
 

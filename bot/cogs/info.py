@@ -1,21 +1,22 @@
 import os
 import platform
 
-from discord import Embed, app_commands
+from discord import Embed
 from discord import __version__ as discord_version
+from discord import app_commands
 from discord.ext import commands
 
 
 class Info(commands.Cog, name="Info"):
-    def __init__(self, client: commands.Bot):
-        self.client = client
+    def __init__(self, client: commands.Bot) -> None:
+        self.client: commands.Bot = client
 
     @commands.hybrid_command(
         name="info", help="Get info about the bot", with_app_command=True
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def get_info(self, ctx):
+    async def get_info(self, ctx: commands.Context) -> None:
         embed = Embed(
             title="WiseOldManBot",
             description=self.client.description,
@@ -37,7 +38,7 @@ class Info(commands.Cog, name="Info"):
     @commands.hybrid_command(
         name="ping", help="Returns the latency of the bot.", with_app_command=True
     )
-    async def ping(self, ctx):
+    async def ping(self, ctx: commands.Context) -> None:
         self.client.log.info(f"User {ctx.author} pinged the bot.")
         await ctx.send(
             f"Pong!\n**Node: {os.getenv('NODE_NAME')}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
@@ -51,7 +52,7 @@ class Info(commands.Cog, name="Info"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def uptime(self, ctx):
+    async def uptime(self, ctx: commands.Context) -> None:
         embed = Embed(
             title="Bot Uptime",
             description=f"Uptime: {self.client.get_uptime()}",
@@ -59,6 +60,7 @@ class Info(commands.Cog, name="Info"):
             timestamp=ctx.message.created_at,
         )
         await ctx.send(embed=embed)
+
 
 async def setup(client):
     await client.add_cog(Info(client))

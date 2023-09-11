@@ -3,6 +3,10 @@ from sqlalchemy import DATETIME, VARCHAR, Column, Integer
 
 
 class DiscordUser(Base):
+    """
+    Discord User Model
+    """
+
     __tablename__ = "discord_users"
     id = Column(Integer, primary_key=True)
     discord_id = Column(VARCHAR(255), nullable=False)

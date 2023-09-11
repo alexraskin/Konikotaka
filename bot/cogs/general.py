@@ -1,19 +1,22 @@
 import os
 import random
+from typing import Literal
 
 import upsidedown
-from discord import Embed, DMChannel, app_commands, Message, Member
-from discord.ext import commands, tasks
+from discord import DMChannel, Member, Message, app_commands
 from discord.abc import GuildChannel
+from discord.ext import commands, tasks
 from models.db import Base
 from models.users import DiscordUser
 
 
 class General(commands.Cog, name="General"):
-    def __init__(self, client: commands.Bot):
+    def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
         self.guild: str = os.getenv("GUILD_ID")
-        self.channel: GuildChannel = self.client.get_channel(os.getenv("GENERAL_CHANNEL_ID"))
+        self.channel: GuildChannel = self.client.get_channel(
+            os.getenv("GENERAL_CHANNEL_ID")
+        )
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
@@ -103,12 +106,33 @@ class General(commands.Cog, name="General"):
         up_down = upsidedown.transform(message)
         await ctx.send(up_down)
 
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.hybrid_command(name="waifu", aliases=["getwaifu"])
+    @commands.guild_only()
+    @app_commands.guild_only()
+    @app_commands.describe(category="The category of waifu to get.")
+    async def get_waifu(
+        self,
+        ctx: commands.Context,
+        category: Literal["waifu", "neko", "shinobu", "megumin", "bully", "cuddle"],
+    ) -> None:
+        """
+        The get_waifu function retrieves a waifu from the Waifu API.
+
+        """
+        response = await self.client.session.get(
+            f"https://api.waifu.pics/sfw/{category}"
+        )
+        response = await response.json()
+        url = response["url"]
+        await ctx.send(url)
+
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         gif_list = [
             "https://media.tenor.com/0He0W1M2LFcAAAAC/lost-gnome.gif",
             "https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif",
-            "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif"
+            "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif",
         ]
         if message.author == self.client.user:
             return
@@ -127,7 +151,9 @@ class General(commands.Cog, name="General"):
             await message.channel.send(random.choice(list(gif_list)))
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx: commands.Context, error: commands.errors) -> None:
+    async def on_command_error(
+        self, ctx: commands.Context, error: commands.errors
+    ) -> None:
         if isinstance(error, commands.errors.CheckFailure):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct role."

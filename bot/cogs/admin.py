@@ -1,34 +1,37 @@
-import logging
 from typing import Literal, Optional
 
-from discord import Embed, Object, HTTPException, app_commands
+from discord import Embed, HTTPException, Object, app_commands
 from discord.ext import commands
 
 
 class Admin(commands.Cog, name="Admin"):
-    def __init__(self, client: commands.Bot):
-        self.client = client
+    def __init__(self, client: commands.Bot) -> None:
+        self.client: commands.Bot = client
 
     @commands.hybrid_command(name="reload", hidden=True, with_app_command=True)
     @commands.is_owner()
     @commands.guild_only()
     @app_commands.describe(extension="The extension to reload.")
-    async def reload(self, ctx: commands.Context, extension: Optional[str] = None) -> None:
+    async def reload(
+        self, ctx: commands.Context, extension: Optional[str] = None
+    ) -> None:
         if extension is None:
             for cog in self.client.extensions.copy():
                 try:
-                  await self.client.unload_extension(cog)
-                  await self.client.load_extension(cog)
+                    await self.client.unload_extension(cog)
+                    await self.client.load_extension(cog)
                 except Exception as e:
                     self.client.log.error(f"Error: {e}")
-                    await ctx.send(f"An error occurred while reloading the {cog} cog.", ephemeral=True)
+                    await ctx.send(
+                        f"An error occurred while reloading the {cog} cog.",
+                        ephemeral=True,
+                    )
                     return
             embed = Embed(
-              
-              title="Cog Reload 🔃",
-              description="I have reloaded all the cogs successfully ✅",
-              color=0x00FF00,
-              timestamp=ctx.message.created_at,
+                title="Cog Reload 🔃",
+                description="I have reloaded all the cogs successfully ✅",
+                color=0x00FF00,
+                timestamp=ctx.message.created_at,
             )
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
@@ -53,7 +56,12 @@ class Admin(commands.Cog, name="Admin"):
     @commands.is_owner()
     @app_commands.describe(guilds="The guilds to sync to.")
     @app_commands.describe(spec="The sync specification.")
-    async def sync(self, ctx: commands.Context, guilds: commands.Greedy[Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    async def sync(
+        self,
+        ctx: commands.Context,
+        guilds: commands.Greedy[Object],
+        spec: Optional[Literal["~", "*", "^"]] = None,
+    ) -> None:
         if not guilds:
             if spec == "~":
                 synced = await self.client.tree.sync(guild=ctx.guild)
@@ -88,7 +96,9 @@ class Admin(commands.Cog, name="Admin"):
     @commands.is_owner()
     @app_commands.describe(amount="The amount of messages to purge.")
     @app_commands.describe(reason="The reason for purging the messages.")
-    async def purge(self, ctx: commands.Context, amount: int, reason: Optional[str] = None):
+    async def purge(
+        self, ctx: commands.Context, amount: int, reason: Optional[str] = None
+    ) -> None:
         """
         Purges a specified amount of messages from the channel.
         """
@@ -103,7 +113,6 @@ class Admin(commands.Cog, name="Admin"):
             self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while purging messages.", ephemeral=True)
             return
-
 
     @purge.error
     async def purge_error(self, ctx: commands.Context, error):

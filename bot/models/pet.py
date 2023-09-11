@@ -5,6 +5,10 @@ from sqlalchemy import DATETIME, VARCHAR, Column, Integer, String
 
 
 class Pet(Base):
+    """
+    Pet Model
+    """
+
     __tablename__ = "pets"
     id = Column(Integer, primary_key=True)
     discord_id = Column(VARCHAR(18), nullable=False)
