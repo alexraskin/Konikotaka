@@ -19,6 +19,7 @@ class JoinRaceButton(discord.ui.View):
     async def race_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        global snail_positions
         if interaction.user.id in snail_positions:
             await interaction.response.edit_message(
                 content="You already joined the race! 🐌",
@@ -36,9 +37,10 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         self.client: commands.Bot = client
 
     async def simulate_race(self, interaction: Interaction):
+        global snail_positions
         winner: Member = None
         race_length: int = 10
-        message = await interaction.channel.send("Race is starting")
+        message = await interaction.channel.send("The Race is starting! 🚩")
         while not winner:
             if len(snail_positions) < 2:
                 snail_positions[self.client.user.id] = 0
