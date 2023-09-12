@@ -45,6 +45,7 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         
     async def simulate_race(self, interaction: Interaction) -> None:
         global snail_positions
+        global shuffled_participants
         winner: Member = None
         race_length: int = 10
         if len(shuffled_participants) <= 0:
