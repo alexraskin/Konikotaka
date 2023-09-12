@@ -37,11 +37,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
-    def game_cooldown(interaction: discord.Interaction) -> Optional[app_commands.Cooldown]:
-      if interaction.guild.id == 80088516616269824:
-        return None
-      return app_commands.Cooldown(1, 10.0)
-    
     async def randomize_snails(self) -> None:
         global shuffled_participants
         shuffled_participants = random.sample(shuffled_participants, len(shuffled_participants))
