@@ -95,6 +95,7 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         global on_command
         if on_command == 1:
             await interaction.response.send_message("A Race is already in progress.", ephemeral=True)
+            return
         if delay > 30:
             await interaction.response.send_message(
                 "Delay must be less than 30 seconds"
