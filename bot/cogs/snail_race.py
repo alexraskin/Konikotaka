@@ -4,7 +4,9 @@ from typing import Dict, Optional
 
 import discord
 from discord import Interaction, Member, app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
+from models.db import Base
+from models.race import Race
 
 snail_positions: Dict = {}
 
@@ -20,6 +22,7 @@ class JoinRaceButton(discord.ui.View):
         if interaction.user.id in snail_positions:
             await interaction.response.edit_message(
                 content="You already joined the race! 🐌",
+                ephemeral=True,
             )
             return
         snail_positions[interaction.user.id] = 0
@@ -64,6 +67,8 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         await interaction.channel.send(embed=embed)
 
     @app_commands.command(name="race", description="Start a Snail Race")
+    @app_commands.guild_only()
+    @discord.app_commands.checks.cooldown(1, 60, key=lambda i: (i.guild_id, i.user.id))
     async def race(self, interaction: Interaction, delay: Optional[int] = 10) -> None:
         view: JoinRaceButton = JoinRaceButton()
         if delay > 30:
@@ -77,7 +82,16 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         )
         await asyncio.sleep(delay)
         await self.simulate_race(interaction)
-
+    
+    @race.error
+    async def on_race_error(self, interaction: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            await interaction.response.send_message("Another race is in progress, please wait until the race has finished.", ephemeral=True)
+  
+    @app_commands.command(name="leaderboard", description="Get Race Leaderboard")
+    async def leaderboard(self, interaction: Interaction) -> None:
+        await interaction.response.send("This command is not implemented yet.")
+  
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(SnailRace(client))
