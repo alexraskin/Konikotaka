@@ -40,7 +40,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     async def randomize_snails(self) -> None:
         global shuffled_participants
         shuffled_participants = random.sample(shuffled_participants, len(shuffled_participants))
-        print(shuffled_participants)
         return shuffled_participants
         
     async def simulate_race(self, interaction: Interaction) -> None:
