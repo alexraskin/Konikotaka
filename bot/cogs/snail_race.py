@@ -16,14 +16,16 @@ class JoinRaceButton(discord.ui.View):
     @discord.ui.button(label="Join Race", style=discord.ButtonStyle.blurple, emoji="🐌")
     async def race_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
-    ):  
+    ):
         if interaction.user.id in snail_positions:
             await interaction.response.edit_message(
                 content="You already joined the race! 🐌",
             )
             return
         snail_positions[interaction.user.id] = 0
-        await interaction.response.send_message(f"You've entered into the race!", ephemeral=True)
+        await interaction.response.send_message(
+            f"You've entered into the race!", ephemeral=True
+        )
 
 
 class SnailRace(commands.Cog, name="Snail Racing"):
@@ -48,7 +50,9 @@ class SnailRace(commands.Cog, name="Snail Racing"):
                 user = self.client.get_user(user_id)
                 race_progress += f"{user.name}: {'🐌' * position}\n"
             await asyncio.sleep(random.randint(1, 3))
-            await message.edit(content=f"🏁 **The race is now in progress!** 🏁\n{race_progress}")
+            await message.edit(
+                content=f"🏁 **The race is now in progress!** 🏁\n{race_progress}"
+            )
         snail_positions.clear()
         embed = discord.Embed(
             title="Congratulations!",
@@ -58,7 +62,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         )
         embed.set_thumbnail(url=winner.display_avatar.url)
         await interaction.channel.send(embed=embed)
-
 
     @app_commands.command(name="race", description="Start a Snail Race")
     async def race(self, interaction: Interaction, delay: Optional[int] = 10) -> None:
