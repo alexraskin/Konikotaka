@@ -9,7 +9,6 @@ import discord
 from aiohttp import ClientSession, ClientTimeout
 from discord.ext import tasks
 from discord.ext.commands import Bot, DefaultHelpCommand
-from discord.utils import utcnow
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -52,7 +51,7 @@ class WiseOldManBot(Bot):
 
     async def on_ready(self) -> None:
         if not hasattr(self, "uptime"):
-            self.uptime = utcnow()
+            self.uptime = time.time()
 
         self.log.info(f"Ready: {self.user} ID: {self.user.id}")
 
@@ -85,7 +84,7 @@ class WiseOldManBot(Bot):
 
 
 client = WiseOldManBot(
-    command_prefix="?",
+    command_prefix=os.getenv("PREFIX", "?"),
     intents=discord.Intents.all(),
     max_messages=10000,
     help_command=DefaultHelpCommand(no_category="Commands"),
@@ -110,6 +109,7 @@ async def change_activity() -> None:
         "With Snad's Mom",
         "Annoying Seaira",
         "/newpet",
+        "/waifu",
     ]
     await client.change_presence(
         activity=discord.Game(name=random.choice(list(activities)))

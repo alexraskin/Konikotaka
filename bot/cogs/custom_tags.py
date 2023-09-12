@@ -124,6 +124,9 @@ class Tags(commands.Cog, name="Custom Tags"):
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get info on")
     async def stats(self, ctx: commands.Context, tag_name: str) -> None:
+        """
+        Get info on a tag
+        """
         async with self.client.async_session() as session:
             query = await session.execute(
                 select(CustomTags).filter(CustomTags.name == tag_name)
