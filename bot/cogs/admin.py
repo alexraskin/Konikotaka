@@ -58,7 +58,7 @@ class Admin(commands.Cog, name="Admin"):
     async def sync(self, ctx: commands.Context) -> None:
         await ctx.send("Syncing...")
         try:
-            synced = await self.client.tree.sync()
+            await self.client.tree.sync()
         except HTTPException as e:
             self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while syncing.", ephemeral=True)
