@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from discord import Embed, HTTPException, app_commands
+from discord import Embed, HTTPException, app_commands, Interaction
 from discord.ext import commands
 
 
@@ -37,11 +37,7 @@ class Admin(commands.Cog, name="Admin"):
             )
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
-            self.client.log.info(f"Reload Command Executed by {ctx.author}")
         else:
-            self.client.log.info(
-                f"Reloaded: {str(extension).upper()} COG - Command Executed by {ctx.author}"
-            )
             await self.client.unload_extension(f"cogs.{extension}")
             await self.client.load_extension(f"cogs.{extension}")
             embed = Embed(
@@ -56,49 +52,58 @@ class Admin(commands.Cog, name="Admin"):
     @commands.command(name="sync", hidden=True)
     @commands.is_owner()
     async def sync(self, ctx: commands.Context) -> None:
-        message = await ctx.send("Syncing... 🔄")
+        """
+        Sync app commands with Discord.
+        """
+        message = await ctx.send(content="Syncing... 🔄")
         try:
             await self.client.tree.sync()
         except HTTPException as e:
             self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while syncing.", ephemeral=True)
             return
-        await message.edit("Synced successfully! ✅")
+        await message.edit(content="Synced successfully! ✅")
 
-    @commands.hybrid_command(name="purge", hidden=True)
+    @app_commands.command(name="purge")
     @commands.is_owner()
     @app_commands.describe(amount="The amount of messages to purge.")
     @app_commands.describe(reason="The reason for purging the messages.")
     async def purge(
-        self, ctx: commands.Context, amount: int, reason: Optional[str] = None
+        self, interaction: Interaction, amount: int, reason: Optional[str] = None
     ) -> None:
         """
         Purges a specified amount of messages from the channel.
         """
         if amount <= 0:
-            await ctx.send("Please specify a positive number of messages to delete.")
+            await interaction.response.send_message(
+                "Please specify a positive number of messages to delete."
+            )
             return
         try:
             amount += 1
-            await ctx.channel.purge(limit=amount, reason=reason)
-            await ctx.send(f"I have purged {amount} messages.")
+            await interaction.channel.purge(limit=amount, reason=reason)
+            await interaction.response.send_message(f"I have purged {amount} messages.")
         except Exception as e:
             self.client.log.error(f"Error: {e}")
-            await ctx.send("An error occurred while purging messages.", ephemeral=True)
+            await interaction.response.send_message(
+                "An error occurred while purging messages.", ephemeral=True
+            )
             return
 
     @purge.error
-    async def purge_error(self, ctx: commands.Context, error: commands.CommandError):
+    async def purge_error(self, interaction: Interaction, error: commands.CommandError):
         if isinstance(error, commands.MissingPermissions):
-            await ctx.send(
+            await interaction.response.send_message(
                 "You do not have permission to use this command.", ephemeral=True
             )
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(
+            await interaction.response.send_message(
                 "Please specify the amount of messages to delete.", ephemeral=True
             )
         else:
-            await ctx.send("An error occurred while purging messages.", ephemeral=True)
+            await interaction.response.send_message(
+                "An error occurred while purging messages.", ephemeral=True
+            )
 
 
 async def setup(client):

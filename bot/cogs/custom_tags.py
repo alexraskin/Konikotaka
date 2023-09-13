@@ -45,12 +45,12 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @commands.hybrid_group(fallback="add")
+    @commands.hybrid_group()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to add")
     @app_commands.describe(tag_content="The content of the tag")
-    async def tagadd(
+    async def add(
         self, ctx: commands.Context, tag_name: str, *, tag_content: str
     ) -> None:
         """
@@ -73,17 +73,16 @@ class Tags(commands.Cog, name="Custom Tags"):
                 await session.commit()
                 await ctx.send(f"Tag `{tag_name}` added!")
                 await ctx.message.add_reaction("👍")
-                self.client.log.info(f"User {ctx.author} added a tag named {tag_name}")
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
 
-    @tag.command(aliases=["edit"])
+    @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to edit")
     @app_commands.describe(tag_content="The new content of the tag")
-    async def tagedit(
+    async def edit(
         self, ctx: commands.Context, tag_name: str, *, tag_content: str
     ) -> None:
         """
@@ -107,9 +106,6 @@ class Tags(commands.Cog, name="Custom Tags"):
                     await session.commit()
                     await ctx.send(f"Tag `{tag_name}` edited!")
                     await ctx.message.add_reaction("👍")
-                    self.client.log.info(
-                        f"User {ctx.author} edited a tag named {tag_name}"
-                    )
                 except Exception as e:
                     await ctx.send(
                         "An error occurred while editing the tag.", ephemeral=True
@@ -142,11 +138,11 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @tag.command(aliases=["delete"])
+    @tag.command(aliases=["del"])
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to remove")
-    async def tagdel(self, ctx: commands.Context, tag_name: str) -> None:
+    async def delete(self, ctx: commands.Context, tag_name: str) -> None:
         """
         Delete a tag
         """

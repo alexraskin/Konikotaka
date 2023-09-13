@@ -1,6 +1,6 @@
 import asyncio
 import random
-from typing import List, Optional
+from typing import List, Optional, Union, Dict
 
 import discord
 from discord import Interaction, Member, app_commands
@@ -11,6 +11,8 @@ from models.races import Races
 
 shuffled_participants: List = []
 running_guilds: List = []
+snail_positions: Dict = {}
+
 
 class JoinRaceButton(discord.ui.View):
     def __init__(self, *, timeout: int = 45):
@@ -24,21 +26,20 @@ class JoinRaceButton(discord.ui.View):
         await interaction.response.defer()
 
         if interaction.user.id not in shuffled_participants:
-          await interaction.followup.send(
-            f"You've entered into the race!", ephemeral=True
-        )
-          shuffled_participants.append(interaction.user.id)
+            await interaction.followup.send(
+                f"You've entered into the race!", ephemeral=True
+            )
+            shuffled_participants.append(interaction.user.id)
         else:
-          await interaction.followup.send(
-              content="You already joined the race! 🐌",
-              ephemeral=True
+            await interaction.followup.send(
+                content="You already joined the race! 🐌", ephemeral=True
             )
 
 
 class SnailRace(commands.Cog, name="Snail Racing"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
-    
+
     @tasks.loop(count=1)
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
@@ -46,7 +47,9 @@ class SnailRace(commands.Cog, name="Snail Racing"):
 
     async def randomize_snails(self) -> None:
         global shuffled_participants
-        shuffled_participants = random.sample(shuffled_participants, len(shuffled_participants))
+        shuffled_participants = random.sample(
+            shuffled_participants, len(shuffled_participants)
+        )
         return shuffled_participants
 
     async def update_leaderboard(self, winner: Member) -> None:
@@ -72,18 +75,18 @@ class SnailRace(commands.Cog, name="Snail Racing"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-                self.client.log.error(f"An error occurred while updating the leaderboard.\n{e}")
-        
+                self.client.log.error(
+                    f"An error occurred while updating the leaderboard.\n{e}"
+                )
+
     async def simulate_race(self, interaction: Interaction) -> None:
         global snail_positions
         global shuffled_participants
         winner: Member = None
         race_length: int = 10
         if len(shuffled_participants) <= 0:
-                await interaction.channel.send(
-                    content="No one joined the race! 😢"
-                )
-                return
+            await interaction.channel.send(content="No one joined the race! 😢")
+            return
         message = await interaction.channel.send("The Race is starting! 🚩")
         shuffled_participants.append(self.client.user.id)
         randomize_snail = await self.randomize_snails()
@@ -111,9 +114,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         )
         embed.set_thumbnail(url=winner.display_avatar.url)
         await interaction.channel.send(embed=embed)
-        snail_positions.clear()
-        shuffled_participants.clear()
-        running_guilds.remove(interaction.guild.id)
         await self.update_leaderboard(winner)
 
     @app_commands.command(name="race", description="Start a Snail Race")
@@ -141,6 +141,20 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         await asyncio.sleep(delay)
         await self.simulate_race(interaction)
 
+    @commands.Cog.listener()
+    async def on_app_command_completion(
+        self,
+        interaction: discord.Interaction,
+        command: Union[app_commands.Command, app_commands.ContextMenu],
+    ) -> None:
+        try:
+          snail_positions.clear()
+          shuffled_participants.clear()
+          running_guilds.remove(interaction.guild.id)
+        except ValueError:
+          pass
+        self.client.log.info(f"{interaction.user} used {command}")
+
     @app_commands.command(name="leaderboard", description="Get Race Leaderboard")
     @app_commands.guild_only()
     async def leaderboard(self, interaction: Interaction) -> None:
@@ -162,7 +176,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
             )
             await interaction.response.send_message(embed=embed)
 
-  
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(SnailRace(client))

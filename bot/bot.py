@@ -8,7 +8,7 @@ from typing import List
 import discord
 from aiohttp import ClientSession, ClientTimeout
 from discord.ext import tasks
-from discord.ext.commands import Bot, DefaultHelpCommand
+from discord.ext.commands import Bot, DefaultHelpCommand, when_mentioned_or
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -31,11 +31,6 @@ class WiseOldManBot(Bot):
         self.start_time = time.time()
         self.log = log
         self.cosmo_guild: int = 1020830000104099860
-        self.channel_ignore: List[int] = [
-            1149054364795805779,
-            1145101773074354287,
-            1145086136142811249,
-        ]
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
@@ -84,7 +79,7 @@ class WiseOldManBot(Bot):
 
 
 client = WiseOldManBot(
-    command_prefix=os.getenv("PREFIX", "?"),
+    command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
     intents=discord.Intents.all(),
     max_messages=10000,
     help_command=DefaultHelpCommand(no_category="Commands"),
