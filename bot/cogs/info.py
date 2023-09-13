@@ -54,8 +54,8 @@ class Info(commands.Cog, name="Info"):
     @app_commands.guild_only()
     async def uptime(self, ctx: commands.Context) -> None:
         embed = Embed(
-            title="Bot Uptime",
-            description=f"Uptime: {self.client.get_uptime()}",
+            title="Bot Uptime 🕒",
+            description=f"Uptime: {self.client.get_uptime()} 🕒",
             color=0x42F56C,
             timestamp=ctx.message.created_at,
         )

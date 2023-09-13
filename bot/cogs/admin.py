@@ -81,8 +81,15 @@ class Admin(commands.Cog, name="Admin"):
             return
         try:
             amount += 1
+            await interaction.response.defer()
             await interaction.channel.purge(limit=amount, reason=reason)
-            await interaction.response.send_message(f"I have purged {amount} messages.")
+            embed = Embed(
+                title="Purge 🗑️",
+                description=f"Purged {amount} messages.",
+                color=0x00FF00,
+                timestamp=interaction.message.created_at,
+            )
+            await interaction.channel.send(embed=embed)
         except Exception as e:
             self.client.log.error(f"Error: {e}")
             await interaction.response.send_message(
