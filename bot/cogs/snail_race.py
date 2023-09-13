@@ -5,11 +5,12 @@ from typing import List, Optional
 import discord
 from discord import Interaction, Member, app_commands
 from discord.ext import commands, tasks
+from sqlalchemy.future import select
 from models.db import Base
-from models.race import Race
+from models.races import Races
 
 shuffled_participants: List = []
-on_command = 0
+running_guilds: List = []
 
 class JoinRaceButton(discord.ui.View):
     def __init__(self, *, timeout: int = 45):
@@ -21,6 +22,7 @@ class JoinRaceButton(discord.ui.View):
     ):
         global shuffled_participants
         await interaction.response.defer()
+
         if interaction.user.id not in shuffled_participants:
           await interaction.followup.send(
             f"You've entered into the race!", ephemeral=True
@@ -36,11 +38,41 @@ class JoinRaceButton(discord.ui.View):
 class SnailRace(commands.Cog, name="Snail Racing"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
+    
+    @tasks.loop(count=1)
+    async def init_database(self) -> None:
+        async with self.client.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
     async def randomize_snails(self) -> None:
         global shuffled_participants
         shuffled_participants = random.sample(shuffled_participants, len(shuffled_participants))
         return shuffled_participants
+
+    async def update_leaderboard(self, winner: Member) -> None:
+        updated_racer = Races(
+            discord_id=winner.id,
+            wins=1,
+            points=1,
+        )
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(Races).filter(Races.discord_id == winner.id)
+            )
+            racer = query.scalar_one_or_none()
+            if racer:
+                racer.wins += 1
+                racer.points += 1
+                session.add(racer)
+            else:
+                session.add(updated_racer)
+            try:
+                await session.flush()
+                await session.commit()
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
+                self.client.log.error(f"An error occurred while updating the leaderboard.\n{e}")
         
     async def simulate_race(self, interaction: Interaction) -> None:
         global snail_positions
@@ -71,7 +103,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
             await message.edit(
                 content=f"🏁 **The race is now in progress!** 🏁\n{race_progress}"
             )
-        snail_positions.clear()
         embed = discord.Embed(
             title="Congratulations!",
             description=f"{winner.mention} won the race! 🏁",
@@ -80,34 +111,57 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         )
         embed.set_thumbnail(url=winner.display_avatar.url)
         await interaction.channel.send(embed=embed)
+        snail_positions.clear()
         shuffled_participants.clear()
+        running_guilds.remove(interaction.guild.id)
+        await self.update_leaderboard(winner)
 
     @app_commands.command(name="race", description="Start a Snail Race")
     @app_commands.guild_only()
-    # @app_commands.checks.dynamic_cooldown(game_cooldown)
     async def race(self, interaction: Interaction, delay: Optional[int] = 10) -> None:
+        global running_guilds
         view: JoinRaceButton = JoinRaceButton()
-        global on_command
-        if on_command == 1:
-            await interaction.response.send_message("A Race is already in progress.", ephemeral=True)
+        if interaction.guild.id in running_guilds:
+            await interaction.response.send_message(
+                content="A race is already running in this server!",
+                ephemeral=True,
+            )
             return
         if delay > 30:
             await interaction.response.send_message(
-                "Delay must be less than 30 seconds"
+                "Delay must be less than 30 seconds",
+                ephemeral=True,
             )
             return
-        on_command = 1
+        running_guilds.append(interaction.guild.id)
         await interaction.response.send_message(
             content=f"{interaction.user.mention} has started a race.\nRace will start in {delay} seconds.",
             view=view,
         )
         await asyncio.sleep(delay)
         await self.simulate_race(interaction)
-        on_command = 0
-  
+
     @app_commands.command(name="leaderboard", description="Get Race Leaderboard")
+    @app_commands.guild_only()
     async def leaderboard(self, interaction: Interaction) -> None:
-        await interaction.response.send("This command is not implemented yet.")
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(Races).order_by(Races.points.desc()).limit(3)
+            )
+            racers = query.scalars().all()
+            leaderboard = ""
+            for racer in racers:
+                racer_info = self.client.get_user(int(str(racer.discord_id).strip()))
+                leaderboard += f"{racer_info.mention}: {racer.points} points 🏅\n"
+
+            embed = discord.Embed(
+                title="Snail Racing Leaderboard 🏆",
+                description=leaderboard,
+                color=discord.Color.green(),
+                timestamp=interaction.created_at,
+            )
+            await interaction.response.send_message(embed=embed)
+
   
 
 async def setup(client: commands.Bot) -> None:

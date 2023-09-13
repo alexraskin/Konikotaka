@@ -56,14 +56,14 @@ class Admin(commands.Cog, name="Admin"):
     @commands.command(name="sync", hidden=True)
     @commands.is_owner()
     async def sync(self, ctx: commands.Context) -> None:
-        await ctx.send("Syncing...")
+        message = await ctx.send("Syncing... 🔄")
         try:
             await self.client.tree.sync()
         except HTTPException as e:
             self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while syncing.", ephemeral=True)
             return
-        await ctx.send("Synced.")
+        await message.edit("Synced successfully! ✅")
 
     @commands.hybrid_command(name="purge", hidden=True)
     @commands.is_owner()
