@@ -153,7 +153,6 @@ class SnailRace(commands.Cog, name="Snail Racing"):
           running_guilds.remove(interaction.guild.id)
         except ValueError:
           pass
-        self.client.log.info(f"{interaction.user} used {command}")
 
     @app_commands.command(name="leaderboard", description="Get Race Leaderboard")
     @app_commands.guild_only()

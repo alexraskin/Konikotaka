@@ -3,7 +3,6 @@ import logging
 import os
 import random
 import time
-from typing import List
 
 import discord
 from aiohttp import ClientSession, ClientTimeout
@@ -12,6 +11,8 @@ from discord.ext.commands import Bot, DefaultHelpCommand, when_mentioned_or
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+
+from cogs.utils.lists import activities, songs, games
 
 load_dotenv()
 
@@ -90,25 +91,10 @@ client = WiseOldManBot(
 
 @tasks.loop(minutes=1)
 async def change_activity() -> None:
-    activities = [
-        "with Cosmo",
-        ".cosmo",
-        "RuneLite",
-        ".help",
-        "Fishing in Lumbridge",
-        "Grand Exchange",
-        "SMITE",
-        "Overwatch 2",
-        ".cats",
-        "with Bartholomeow",
-        "With Snad's Mom",
-        "Annoying Seaira",
-        "/newpet",
-        "/waifu",
-    ]
-    await client.change_presence(
-        activity=discord.Game(name=random.choice(list(activities)))
-    )
+    game = discord.Game(name=random.choice(activities))
+    listen = discord.Activity(type=discord.ActivityType.listening, name=random.choice(songs))
+    watch = discord.Activity(type=discord.ActivityType.watching, name=random.choice(games))
+    await client.change_presence(activity=random.choice([game, listen, watch]))
 
 
 @client.event

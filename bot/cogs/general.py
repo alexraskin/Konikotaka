@@ -1,11 +1,13 @@
 import os
 import random
 
-from discord import DMChannel, Member, Message
+from discord import DMChannel, Member, Message, Embed
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
 from models.users import DiscordUser
+
+from .utils.utils import get_year_round, progress_bar
 
 
 class General(commands.Cog, name="General"):
@@ -36,6 +38,19 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
+                
+    @commands.hybrid_command(name="year")
+    async def year(self, ctx):
+        await ctx.typing()
+        embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
+        embed.set_author(
+            name="Year Progress",
+            icon_url="https://i.gyazo.com/db74b90ebf03429e4cc9873f2990d01e.png",
+        )
+        embed.add_field(
+            name="Progress:", value=progress_bar(get_year_round()), inline=True
+        )
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="source", help="Get the source code for the bot.")
     async def source(self, ctx: commands.Context) -> None:
@@ -67,17 +82,8 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context) -> None:
-        """
-        The on_command_completion function tracks the commands that are executed in each server.
-
-        :param ctx: Used to access the context of the command.
-        :return: a string of the executed command.
-        """
-        full_command_name = ctx.command.qualified_name
-        split = full_command_name.split(" ")
-        executed_command = str(split[0])
         self.client.log.info(
-            f"Executed {executed_command} command in {ctx.guild.name}"
+            f"Executed {ctx.command.qualified_name} command in {ctx.guild.name}"
             + f"(ID: {ctx.message.guild.id}) by {ctx.message.author} (ID: {ctx.message.author.id})"
         )
 
