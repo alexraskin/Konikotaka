@@ -9,10 +9,17 @@ import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs.utils.lists import activities, games, songs
 from discord.ext import tasks
-from discord.ext.commands import Bot, DefaultHelpCommand, when_mentioned_or
+from discord.ext.commands import (
+    Bot,
+    DefaultHelpCommand,
+    when_mentioned_or,
+    NoEntryPointError,
+)
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+
+from cogs import EXTENSIONS
 
 load_dotenv()
 
@@ -34,6 +41,7 @@ class WiseOldManBot(Bot):
         self.cosmo_guild: int = 1020830000104099860
         self.lavalink_uri = os.getenv("LAVALINK_URI")
         self.lavalink_password = os.getenv("LAVALINK_PASSWORD")
+        self.logo_url = "https://i.gyazo.com/b44411736275628586cc8b3ff4239789.jpg"
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
@@ -58,26 +66,27 @@ class WiseOldManBot(Bot):
             uri=self.lavalink_uri, password=self.lavalink_password
         )
         await wavelink.NodePool.connect(client=self, nodes=[node])
-        startup_extensions = []
-        for file in os.listdir(os.path.join(os.path.dirname(__file__), "cogs/")):
-            filename, ext = os.path.splitext(file)
-            if ".py" in ext:
-                startup_extensions.append(f"cogs.{filename}")
-
-        for extension in reversed(startup_extensions):
+        for cog in EXTENSIONS:
             try:
-                self.log.info(f"Loading: {extension}")
-                await self.load_extension(f"{extension}")
-            except Exception as error:
-                exc = f"{type(error).__name__}: {error}"
-                self.log.error(f"Failed to load extension {extension}\n{exc}")
+                await self.load_extension(cog)
+                self.log.info(f"Loaded extension: {cog}")
+            except NoEntryPointError:
+                self.log.error(
+                    f"Could not load extension: {cog} due to NoEntryPointError"
+                )
+            except Exception as exc:
+                self.log.error(
+                    f"Could not load extension: {cog} due to {exc.__class__.__name__}: {exc}"
+                )
 
+    @property
     def get_bot_latency(self) -> float:
         """
         Returns the websocket latency in seconds.
         """
         return round(self.latency * 1000)
 
+    @property
     def get_uptime(self) -> str:
         """Returns the uptime of the bot."""
         return str(

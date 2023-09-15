@@ -24,24 +24,20 @@ class Info(commands.Cog, name="Info"):
             timestamp=ctx.message.created_at,
         )
         embed.add_field(name="Node Name", value=os.getenv("NODE_NAME"))
-        embed.add_field(name="Uptime", value=self.client.get_uptime())
-        embed.add_field(name="Bot Version", value="1.0.0")
+        embed.add_field(name="Uptime", value=self.client.get_uptime)
+        embed.add_field(name="Bot Version", value="1.0.1")
         embed.add_field(name="Python Version", value=platform.python_version())
         embed.add_field(name="Discord.py Version", value=discord_version)
         embed.set_footer(text=f"Made with 💖 with Discord.py")
-        embed.set_thumbnail(
-            url="https://i.gyazo.com/5ebe2c95171d17d96f83822de0366974.jpg"
-        )
-        self.client.log.info(f"User {ctx.author} requested info about the bot.")
+        embed.set_thumbnail(url=self.client.logo_url)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(
         name="ping", help="Returns the latency of the bot.", with_app_command=True
     )
     async def ping(self, ctx: commands.Context) -> None:
-        self.client.log.info(f"User {ctx.author} pinged the bot.")
         await ctx.send(
-            f"Pong!\n**Node: {os.getenv('NODE_NAME')}** {round(self.client.latency * 1000)}ms\n**Python Version: {platform.python_version()}**"
+            f"Pong! 🏓\nNode: **{os.getenv('NODE_NAME')}**\nLatency: **{round(self.client.get_bot_latency)}ms**\nPython Version: **{platform.python_version()}**"
         )
 
     @commands.hybrid_command(
@@ -55,10 +51,11 @@ class Info(commands.Cog, name="Info"):
     async def uptime(self, ctx: commands.Context) -> None:
         embed = Embed(
             title="Bot Uptime 🕒",
-            description=f"Uptime: {self.client.get_uptime()} 🕒",
+            description=f"Uptime: {self.client.get_uptime} 🕒",
             color=0x42F56C,
             timestamp=ctx.message.created_at,
         )
+        embed.set_thumbnail(url=self.client.logo_url)
         await ctx.send(embed=embed)
 
 
