@@ -1,13 +1,13 @@
 import asyncio
 import random
-from typing import List, Optional, Union, Dict
+from typing import Dict, List, Optional, Union
 
 import discord
 from discord import Interaction, Member, app_commands
 from discord.ext import commands, tasks
-from sqlalchemy.future import select
 from models.db import Base
 from models.races import Races
+from sqlalchemy.future import select
 
 shuffled_participants: List = []
 running_guilds: List = []
@@ -148,11 +148,11 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         command: Union[app_commands.Command, app_commands.ContextMenu],
     ) -> None:
         try:
-          snail_positions.clear()
-          shuffled_participants.clear()
-          running_guilds.remove(interaction.guild.id)
+            snail_positions.clear()
+            shuffled_participants.clear()
+            running_guilds.remove(interaction.guild.id)
         except ValueError:
-          pass
+            pass
 
     @app_commands.command(name="leaderboard", description="Get Race Leaderboard")
     @app_commands.guild_only()

@@ -14,6 +14,7 @@ def progress_bar(percent):
     progress_bar += bar_empty * (length - len(progress_bar))
     return f"{progress_bar} {percent:.1f}%"
 
+
 def get_year_round() -> str:
     now = dt.utcnow()
     year_end = dt(now.year + 1, 1, 1)

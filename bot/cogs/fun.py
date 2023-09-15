@@ -1,5 +1,5 @@
-from typing import Literal
 from inspect import getsourcelines
+from typing import Literal
 
 import upsidedown
 from discord import app_commands

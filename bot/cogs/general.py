@@ -1,7 +1,7 @@
 import os
 import random
 
-from discord import DMChannel, Member, Message, Embed, Interaction, app_commands
+from discord import DMChannel, Embed, Interaction, Member, Message, app_commands
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
@@ -18,11 +18,11 @@ class General(commands.Cog, name="General"):
             os.getenv("GENERAL_CHANNEL_ID")
         )
         self.ctx_menu = app_commands.ContextMenu(
-            name='React to message',
+            name="React to message",
             callback=self.react,
         )
         self.client.tree.add_command(self.ctx_menu)
-    
+
     async def cog_unload(self) -> None:
         self.client.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
@@ -30,9 +30,9 @@ class General(commands.Cog, name="General"):
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-      
+
     async def react(self, interaction: Interaction, message: Message) -> None:
-        await interaction.response.send_message('Very cool message!', ephemeral=True)
+        await interaction.response.send_message("Very cool message!", ephemeral=True)
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member: Member) -> None:
@@ -49,7 +49,7 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-                
+
     @commands.hybrid_command(name="year")
     async def year(self, ctx):
         await ctx.typing()

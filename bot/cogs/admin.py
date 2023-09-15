@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from discord import Embed, HTTPException, app_commands, Interaction
+from discord import Embed, HTTPException, Interaction, app_commands
 from discord.ext import commands
 
 

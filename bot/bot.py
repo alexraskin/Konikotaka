@@ -5,14 +5,14 @@ import random
 import time
 
 import discord
+import wavelink
 from aiohttp import ClientSession, ClientTimeout
+from cogs.utils.lists import activities, games, songs
 from discord.ext import tasks
 from discord.ext.commands import Bot, DefaultHelpCommand, when_mentioned_or
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
-from cogs.utils.lists import activities, songs, games
 
 load_dotenv()
 
@@ -32,6 +32,8 @@ class WiseOldManBot(Bot):
         self.start_time = time.time()
         self.log = log
         self.cosmo_guild: int = 1020830000104099860
+        self.lavalink_uri = os.getenv("LAVALINK_URI")
+        self.lavalink_password = os.getenv("LAVALINK_PASSWORD")
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
@@ -52,6 +54,10 @@ class WiseOldManBot(Bot):
         self.log.info(f"Ready: {self.user} ID: {self.user.id}")
 
     async def setup_hook(self) -> None:
+        node: wavelink.Node = wavelink.Node(
+            uri=self.lavalink_uri, password=self.lavalink_password
+        )
+        await wavelink.NodePool.connect(client=self, nodes=[node])
         startup_extensions = []
         for file in os.listdir(os.path.join(os.path.dirname(__file__), "cogs/")):
             filename, ext = os.path.splitext(file)
@@ -92,8 +98,12 @@ client = WiseOldManBot(
 @tasks.loop(minutes=1)
 async def change_activity() -> None:
     game = discord.Game(name=random.choice(activities))
-    listen = discord.Activity(type=discord.ActivityType.listening, name=random.choice(songs))
-    watch = discord.Activity(type=discord.ActivityType.watching, name=random.choice(games))
+    listen = discord.Activity(
+        type=discord.ActivityType.listening, name=random.choice(songs)
+    )
+    watch = discord.Activity(
+        type=discord.ActivityType.watching, name=random.choice(games)
+    )
     await client.change_presence(activity=random.choice([game, listen, watch]))
 
 
