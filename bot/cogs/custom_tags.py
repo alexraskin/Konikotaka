@@ -17,7 +17,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    @commands.hybrid_group(fallback="get")
+    @commands.hybrid_group(fallback="get", with_app_command=True)
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get")
@@ -45,7 +45,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @commands.hybrid_group()
+    @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to add")
