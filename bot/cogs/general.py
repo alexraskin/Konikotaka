@@ -1,7 +1,7 @@
 import os
 import random
 
-from discord import DMChannel, Member, Message, Embed
+from discord import DMChannel, Member, Message, Embed, Interaction, app_commands
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
@@ -17,11 +17,22 @@ class General(commands.Cog, name="General"):
         self.channel: GuildChannel = self.client.get_channel(
             os.getenv("GENERAL_CHANNEL_ID")
         )
+        self.ctx_menu = app_commands.ContextMenu(
+            name='React to message',
+            callback=self.react,
+        )
+        self.client.tree.add_command(self.ctx_menu)
+    
+    async def cog_unload(self) -> None:
+        self.client.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+      
+    async def react(self, interaction: Interaction, message: Message) -> None:
+        await interaction.response.send_message('Very cool message!', ephemeral=True)
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member: Member) -> None:
@@ -51,11 +62,6 @@ class General(commands.Cog, name="General"):
             name="Progress:", value=progress_bar(get_year_round()), inline=True
         )
         await ctx.send(embed=embed)
-
-    @commands.hybrid_command(name="source", help="Get the source code for the bot.")
-    async def source(self, ctx: commands.Context) -> None:
-        self.client.log.info(f"User {ctx.author} requested the source code.")
-        await ctx.send("https://github.com/alexraskin/WiseOldManBot")
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
