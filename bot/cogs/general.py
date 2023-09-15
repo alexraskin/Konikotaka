@@ -1,7 +1,8 @@
 import os
 import random
 
-from discord import DMChannel, Embed, Interaction, Member, Message, app_commands
+from discord import (DMChannel, Embed, Interaction, Member, Message,
+                     app_commands)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
