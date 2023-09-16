@@ -93,7 +93,6 @@ client = WiseOldManBot(
     command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
     intents=discord.Intents.all(),
     max_messages=10000,
-    help_command=DefaultHelpCommand(no_category="Commands"),
     description="Hello, I am WiseOldManBot!",
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )

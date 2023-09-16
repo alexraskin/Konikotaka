@@ -17,7 +17,19 @@ class Tags(commands.Cog, name="Custom Tags"):
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    @commands.hybrid_group(fallback="get", with_app_command=True)
+    @commands.hybrid_group()
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def tags(self, ctx: commands.Context) -> None:
+        """
+        Custom tag commands
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
+
+
+
+    @tags.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get")
@@ -45,7 +57,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @tag.command()
+    @tags.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to add")
@@ -77,7 +89,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                 self.client.log.error(e)
                 await session.rollback()
 
-    @tag.command()
+    @tags.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to edit")
@@ -115,7 +127,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @tag.command(aliases=["info"])
+    @tags.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get info on")
@@ -138,7 +150,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @tag.command(aliases=["del"])
+    @tags.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to remove")
