@@ -98,6 +98,7 @@ class Help(commands.Cog):
                 "help": "Shows help about the bot, a command, or a category",
             }
         )
+
     def cog_unload(self):
         self.client.get_command("help").hidden = False
         self.client.help_command = DefaultHelpCommand()

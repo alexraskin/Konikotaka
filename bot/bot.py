@@ -10,8 +10,12 @@ from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from cogs.utils.lists import activities, games, songs
 from discord.ext import tasks
-from discord.ext.commands import (Bot, DefaultHelpCommand, NoEntryPointError,
-                                  when_mentioned_or)
+from discord.ext.commands import (
+    Bot,
+    DefaultHelpCommand,
+    NoEntryPointError,
+    when_mentioned_or,
+)
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -100,14 +104,7 @@ client = WiseOldManBot(
 
 @tasks.loop(minutes=1)
 async def change_activity() -> None:
-    game = discord.Game(name=random.choice(activities))
-    listen = discord.Activity(
-        type=discord.ActivityType.listening, name=random.choice(songs)
-    )
-    watch = discord.Activity(
-        type=discord.ActivityType.watching, name=random.choice(games)
-    )
-    await client.change_presence(activity=random.choice([game, listen, watch]))
+    await client.change_presence(activity=discord.Game(name=random.choice(activities)))
 
 
 @client.event

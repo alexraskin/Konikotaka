@@ -27,8 +27,6 @@ class Tags(commands.Cog, name="Custom Tags"):
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
-
-
     @tags.command()
     @commands.guild_only()
     @app_commands.guild_only()

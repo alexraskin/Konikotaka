@@ -14,7 +14,9 @@ class Music(commands.Cog, name="Music"):
     async def on_wavelink_node_ready(self, node: wavelink.Node) -> None:
         self.client.log.info(f"Node {node.id} is ready!")
 
-    @app_commands.command(name="play_music", description="Search a song on Youtube, or queue a song!")
+    @app_commands.command(
+        name="play_music", description="Search a song on Youtube, or queue a song!"
+    )
     @app_commands.guild_only()
     @app_commands.describe(search="The search query to use.")
     @app_commands.describe(volume="The volume to play at.")
@@ -26,19 +28,26 @@ class Music(commands.Cog, name="Music"):
         """
 
         if search is None:
-            await interaction.response.send_message("Please provide a search query.", ephemeral=True)
+            await interaction.response.send_message(
+                "Please provide a search query.", ephemeral=True
+            )
             return
 
         if volume > 100 or volume < 0:
-            await interaction.response.send_message("Volume must be between 0 and 100", ephemeral=True)
+            await interaction.response.send_message(
+                "Volume must be between 0 and 100", ephemeral=True
+            )
             return
 
         if await self.check_author(interaction) is False:
             return
-        
+
         author_voice = interaction.user.voice
 
-        player: wavelink.Player = interaction.guild.voice_client or await author_voice.channel.connect(cls=wavelink.Player)
+        player: wavelink.Player = (
+            interaction.guild.voice_client
+            or await author_voice.channel.connect(cls=wavelink.Player)
+        )
         player.autoplay = True
 
         tracks = await wavelink.YouTubeTrack.search(search)
@@ -69,7 +78,9 @@ class Music(commands.Cog, name="Music"):
                 embed.set_image(url=track.thumb)
                 await interaction.response.send_message(embed=embed)
             else:
-                await interaction.response.send_message(f"Queued Playlist {tracks.title}")
+                await interaction.response.send_message(
+                    f"Queued Playlist {tracks.title}"
+                )
 
         else:
             await interaction.response.send_message("No results found", ephemeral=True)
@@ -141,7 +152,9 @@ class Music(commands.Cog, name="Music"):
             )
             return
         if volume > 100 or volume < 0:
-            await interaction.response.send_message("Volume must be between 0 and 100", ephemeral=True)
+            await interaction.response.send_message(
+                "Volume must be between 0 and 100", ephemeral=True
+            )
             return
         player: wavelink.Player = interaction.guild.voice_client
         await player.set_volume(volume)
@@ -173,14 +186,18 @@ class Music(commands.Cog, name="Music"):
             await interaction.response.send_message("Queue is empty")
             return
         if index > len(player.queue):
-            await interaction.response.send_message("Index out of range", ephemeral=True)
+            await interaction.response.send_message(
+                "Index out of range", ephemeral=True
+            )
             return
         del player.queue[index - 1]
         await interaction.response.send_message("Removed! ✅")
 
     async def check_author(self, interaction: Interaction) -> bool:
         if interaction.user.voice is None:
-            await interaction.response.send_message("Join a voice channel first..", ephemeral=True)
+            await interaction.response.send_message(
+                "Join a voice channel first..", ephemeral=True
+            )
             return False
         return True
 
