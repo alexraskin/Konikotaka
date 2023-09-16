@@ -14,7 +14,7 @@ class Music(commands.Cog, name="Music"):
     async def on_wavelink_node_ready(self, node: wavelink.Node) -> None:
         self.client.log.info(f"Node {node.id} is ready!")
 
-    @app_commands.command(name="play", description="Search a song on Youtube\nExample: /play Never Gonna Give You Up")
+    @app_commands.command(name="play_music", description="Search a song on Youtube, or queue a song!")
     @app_commands.guild_only()
     @app_commands.describe(search="The search query to use.")
     @app_commands.describe(volume="The volume to play at.")
@@ -74,7 +74,7 @@ class Music(commands.Cog, name="Music"):
         else:
             await interaction.response.send_message("No results found")
 
-    @app_commands.command(name="stop", description="Stop the current song")
+    @app_commands.command(name="stop_music", description="Stop the current song")
     @app_commands.guild_only()
     async def stop(self, interaction: Interaction) -> None:
         """Stop the current song"""
@@ -102,7 +102,7 @@ class Music(commands.Cog, name="Music"):
         embed.set_image(url=player.current.thumbnail)
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="pause", description="Pause the current song")
+    @app_commands.command(name="pause_music", description="Pause the current song")
     @app_commands.guild_only()
     async def pause(self, interaction: Interaction) -> None:
         """
@@ -114,7 +114,7 @@ class Music(commands.Cog, name="Music"):
         await player.pause()
         await interaction.response.send_message(content="Paused! ⏸️")
 
-    @app_commands.command(name="resume", description="Resume the current song")
+    @app_commands.command(name="resume_music", description="Resume the current song")
     @app_commands.guild_only()
     async def resume(self, interaction: Interaction) -> None:
         """
@@ -147,7 +147,7 @@ class Music(commands.Cog, name="Music"):
         await player.set_volume(volume)
         await interaction.response.send_message(content=f"Set volume to {volume}. 🔊")
 
-    @app_commands.command(name="queue", description="Show the current queue")
+    @app_commands.command(name="music_queue", description="Show the current queue")
     @app_commands.guild_only()
     async def queue(self, interaction: Interaction) -> None:
         """Show the current queue"""
