@@ -14,25 +14,52 @@ class General(commands.Cog, name="General"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
         self.guild: str = os.getenv("GUILD_ID")
+        self.message_reports_channel: int = 1152498407416533053
         self.channel: GuildChannel = self.client.get_channel(
             os.getenv("GENERAL_CHANNEL_ID")
         )
-        self.ctx_menu = app_commands.ContextMenu(
-            name="React to message",
-            callback=self.react,
+        self.message_report_ctx = app_commands.ContextMenu(
+            name="Report Message",
+            callback=self.report,
         )
-        self.client.tree.add_command(self.ctx_menu)
+        self.client.tree.add_command(self.message_report_ctx)
 
     async def cog_unload(self) -> None:
-        self.client.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
+        self.client.tree.remove_command(self.message_report_ctx.name, type=self.message_report_ctx.type)
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    async def react(self, interaction: Interaction, message: Message) -> None:
-        await interaction.response.send_message("Very cool message!", ephemeral=True)
+    async def report(self, interaction: Interaction, message: Message) -> None:
+        await interaction.response.defer(ephemeral=True)
+        channel = self.client.get_channel(self.message_reports_channel)
+        embed = Embed(
+            title="Message Report",
+            color=0x2ECC71,
+            timestamp=message.created_at,
+        )
+        embed.add_field(name="Message:", value=message.content, inline=False)
+        embed.add_field(
+            name="Author:",
+            value=f"{message.author.mention} ({message.author})",
+            inline=False,
+        )
+        embed.add_field(
+            name="Channel:",
+            value=f"{message.channel.mention} ({message.channel})",
+            inline=False,
+        )
+        embed.add_field(
+            name="Jump:",
+            value=f"[Click here]({message.jump_url})",
+            inline=False,
+        )
+        await channel.send(embed=embed)
+        await interaction.followup.send("Message reported", ephemeral=True)
+        
+
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member: Member) -> None:
