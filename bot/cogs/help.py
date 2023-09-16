@@ -67,7 +67,7 @@ class myHelpCommand(HelpCommand):
         filtered = await self.filter_commands(group.commands, sort=True)
         if not filtered:
             await self.context.send(
-                "No public commands in group. Try again with !help helpall."
+                "No public commands in group. Try again with !helpall"
             )
             return
         category = f"**{group.name}** - {group.description or group.short_doc}"

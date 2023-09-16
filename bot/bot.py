@@ -64,7 +64,10 @@ class WiseOldManBot(Bot):
         node: wavelink.Node = wavelink.Node(
             uri=self.lavalink_uri, password=self.lavalink_password
         )
-        await wavelink.NodePool.connect(client=self, nodes=[node])
+        node1: wavelink.Node = wavelink.Node(
+            uri="lava2.horizxon.studio:80", password="horizxon.studio"
+        )
+        await wavelink.NodePool.connect(client=self, nodes=[node, node1])
         for cog in EXTENSIONS:
             try:
                 await self.load_extension(cog)
