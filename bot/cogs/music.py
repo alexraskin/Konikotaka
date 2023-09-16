@@ -26,11 +26,11 @@ class Music(commands.Cog, name="Music"):
         """
 
         if search is None:
-            await interaction.response.send_message("Please provide a search query.")
+            await interaction.response.send_message("Please provide a search query.", ephemeral=True)
             return
 
         if volume > 100 or volume < 0:
-            await interaction.response.send_message("Volume must be between 0 and 100")
+            await interaction.response.send_message("Volume must be between 0 and 100", ephemeral=True)
             return
 
         if await self.check_author(interaction) is False:
@@ -69,10 +69,10 @@ class Music(commands.Cog, name="Music"):
                 embed.set_image(url=track.thumb)
                 await interaction.response.send_message(embed=embed)
             else:
-                await interaction.response.send_message(f"Queued Playlist")
+                await interaction.response.send_message(f"Queued Playlist {tracks.title}")
 
         else:
-            await interaction.response.send_message("No results found")
+            await interaction.response.send_message("No results found", ephemeral=True)
 
     @app_commands.command(name="stop_music", description="Stop the current song")
     @app_commands.guild_only()
@@ -141,7 +141,7 @@ class Music(commands.Cog, name="Music"):
             )
             return
         if volume > 100 or volume < 0:
-            await interaction.response.send_message("Volume must be between 0 and 100")
+            await interaction.response.send_message("Volume must be between 0 and 100", ephemeral=True)
             return
         player: wavelink.Player = interaction.guild.voice_client
         await player.set_volume(volume)
@@ -173,14 +173,14 @@ class Music(commands.Cog, name="Music"):
             await interaction.response.send_message("Queue is empty")
             return
         if index > len(player.queue):
-            await interaction.response.send_message("Index out of range")
+            await interaction.response.send_message("Index out of range", ephemeral=True)
             return
         del player.queue[index - 1]
         await interaction.response.send_message("Removed! ✅")
 
     async def check_author(self, interaction: Interaction) -> bool:
         if interaction.user.voice is None:
-            await interaction.response.send_message("Join a voice channel first..")
+            await interaction.response.send_message("Join a voice channel first..", ephemeral=True)
             return False
         return True
 
