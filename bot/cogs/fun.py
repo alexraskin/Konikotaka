@@ -71,7 +71,6 @@ class Fun(commands.Cog, name="Fun"):
         up_down = upsidedown.transform(message)
         await ctx.send(up_down)
 
-    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.hybrid_command(name="waifu", aliases=["getwaifu"])
     @commands.guild_only()
     @app_commands.guild_only()
