@@ -10,12 +10,8 @@ from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from cogs.utils.lists import activities, games, songs
 from discord.ext import tasks
-from discord.ext.commands import (
-    Bot,
-    DefaultHelpCommand,
-    NoEntryPointError,
-    when_mentioned_or,
-)
+from discord.ext.commands import (Bot, DefaultHelpCommand, NoEntryPointError,
+                                  when_mentioned_or)
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker

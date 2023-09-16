@@ -1,7 +1,8 @@
 import os
 import random
 
-from discord import DMChannel, Embed, Interaction, Member, Message, app_commands
+from discord import (DMChannel, Embed, Interaction, Member, Message,
+                     app_commands)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
@@ -25,7 +26,9 @@ class General(commands.Cog, name="General"):
         self.client.tree.add_command(self.message_report_ctx)
 
     async def cog_unload(self) -> None:
-        self.client.tree.remove_command(self.message_report_ctx.name, type=self.message_report_ctx.type)
+        self.client.tree.remove_command(
+            self.message_report_ctx.name, type=self.message_report_ctx.type
+        )
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
@@ -56,10 +59,9 @@ class General(commands.Cog, name="General"):
             value=f"[Click here]({message.jump_url})",
             inline=False,
         )
+        embed.set_thumbnail(url=self.client.logo_url)
         await channel.send(embed=embed)
         await interaction.followup.send("Message reported", ephemeral=True)
-        
-
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member: Member) -> None:
