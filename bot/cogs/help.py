@@ -22,11 +22,11 @@ class myHelpCommand(HelpCommand):
             embed.set_footer(text="Use !help <command/category> for more information.")
         await destination.send(embed=embed)
 
-    async def send_bot_help(self, mapping):
+    async def send_bot_help(self, mapping: dict):
         ctx = self.context
         bot = ctx.bot
 
-        def get_category(command):
+        def get_category(command: commands.Command):
             cog = command.cog
             return cog.qualified_name + ":" if cog is not None else "Help:"
 
@@ -47,7 +47,7 @@ class myHelpCommand(HelpCommand):
             self.paginator.append((category, entries))
         await self.send_pages(header=True, footer=True)
 
-    async def send_cog_help(self, cog):
+    async def send_cog_help(self, cog: commands.Cog):
         filtered = await self.filter_commands(cog.get_commands(), sort=True)
         if not filtered:
             await self.context.send(
@@ -63,7 +63,7 @@ class myHelpCommand(HelpCommand):
         self.paginator.append((category, entries))
         await self.send_pages(footer=True)
 
-    async def send_group_help(self, group):
+    async def send_group_help(self, group: commands.Groups):
         filtered = await self.filter_commands(group.commands, sort=True)
         if not filtered:
             await self.context.send(
@@ -78,19 +78,19 @@ class myHelpCommand(HelpCommand):
         self.paginator.append((category, entries))
         await self.send_pages(footer=True)
 
-    async def send_command_help(self, command):
+    async def send_command_help(self, command: commands.Command):
         signature = self.get_command_signature(command)
         helptext = command.help or command.description or "No help Text"
         self.paginator.append((signature, helptext))
         await self.send_pages()
 
-    async def prepare_help_command(self, ctx, command=None):
+    async def prepare_help_command(self, ctx: commands.Context, command=None):
         self.paginator = []
         await super().prepare_help_command(ctx, command)
 
 
 class Help(commands.Cog):
-    def __init__(self, client):
+    def __init__(self, client: commands.Bot):
         self.client = client
         self.client.help_command = myHelpCommand(
             command_attrs={
@@ -114,5 +114,5 @@ class Help(commands.Cog):
         self.client.help_command = myHelpCommand()
 
 
-async def setup(client):
+async def setup(client: commands.Bot):
     await client.add_cog(Help(client))

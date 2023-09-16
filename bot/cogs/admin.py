@@ -113,5 +113,5 @@ class Admin(commands.Cog, name="Admin"):
             )
 
 
-async def setup(client):
+async def setup(client: commands.Bot):
     await client.add_cog(Admin(client))

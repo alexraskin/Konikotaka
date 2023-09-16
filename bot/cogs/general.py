@@ -1,8 +1,7 @@
 import os
 import random
 
-from discord import (DMChannel, Embed, Interaction, Member, Message,
-                     app_commands)
+from discord import DMChannel, Embed, Interaction, Member, Message, app_commands
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
@@ -79,9 +78,8 @@ class General(commands.Cog, name="General"):
                 self.client.log.error(e)
                 await session.rollback()
 
-    @commands.hybrid_command(name="year")
-    async def year(self, ctx):
-        await ctx.typing()
+    @commands.hybrid_command(name="year", description="Show the year progress")
+    async def year(self, ctx: commands.Context):
         embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
         embed.set_author(
             name="Year Progress",
@@ -142,5 +140,5 @@ class General(commands.Cog, name="General"):
             await ctx.send("Missing required argument.")
 
 
-async def setup(client) -> None:
+async def setup(client: commands.Bot) -> None:
     await client.add_cog(General(client))

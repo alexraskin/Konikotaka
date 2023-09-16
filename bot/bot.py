@@ -8,10 +8,9 @@ import discord
 import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
-from cogs.utils.lists import activities, games, songs
+from cogs.utils.lists import activities
 from discord.ext import tasks
-from discord.ext.commands import (Bot, DefaultHelpCommand, NoEntryPointError,
-                                  when_mentioned_or)
+from discord.ext.commands import Bot, NoEntryPointError, when_mentioned_or
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -92,7 +91,7 @@ class WiseOldManBot(Bot):
         )
 
 
-client = WiseOldManBot(
+client: WiseOldManBot = WiseOldManBot(
     command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
     intents=discord.Intents.all(),
     max_messages=10000,

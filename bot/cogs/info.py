@@ -59,5 +59,5 @@ class Info(commands.Cog, name="Info"):
         await ctx.send(embed=embed)
 
 
-async def setup(client):
+async def setup(client: commands.Bot):
     await client.add_cog(Info(client))

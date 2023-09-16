@@ -125,7 +125,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             else:
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
-    @tags.command()
+    @tags.command(description="Get info on a tag")
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get info on")
@@ -183,5 +183,5 @@ class Tags(commands.Cog, name="Custom Tags"):
                 await ctx.send(f"Tag `{tag_name}` not found.")
 
 
-async def setup(client):
+async def setup(client: commands.Bot):
     await client.add_cog(Tags(client))

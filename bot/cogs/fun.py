@@ -128,5 +128,5 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(f"{base_url}{url}")
 
 
-async def setup(client) -> None:
+async def setup(client: commands.Bot) -> None:
     await client.add_cog(Fun(client))
