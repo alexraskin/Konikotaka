@@ -17,12 +17,12 @@ snail_positions: Dict = {}
 class JoinRaceButton(discord.ui.View):
     def __init__(self, *, timeout: int = 45):
         super().__init__(timeout=timeout)
+        global shuffled_participants
 
     @discord.ui.button(label="Join Race", style=discord.ButtonStyle.blurple, emoji="🐌")
-    async def race_button(
+    async def join_race(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        global shuffled_participants
         await interaction.response.defer()
 
         if interaction.user.id not in shuffled_participants:
@@ -33,6 +33,22 @@ class JoinRaceButton(discord.ui.View):
         else:
             await interaction.followup.send(
                 content="You already joined the race! 🐌", ephemeral=True
+            )
+
+    @discord.ui.button(label="Leave Race", style=discord.ButtonStyle.red, emoji="🚫")
+    async def leave_race(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await interaction.response.defer()
+
+        if interaction.user.id not in shuffled_participants:
+            await interaction.followup.send(
+                content="You need to join the race first!", ephemeral=True
+            )
+        else:
+            shuffled_participants.remove(interaction.user.id)
+            await interaction.followup.send(
+                content="You have left the race! 🚫", ephemeral=True
             )
 
 
@@ -120,16 +136,16 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     @app_commands.guild_only()
     async def race(self, interaction: Interaction, delay: Optional[int] = 10) -> None:
         global running_guilds
-        view: JoinRaceButton = JoinRaceButton()
+        view: JoinRaceButton = JoinRaceButton(timeout=delay)
         if interaction.guild.id in running_guilds:
             await interaction.response.send_message(
                 content="A race is already running in this server!",
                 ephemeral=True,
             )
             return
-        if delay > 30:
+        if delay > 30 or delay < 5:
             await interaction.response.send_message(
-                "Delay must be less than 30 seconds",
+                content="Please specify a delay between 5 and 30 seconds.",
                 ephemeral=True,
             )
             return

@@ -63,7 +63,7 @@ class myHelpCommand(HelpCommand):
         self.paginator.append((category, entries))
         await self.send_pages(footer=True)
 
-    async def send_group_help(self, group: commands.Groups):
+    async def send_group_help(self, group: commands.group):
         filtered = await self.filter_commands(group.commands, sort=True)
         if not filtered:
             await self.context.send(

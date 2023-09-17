@@ -74,23 +74,22 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="waifu", aliases=["getwaifu"])
     @commands.guild_only()
     @app_commands.guild_only()
-    @app_commands.describe(category="The category of waifu to get.")
     async def get_waifu(
         self,
         ctx: commands.Context,
         category: Literal["waifu", "neko", "shinobu", "megumin", "bully", "cuddle"],
     ) -> None:
         """
-        Get a random waifu image from the waifu.pics API
+        Get a random waifu image from the waifu API
         """
         response = await self.client.session.get(
             f"https://api.waifu.pics/sfw/{category}"
         )
-        response = await response.json()
-        if response["code"] != 200:
-            return await ctx.send("Error getting waifu!")
-        url = response["url"]
-        await ctx.send(url)
+        if response.status == 200:
+            waifu = await response.json()
+            await ctx.send(waifu["url"])
+        else:
+            await ctx.send("Error getting waifu!")
 
     @commands.command(name="inspect")
     async def inspect(self, ctx, *, command_name: str):
@@ -107,7 +106,6 @@ class Fun(commands.Cog, name="Fun"):
             f'{"/".join(module.split("."))}.py#L{startline}>\n'
         )
         sauce = "".join(saucelines)
-        # Little hack so triple quotes don't end discord codeblocks when printed
         sanitized = sauce.replace("`", "\u200B`")
         if len(url) + len(sanitized) > 1950:
             sanitized = sanitized[: 1950 - len(url)] + "\n[...]"

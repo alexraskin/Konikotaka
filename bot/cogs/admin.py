@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Optional
 
 from discord import Embed, HTTPException, Interaction, app_commands
 from discord.ext import commands
@@ -89,28 +89,13 @@ class Admin(commands.Cog, name="Admin"):
                 color=0x00FF00,
                 timestamp=interaction.message.created_at,
             )
-            await interaction.channel.send(embed=embed)
+            await interaction.followup.send(embed=embed)
         except Exception as e:
             self.client.log.error(f"Error: {e}")
             await interaction.response.send_message(
                 "An error occurred while purging messages.", ephemeral=True
             )
             return
-
-    @purge.error
-    async def purge_error(self, interaction: Interaction, error: commands.CommandError):
-        if isinstance(error, commands.MissingPermissions):
-            await interaction.response.send_message(
-                "You do not have permission to use this command.", ephemeral=True
-            )
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await interaction.response.send_message(
-                "Please specify the amount of messages to delete.", ephemeral=True
-            )
-        else:
-            await interaction.response.send_message(
-                "An error occurred while purging messages.", ephemeral=True
-            )
 
 
 async def setup(client: commands.Bot):
