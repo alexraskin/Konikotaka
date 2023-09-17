@@ -10,6 +10,9 @@ from sqlalchemy.future import select
 class Tags(commands.Cog, name="Custom Tags"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
         self.init_database.start()
 
     @tasks.loop(count=1)

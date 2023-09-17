@@ -56,6 +56,10 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        self.init_database.start()
+
     @tasks.loop(count=1)
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:

@@ -26,16 +26,16 @@ class WiseOldManBot(Bot):
 
     def __init__(self, *args, **options) -> None:
         super().__init__(*args, **options)
-        self.session = None
-        self.engine: create_async_engine = create_async_engine(
-            os.getenv("MYSQL_URL"), echo=True, future=True
-        )
-        self.start_time = time.time()
         self.log = log
+        self.session = None
+        self.start_time = time.time()
         self.cosmo_guild: int = 1020830000104099860
         self.lavalink_uri = os.getenv("LAVALINK_URI")
         self.lavalink_password = os.getenv("LAVALINK_PASSWORD")
         self.logo_url = "https://i.gyazo.com/b44411736275628586cc8b3ff4239789.jpg"
+        self.engine: create_async_engine = create_async_engine(
+            os.getenv("MYSQL_URL"), echo=True, future=True
+        )
 
     async def start(self, *args, **kwargs) -> None:
         self.session = ClientSession(timeout=ClientTimeout(total=30))
@@ -50,8 +50,6 @@ class WiseOldManBot(Bot):
         await super().close()
 
     async def on_ready(self) -> None:
-        if not hasattr(self, "uptime"):
-            self.uptime = time.time()
 
         self.log.info(f"Ready: {self.user} ID: {self.user.id}")
 

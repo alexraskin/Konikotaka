@@ -28,6 +28,10 @@ class General(commands.Cog, name="General"):
         self.client.tree.remove_command(
             self.message_report_ctx.name, type=self.message_report_ctx.type
         )
+  
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        self.init_database.start()
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
