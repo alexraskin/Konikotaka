@@ -32,6 +32,15 @@ class General(commands.Cog, name="General"):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.init_database.start()
+        self.health_check.start()
+
+    @tasks.loop(hours=1)
+    async def health_check(self) -> None:
+        check = await self.client.session.get(os.getenv("HEALTHCHECK_URL"))
+        if check.status == 200:
+            self.client.log.info("Health check successful.")
+        else:
+            self.client.log.error("Health check failed.")
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
