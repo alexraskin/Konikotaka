@@ -20,17 +20,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    @commands.hybrid_group()
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def tags(self, ctx: commands.Context) -> None:
-        """
-        Custom tag commands
-        """
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
-
-    @tags.command()
+    @commands.hybrid_group(fallback="get")
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get")
@@ -52,13 +42,13 @@ class Tags(commands.Cog, name="Custom Tags"):
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
-                    await ctx.send(
-                        "An error occurred while fetching the tag.", ephemeral=True
+                    await ctx.reply(
+                        "An error occurred while fetching the tag. 👎", ephemeral=True
                     )
             else:
-                await ctx.send(f"Tag `{tag_name}` not found.")
+                await ctx.reply(f"Tag `{tag_name}` not found. 👎", ephemeral=True)
 
-    @tags.command()
+    @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to add")
@@ -70,27 +60,35 @@ class Tags(commands.Cog, name="Custom Tags"):
         Add a new tag
         """
         if len(tag_name) > 255:
-            return await ctx.send("Tag name is too long.")
+            return await ctx.reply("Tag name is too long. 👎", ephemeral=True)
         if len(tag_content) > 1000:
-            return await ctx.send("Tag content is too long.")
+            return await ctx.reply("Tag content is too long. 👎", ephemeral=True)
         async with self.client.async_session() as session:
-            tag = CustomTags(
+            query = await session.execute(
+                select(CustomTags).filter(CustomTags.name == tag_name)
+            )
+            tag = query.scalar_one_or_none()
+            if tag:
+                return await ctx.reply(f"Tag `{tag_name}` already exists 👎", ephemeral=True)
+            new_tag = CustomTags(
                 name=tag_name.strip(),
                 content=tag_content,
                 discord_id=ctx.author.id,
                 date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
             )
             try:
-                session.add(tag)
+                session.add(new_tag)
                 await session.flush()
                 await session.commit()
-                await ctx.send(f"Tag `{tag_name}` added!")
-                await ctx.message.add_reaction("👍")
+                await ctx.reply(f"Tag `{tag_name}` added! 👍")
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
+                await ctx.reply(
+                    "An error occurred while adding the tag.", ephemeral=True
+                )
 
-    @tags.command()
+    @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to edit")
@@ -102,9 +100,9 @@ class Tags(commands.Cog, name="Custom Tags"):
         Edit a tag
         """
         if len(tag_name) > 255:
-            return await ctx.send("Tag name is too long.")
+            return await ctx.reply("Tag name is too long.", ephemeral=True)
         if len(tag_content) > 1000:
-            return await ctx.send("Tag content is too long.")
+            return await ctx.reply("Tag content is too long.", ephemeral=True)
         async with self.client.async_session() as session:
             query = await session.execute(
                 select(CustomTags).filter(CustomTags.name == tag_name)
@@ -112,23 +110,22 @@ class Tags(commands.Cog, name="Custom Tags"):
             tag = query.scalar_one_or_none()
             if tag:
                 if int(str(tag.discord_id).strip()) != ctx.author.id:
-                    return await ctx.send("You are not the owner of this tag.")
+                    return await ctx.reply("You are not the owner of this tag.", ephemeral=True)
                 tag.content = tag_content
                 try:
                     await session.flush()
                     await session.commit()
-                    await ctx.send(f"Tag `{tag_name}` edited!")
-                    await ctx.message.add_reaction("👍")
+                    await ctx.reply(f"Tag `{tag_name}` edited!")
                 except Exception as e:
-                    await ctx.send(
+                    await ctx.reply(
                         "An error occurred while editing the tag.", ephemeral=True
                     )
                     self.client.log.error(e)
                     await session.rollback()
             else:
-                await ctx.send(f"Tag `{tag_name}` not found.")
+                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
-    @tags.command(description="Get info on a tag")
+    @tag.command(description="Get info on a tag")
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to get info on")
@@ -147,11 +144,11 @@ class Tags(commands.Cog, name="Custom Tags"):
                 embed.add_field(name="Owner", value=f"<@{tag.discord_id}>")
                 embed.add_field(name="Date Added", value=time.strftime("%B %d, %Y"))
                 embed.add_field(name="Times Called", value=tag.called)
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed)
             else:
-                await ctx.send(f"Tag `{tag_name}` not found.")
+                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
-    @tags.command()
+    @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to remove")
@@ -165,25 +162,24 @@ class Tags(commands.Cog, name="Custom Tags"):
             )
             tag = query.scalar_one_or_none()
             if int(str(tag.discord_id).strip()) != ctx.author.id:
-                return await ctx.send("You are not the owner of this tag.")
+                return await ctx.reply("You are not the owner of this tag.", ephemeral=True)
             if tag:
                 try:
                     session.delete(tag)
                     await session.flush()
                     await session.commit()
-                    await ctx.send(f"Tag `{tag_name}` deleted!")
-                    await ctx.message.add_reaction("👍")
+                    await ctx.reply(f"Tag `{tag_name}` deleted!")
                     self.client.log.info(
                         f"User {ctx.author} deleted a tag named {tag_name}"
                     )
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
-                    await ctx.send(
-                        "An error occurred while deleting the tag.", ephemeral=True
+                    await ctx.reply(
+                        "An error occurred while deleting the tag. 👎", ephemeral=True
                     )
             else:
-                await ctx.send(f"Tag `{tag_name}` not found.")
+                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
 
 async def setup(client: commands.Bot):
