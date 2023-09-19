@@ -15,7 +15,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def get_cat_photo(self, ctx: commands.Context) -> None:
+    async def cosmo_photo(self, ctx: commands.Context) -> None:
         """
         Get a random photo of Cosmo the Cat from the twizy.dev API
         """

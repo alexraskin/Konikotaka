@@ -9,6 +9,7 @@ OldWiseManBot: A mystical Discord companion, weaving enchanting wisdom and magic
 
 ![Endpoint Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fhealthchecks.io%2Fbadge%2Fcb6a79be-ef54-4470-8374-01f814%2FhKTJMc6--2.shields)
 
+
 ## Installation
 
 Creat an `.env` file:

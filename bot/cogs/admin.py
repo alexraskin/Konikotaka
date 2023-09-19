@@ -62,6 +62,7 @@ class Admin(commands.Cog, name="Admin"):
             self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while syncing.", ephemeral=True)
             return
+        await ctx.message.delete()
         await message.edit(content="Synced successfully! ✅")
 
     @app_commands.command(name="purge")
