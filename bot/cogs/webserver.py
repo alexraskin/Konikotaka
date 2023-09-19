@@ -10,12 +10,14 @@ class WebServer(commands.Cog, name="WebServer"):
         self.client: commands.Bot = client
 
     async def index_handler(self, request: web.Request) -> dict:
-        return web.json_response({
-            "botStatus": "online",
-            "discordVersion": discord_version,
-            "botLatency": f"{self.client.get_bot_latency}ms",
-            "botUptime": self.client.get_uptime,
-        })
+        return web.json_response(
+            {
+                "botStatus": "online",
+                "discordVersion": discord_version,
+                "botLatency": f"{self.client.get_bot_latency}ms",
+                "botUptime": self.client.get_uptime,
+            }
+        )
 
     async def webserver(self) -> None:
         app: web.Application = web.Application()

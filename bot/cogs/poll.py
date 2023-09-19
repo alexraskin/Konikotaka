@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from discord.ext import commands
 
+
 class Polls(commands.Cog):
     """Poll voting system.
 
@@ -13,8 +14,8 @@ class Polls(commands.Cog):
         self.client: commands.Bot = client
 
     def to_emoji(self, c: int) -> str:
-      base = 0x1F1E6
-      return chr(base + c)
+        base = 0x1F1E6
+        return chr(base + c)
 
     @commands.command()
     @commands.guild_only()
@@ -25,16 +26,20 @@ class Polls(commands.Cog):
         """
 
         if len(questions_and_choices) < 3:
-            return await ctx.send('Need at least 1 question with 2 choices.')
+            return await ctx.send("Need at least 1 question with 2 choices.")
         elif len(questions_and_choices) > 21:
-            return await ctx.send('You can only have up to 20 choices.')
+            return await ctx.send("You can only have up to 20 choices.")
 
         perms = ctx.channel.permissions_for(ctx.me)
         if not (perms.read_message_history or perms.add_reactions):
-            return await ctx.send('Need Read Message History and Add Reactions permissions.')
+            return await ctx.send(
+                "Need Read Message History and Add Reactions permissions."
+            )
 
         question = questions_and_choices[0]
-        choices = [(self.to_emoji(e), v) for e, v in enumerate(questions_and_choices[1:])]
+        choices = [
+            (self.to_emoji(e), v) for e, v in enumerate(questions_and_choices[1:])
+        ]
 
         try:
             await ctx.message.delete()
@@ -42,7 +47,7 @@ class Polls(commands.Cog):
             pass
 
         body = "\n".join(f"{key}: {c}" for key, c in choices)
-        poll = await ctx.send(f'{ctx.author} asks: {question}\n\n{body}')
+        poll = await ctx.send(f"{ctx.author} asks: {question}\n\n{body}")
         for emoji, _ in choices:
             await poll.add_reaction(emoji)
 

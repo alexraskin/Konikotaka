@@ -1,9 +1,10 @@
 import random
 from inspect import getsourcelines
 from typing import Literal
+import asyncio
 
 import upsidedown
-from discord import app_commands, Embed
+from discord import app_commands, Embed, Member
 from discord.ext import commands
 
 
@@ -93,7 +94,7 @@ class Fun(commands.Cog, name="Fun"):
             await ctx.send("Error getting waifu!")
 
     @commands.command(name="inspect")
-    async def inspect(self, ctx, *, command_name: str):
+    async def inspect(self, ctx, *, command_name: str) -> None:
         """
         Print a link and the source code of a command
         """
@@ -113,7 +114,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(url + f"```python\n{sanitized}\n```")
 
     @commands.command(name="cat", description="Get a random cat image")
-    async def cat(self, ctx):
+    async def cat(self, ctx: commands.Context):
         """
         Get a random cat image from the catapi
         """
@@ -124,12 +125,11 @@ class Fun(commands.Cog, name="Fun"):
         response = await response.json()
         url = response["url"]
         await ctx.send(f"{base_url}{url}")
-    
 
     @commands.hybrid_command(name="roll", description="Roll a dice with NdN")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def roll(self, ctx: commands.Context, dice: str):
+    async def roll(self, ctx: commands.Context, dice: str) -> Embed:
         """
         Roll a dice
         """
@@ -139,10 +139,157 @@ class Fun(commands.Cog, name="Fun"):
         except Exception:
             return await ctx.send("Format has to be in NdN!\n(e.g. 1d20)")
         result = ", ".join(str(random.randint(1, limit)) for r in range(rolls))
-        embed = Embed(title="🎲 Roll Dice", description=f"{ctx.author.name} threw a **{result}**", color=0x2ECC71)
-        embed.set_footer(text=f"{ctx.author}")
+        embed = Embed(
+            title="🎲 Roll Dice",
+            description=f"{ctx.author.name} threw a **{result}** ({rolls}-{limit})",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command(name="8ball", description="Ask the magic 8ball a question")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def eight_ball(self, ctx: commands.Context, question: str) -> Embed:
+        """
+        Ask the magic 8ball a question
+        """
+        responses = [
+            "It is certain.",
+            "It is decidedly so.",
+            "Without a doubt.",
+            "Yes – definitely.",
+            "You may rely on it.",
+            "As I see it, yes.",
+            "Most likely.",
+            "Outlook good.",
+            "Yes.",
+            "Signs point to yes.",
+            "Reply hazy, try again.",
+            "Ask again later.",
+            "Better not tell you now.",
+            "Cannot predict now.",
+            "Concentrate and ask again.",
+            "Don't count on it.",
+            "My reply is no.",
+            "My sources say no.",
+            "Outlook not so good.",
+            "Very doubtful.",
+        ]
+        embed = Embed(
+            title="🎱 8ball",
+            description=f"Question: {question}\nAnswer: {random.choice(responses)}",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
+  
+    @commands.hybrid_command(name="reverse", description="Reverse a string")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def reverse(self, ctx: commands.Context, string: str) -> Embed:
+        """
+        Reverse a string
+        """
+        embed = Embed(
+            title="🔁 Reverse",
+            description=f"String: {string}\nReversed: {string[::-1]}",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
+    
+    @commands.hybrid_command(name="say", description="Make the bot say something")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def say(self, ctx: commands.Context, message: str) -> None:
+        """
+        Make the bot say something
+        """
+        await ctx.send(message)
+    
+    @commands.hybrid_command(name="embed", description="Make the bot say something in an embed")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def _embed(self, ctx: commands.Context, message: str) -> Embed:
+        """
+        Make the bot say something in an embed
+        """
+        embed = Embed(
+            title="📝 Embed",
+            description=f"{message}",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
+    
+    @commands.hybrid_command(name="hug", description="Hug someone")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def hug(self, ctx: commands.Context, member: Member) -> Embed:
+        """
+        Hug someone
+        """
+        embed = Embed(
+            title="🫂 Hug",
+            description=f"{ctx.author.mention} hugged {member.mention} 😊",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
+        embed.set_image(url="https://media.tenor.com/b3Qvt--s_i0AAAAC/hugs.gif")
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="slap", description="Slap someone")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def slap(self, ctx: commands.Context, member: Member) -> Embed:
+        """
+        Slap someone
+        """
+        embed = Embed(
+            title="👊 Slap",
+            description=f"{ctx.author.mention} slapped {member.mention} 😡",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
+        embed.set_image(url="https://media.tenor.com/images/4d8f0b0d3b3c0f5d5c5f9e0f4f2b4d1d/tenor.gif")
+        await ctx.send(embed=embed)
+    
+    @commands.hybrid_command(name="slots", description="Play the slots")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def slots(self, ctx: commands.Context) -> Embed:
+      await ctx.send("🎰 Slot Machine")
+      emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
+      
+      # Create the initial embed message with spinning slots
+      embed = Embed(title="🎰 Slot Machine", color=0x00ff00)
+      embed.add_field(name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n")
+      message = await ctx.send(embed=embed)
+      
+      # Spin the slots
+      for _ in range(3):
+          await asyncio.sleep(1)  # Delay for a second to simulate spinning
+          slot1 = random.choice(emojis)
+          slot2 = random.choice(emojis)
+          slot3 = random.choice(emojis)
+          
+          # Update the embed with spinning slots
+          embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n")
+          await message.edit(embed=embed)
+      
+      # Check if the player wins or loses
+      if slot1 == slot2 == slot3:
+          result = "You won! 🎉"
+      else:
+          result = "You lost. 💥"
+      
+      # Update the embed with the final result
+      embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n{result}")
+      await message.edit(embed=embed)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Fun(client))

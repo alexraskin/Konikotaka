@@ -50,7 +50,6 @@ class WiseOldManBot(Bot):
         await super().close()
 
     async def on_ready(self) -> None:
-
         self.log.info(f"Ready: {self.user} ID: {self.user.id}")
 
     async def setup_hook(self) -> None:

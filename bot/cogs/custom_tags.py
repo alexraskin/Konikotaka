@@ -15,10 +15,9 @@ class Tags(commands.Cog, name="Custom Tags"):
     async def on_ready(self) -> None:
         self.init_database.start()
 
-
     @property
     def display_emoji(self) -> PartialEmoji:
-        return PartialEmoji(name='cosmo')
+        return PartialEmoji(name="cosmo")
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
@@ -51,10 +50,17 @@ class Tags(commands.Cog, name="Custom Tags"):
                         "An error occurred while fetching the tag. 👎", ephemeral=True
                     )
             else:
-                query = await session.execute(select(CustomTags).where(CustomTags.name.like(f"%{tag_name.lower()}%")))
+                query = await session.execute(
+                    select(CustomTags).where(
+                        CustomTags.name.like(f"%{tag_name.lower()}%")
+                    )
+                )
                 tags = query.scalars().all()
                 if tags:
-                    await ctx.reply(content=f"Tag `{tag_name}` not found. Did you mean one of these?\n" + "\n".join([f"{tag.name}" for tag in tags]))
+                    await ctx.reply(
+                        content=f"Tag `{tag_name}` not found. Did you mean one of these?\n"
+                        + "\n".join([f"{tag.name}" for tag in tags])
+                    )
                 else:
                     await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
 
@@ -79,7 +85,9 @@ class Tags(commands.Cog, name="Custom Tags"):
             )
             tag = query.scalar_one_or_none()
             if tag:
-                return await ctx.reply(f"Tag `{tag_name}` already exists 👎", ephemeral=True)
+                return await ctx.reply(
+                    f"Tag `{tag_name}` already exists 👎", ephemeral=True
+                )
             new_tag = CustomTags(
                 name=tag_name.strip().lower(),
                 content=tag_content,
@@ -120,7 +128,9 @@ class Tags(commands.Cog, name="Custom Tags"):
             tag = query.scalar_one_or_none()
             if tag:
                 if int(str(tag.discord_id).strip()) != ctx.author.id:
-                    return await ctx.reply("You are not the owner of this tag.", ephemeral=True)
+                    return await ctx.reply(
+                        "You are not the owner of this tag.", ephemeral=True
+                    )
                 tag.content = tag_content
                 try:
                     await session.flush()
@@ -154,9 +164,22 @@ class Tags(commands.Cog, name="Custom Tags"):
                 embed.add_field(name="Owner", value=f"<@{tag.discord_id}>")
                 embed.add_field(name="Date Added", value=time.strftime("%B %d, %Y"))
                 embed.add_field(name="Times Called", value=tag.called)
+                embed.set_footer(text=f"ID: {tag.id}")
                 await ctx.reply(embed=embed)
             else:
-                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
+                query = await session.execute(
+                    select(CustomTags).where(
+                        CustomTags.name.like(f"%{tag_name.lower()}%")
+                    )
+                )
+                tags = query.scalars().all()
+                if tags:
+                    await ctx.reply(
+                        content=f"Tag `{tag_name}` not found. Did you mean one of these?\n"
+                        + "\n".join([f"{tag.name}" for tag in tags])
+                    )
+                else:
+                    await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
 
     @tag.command()
     @commands.guild_only()
@@ -172,7 +195,9 @@ class Tags(commands.Cog, name="Custom Tags"):
             )
             tag = query.scalar_one_or_none()
             if int(str(tag.discord_id).strip()) != ctx.author.id:
-                return await ctx.reply("You are not the owner of this tag.", ephemeral=True)
+                return await ctx.reply(
+                    "You are not the owner of this tag.", ephemeral=True
+                )
             if tag:
                 try:
                     session.delete(tag)

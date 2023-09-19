@@ -1,7 +1,15 @@
 import os
 import random
 
-from discord import DMChannel, Embed, Interaction, Member, Message, app_commands, PartialEmoji
+from discord import (
+    DMChannel,
+    Embed,
+    Interaction,
+    Member,
+    Message,
+    app_commands,
+    PartialEmoji,
+)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
@@ -26,7 +34,7 @@ class General(commands.Cog, name="General"):
         self.client.tree.remove_command(
             self.message_report_ctx.name, type=self.message_report_ctx.type
         )
-  
+
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.init_database.start()
@@ -72,7 +80,7 @@ class General(commands.Cog, name="General"):
         embed.set_thumbnail(url=self.client.logo_url)
         await channel.send(embed=embed)
         await interaction.followup.send("Message reported", ephemeral=True)
-    
+
     @property
     def display_emoji(self) -> PartialEmoji:
         return PartialEmoji(name="cosmo")
@@ -114,7 +122,6 @@ class General(commands.Cog, name="General"):
             name="Progress:", value=progress_bar(get_year_round()), inline=True
         )
         await ctx.send(embed=embed)
-            
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
@@ -125,19 +132,25 @@ class General(commands.Cog, name="General"):
         ]
         if message.author == self.client.user:
             return
-        
+
         if message.content.__contains__("?gothgf"):
-            await message.channel.send("https://i.gyazo.com/83858c9e4b22334ee8b514fb232b2f4a.jpg")
+            await message.channel.send(
+                "https://i.gyazo.com/83858c9e4b22334ee8b514fb232b2f4a.jpg"
+            )
             return
-        
+
         if message.content.__contains__("?servericon"):
-            await message.channel.send("https://media.discordapp.net/attachments/1064936966136795257/1151551567493865613/alexraskin.jpg?width=589&height=589")
+            await message.channel.send(
+                "https://media.discordapp.net/attachments/1064936966136795257/1151551567493865613/alexraskin.jpg?width=589&height=589"
+            )
             return
-        
+
         if message.content.__contains__("?snadcaught"):
-            await message.channel.send("https://i.imgur.com/N6bI2DQ.png <@!253223272328462338> <a:JBF_actingSusNotMeOwO:1145086854467686501>")
+            await message.channel.send(
+                "https://i.imgur.com/N6bI2DQ.png <@!253223272328462338> <a:JBF_actingSusNotMeOwO:1145086854467686501>"
+            )
             return
-        
+
         if message.content.__contains__("?twizy"):
             await message.channel.send("https://twizy.dev/")
             return
