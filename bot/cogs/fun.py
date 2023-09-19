@@ -1,8 +1,9 @@
+import random
 from inspect import getsourcelines
 from typing import Literal
 
 import upsidedown
-from discord import app_commands
+from discord import app_commands, Embed
 from discord.ext import commands
 
 
@@ -123,6 +124,24 @@ class Fun(commands.Cog, name="Fun"):
         response = await response.json()
         url = response["url"]
         await ctx.send(f"{base_url}{url}")
+    
+
+    @commands.hybrid_command(name="roll", description="Roll a dice with NdN")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def roll(self, ctx: commands.Context, dice: str):
+        """
+        Roll a dice
+        """
+        dice = dice.strip()
+        try:
+            rolls, limit = map(int, dice.split("d"))
+        except Exception:
+            return await ctx.send("Format has to be in NdN!\n(e.g. 1d20)")
+        result = ", ".join(str(random.randint(1, limit)) for r in range(rolls))
+        embed = Embed(title="🎲 Roll Dice", description=f"{ctx.author.name} threw a **{result}**", color=0x2ECC71)
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
 
 
 async def setup(client: commands.Bot) -> None:

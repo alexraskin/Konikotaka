@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from discord import Embed, app_commands
+from discord import Embed, app_commands, PartialEmoji
 from discord.ext import commands, tasks
 from models.db import Base
 from models.tags import CustomTags
@@ -14,6 +14,11 @@ class Tags(commands.Cog, name="Custom Tags"):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.init_database.start()
+
+
+    @property
+    def display_emoji(self) -> PartialEmoji:
+        return PartialEmoji(name='cosmo')
 
     @tasks.loop(count=1)
     async def init_database(self) -> None:
@@ -30,7 +35,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name)
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
             )
             tag = query.scalar_one_or_none()
             if tag:
@@ -46,7 +51,12 @@ class Tags(commands.Cog, name="Custom Tags"):
                         "An error occurred while fetching the tag. 👎", ephemeral=True
                     )
             else:
-                await ctx.reply(f"Tag `{tag_name}` not found. 👎", ephemeral=True)
+                query = await session.execute(select(CustomTags).where(CustomTags.name.like(f"%{tag_name.lower()}%")))
+                tags = query.scalars().all()
+                if tags:
+                    await ctx.reply(content=f"Tag `{tag_name}` not found. Did you mean one of these?\n" + "\n".join([f"{tag.name}" for tag in tags]))
+                else:
+                    await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
 
     @tag.command()
     @commands.guild_only()
@@ -65,13 +75,13 @@ class Tags(commands.Cog, name="Custom Tags"):
             return await ctx.reply("Tag content is too long. 👎", ephemeral=True)
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name)
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
             )
             tag = query.scalar_one_or_none()
             if tag:
                 return await ctx.reply(f"Tag `{tag_name}` already exists 👎", ephemeral=True)
             new_tag = CustomTags(
-                name=tag_name.strip(),
+                name=tag_name.strip().lower(),
                 content=tag_content,
                 discord_id=ctx.author.id,
                 date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
@@ -105,7 +115,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             return await ctx.reply("Tag content is too long.", ephemeral=True)
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name)
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
             )
             tag = query.scalar_one_or_none()
             if tag:
@@ -135,7 +145,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name)
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
             )
             tag = query.scalar_one_or_none()
             if tag:
@@ -158,7 +168,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name)
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
             )
             tag = query.scalar_one_or_none()
             if int(str(tag.discord_id).strip()) != ctx.author.id:

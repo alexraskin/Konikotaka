@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from models.db import Base
-from sqlalchemy import DATETIME, VARCHAR, Column, Integer, String
+from sqlalchemy import VARCHAR, Column, Integer
 
 
 class Races(Base):
