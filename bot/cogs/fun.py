@@ -178,7 +178,7 @@ class Fun(commands.Cog, name="Fun"):
         ]
         embed = Embed(
             title="🎱 8ball",
-            description=f"Question: {question}\nAnswer: {random.choice(responses)}",
+            description=f"Question: {question}\n\nAnswer: {random.choice(responses)}",
             color=0x2ECC71,
             timestamp=ctx.message.created_at
         )
