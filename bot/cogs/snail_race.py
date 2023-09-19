@@ -1,6 +1,6 @@
 import asyncio
 import random
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import discord
 from discord import Interaction, Member, app_commands
@@ -165,7 +165,7 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     async def on_app_command_completion(
         self,
         interaction: discord.Interaction,
-        command: Union[app_commands.Command, app_commands.ContextMenu],
+        command: app_commands.Command,
     ) -> None:
         try:
             snail_positions.clear()
