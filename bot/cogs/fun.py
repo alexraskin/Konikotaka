@@ -255,7 +255,7 @@ class Fun(commands.Cog, name="Fun"):
             color=0x2ECC71,
             timestamp=ctx.message.created_at
         )
-        embed.set_image(url="https://media.tenor.com/images/4d8f0b0d3b3c0f5d5c5f9e0f4f2b4d1d/tenor.gif")
+        embed.set_image(url="https://media.tenor.com/XiYuU9h44-AAAAAC/anime-slap-mad.gif")
         await ctx.send(embed=embed)
     
     @commands.hybrid_command(name="slots", description="Play the slots")
