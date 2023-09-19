@@ -263,8 +263,9 @@ class Fun(commands.Cog, name="Fun"):
     @app_commands.guild_only()
     async def slots(self, ctx: commands.Context) -> Embed:
       emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
-      embed = Embed(title="🎰 Slot Machine", color=0x00ff00)
+      embed = Embed(title="🎰 Slot Machine", color=0x00ff00, timestamp=ctx.message.created_at)
       embed.add_field(name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n")
+      embed.set_footer(text=f"{ctx.author}")
       message = await ctx.reply(embed=embed)
       # Spin the slots
       for _ in range(3):
@@ -282,10 +283,11 @@ class Fun(commands.Cog, name="Fun"):
       if slot1 == slot2 == slot3:
           result = "You won! 🎉"
       else:
-          result = "You lost. 💥"
+          result = "You lost. ☠️"
       
       # Update the embed with the final result
-      embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n{result}")
+      embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n")
+      embed.add_field(name="Result:", value=f"**{result}**", inline=False)
       await message.edit(embed=embed)
       print("hello4")
   
