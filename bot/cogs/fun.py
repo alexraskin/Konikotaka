@@ -262,14 +262,10 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def slots(self, ctx: commands.Context) -> Embed:
-      await ctx.send("🎰 Slot Machine")
       emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
-      
-      # Create the initial embed message with spinning slots
       embed = Embed(title="🎰 Slot Machine", color=0x00ff00)
-      embed.add_field(name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n")
-      message = await ctx.send(embed=embed)
-      
+      embed.add_field(name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n")
+      message = await ctx.reply(embed=embed)
       # Spin the slots
       for _ in range(3):
           await asyncio.sleep(1)  # Delay for a second to simulate spinning
@@ -278,8 +274,9 @@ class Fun(commands.Cog, name="Fun"):
           slot3 = random.choice(emojis)
           
           # Update the embed with spinning slots
-          embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n")
+          embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{slot1} {slot2} {slot3}\n\n")
           await message.edit(embed=embed)
+          print("hello3")
       
       # Check if the player wins or loses
       if slot1 == slot2 == slot3:
@@ -290,6 +287,20 @@ class Fun(commands.Cog, name="Fun"):
       # Update the embed with the final result
       embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n{result}")
       await message.edit(embed=embed)
+      print("hello4")
+  
+    @commands.hybrid_command(name="coinflip", description="Flip a coin")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def coinflip(self, ctx: commands.Context) -> Embed:
+      result = random.choice(["Heads", "Tails"])
+      embed = Embed(
+            title="🪙 Coinflip",
+            description=f"{ctx.author.mention} flipped a coin and got **{result}**",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at
+        )
+      await ctx.send(embed=embed)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Fun(client))
