@@ -312,6 +312,8 @@ class Fun(commands.Cog, name="Fun"):
     async def rps(self, ctx: commands.Context, choice: Optional[Literal["rock", "paper", "scissors"]]) -> Embed:
       choices = ["rock", "paper", "scissors"]
       bot_choice = random.choice(choices)
+      if choice is None or choice.lower() not in choices:
+        return await ctx.send("Please choose either rock, paper, or scissors.")
       if choice.lower() not in choices:
         return await ctx.send("Please choose either rock, paper, or scissors.")
       if choice.lower() == bot_choice:
@@ -333,7 +335,7 @@ class Fun(commands.Cog, name="Fun"):
           result = "You won! 🎉"
       embed = Embed(
             title="✂️ Rock Paper Scissors",
-            description=f"{ctx.author.mention} chose **{choice}** and {self.client.user.name} chose **{bot_choice}**\n\n{result}",
+            description=f"{ctx.author.mention} chose **{choice}** and {self.client.user.mention} chose **{bot_choice}**\n\n{result}",
             color=0x2ECC71,
             timestamp=ctx.message.created_at
         )
