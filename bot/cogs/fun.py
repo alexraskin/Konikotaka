@@ -145,7 +145,7 @@ class Fun(commands.Cog, name="Fun"):
             title="🎲 Roll Dice",
             description=f"{ctx.author.name} threw a **{result}** ({rolls}-{limit})",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
         await ctx.send(embed=embed)
 
@@ -182,11 +182,11 @@ class Fun(commands.Cog, name="Fun"):
             title="🎱 8ball",
             description=f"Question: {question}\n\nAnswer: {random.choice(responses)}",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
-  
+
     @commands.hybrid_command(name="reverse", description="Reverse a string")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -198,11 +198,11 @@ class Fun(commands.Cog, name="Fun"):
             title="🔁 Reverse",
             description=f"String: {string}\nReversed: {string[::-1]}",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
-    
+
     @commands.hybrid_command(name="say", description="Make the bot say something")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -211,8 +211,10 @@ class Fun(commands.Cog, name="Fun"):
         Make the bot say something
         """
         await ctx.send(message)
-    
-    @commands.hybrid_command(name="embed", description="Make the bot say something in an embed")
+
+    @commands.hybrid_command(
+        name="embed", description="Make the bot say something in an embed"
+    )
     @commands.guild_only()
     @app_commands.guild_only()
     async def _embed(self, ctx: commands.Context, message: str) -> Embed:
@@ -223,11 +225,11 @@ class Fun(commands.Cog, name="Fun"):
             title="📝 Embed",
             description=f"{message}",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
-    
+
     @commands.hybrid_command(name="hug", description="Hug someone")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -239,7 +241,7 @@ class Fun(commands.Cog, name="Fun"):
             title="🫂 Hug",
             description=f"{ctx.author.mention} hugged {member.mention} 😊",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
         embed.set_image(url="https://media.tenor.com/b3Qvt--s_i0AAAAC/hugs.gif")
         await ctx.send(embed=embed)
@@ -255,139 +257,164 @@ class Fun(commands.Cog, name="Fun"):
             title="👊 Slap",
             description=f"{ctx.author.mention} slapped {member.mention} 😡",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
-        embed.set_image(url="https://media.tenor.com/XiYuU9h44-AAAAAC/anime-slap-mad.gif")
+        embed.set_image(
+            url="https://media.tenor.com/XiYuU9h44-AAAAAC/anime-slap-mad.gif"
+        )
         await ctx.send(embed=embed)
-    
+
     @commands.hybrid_command(name="slots", description="Play the slots")
     @commands.guild_only()
     @app_commands.guild_only()
     async def slots(self, ctx: commands.Context) -> Embed:
-      emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
-      embed = Embed(title="🎰 Slot Machine", color=0x00ff00, timestamp=ctx.message.created_at)
-      embed.add_field(name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n")
-      embed.set_footer(text=f"{ctx.author}")
-      message = await ctx.reply(embed=embed)
-      # Spin the slots
-      for _ in range(3):
-          await asyncio.sleep(1)  # Delay for a second to simulate spinning
-          slot1 = random.choice(emojis)
-          slot2 = random.choice(emojis)
-          slot3 = random.choice(emojis)
-          
-          # Update the embed with spinning slots
-          embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{slot1} {slot2} {slot3}\n\n")
-          await message.edit(embed=embed)
-          print("hello3")
-      
-      # Check if the player wins or loses
-      if slot1 == slot2 == slot3:
-          result = "You won! 🎉"
-      else:
-          result = "You lost. ☠️"
-      
-      # Update the embed with the final result
-      embed.set_field_at(0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n")
-      embed.add_field(name="Result:", value=f"**{result}**", inline=False)
-      await message.edit(embed=embed)
-      print("hello4")
-  
+        emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
+        embed = Embed(
+            title="🎰 Slot Machine", color=0x00FF00, timestamp=ctx.message.created_at
+        )
+        embed.add_field(
+            name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n",
+            value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n",
+        )
+        embed.set_footer(text=f"{ctx.author}")
+        message = await ctx.reply(embed=embed)
+        # Spin the slots
+        for _ in range(3):
+            await asyncio.sleep(1)  # Delay for a second to simulate spinning
+            slot1 = random.choice(emojis)
+            slot2 = random.choice(emojis)
+            slot3 = random.choice(emojis)
+
+            # Update the embed with spinning slots
+            embed.set_field_at(
+                0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{slot1} {slot2} {slot3}\n\n"
+            )
+            await message.edit(embed=embed)
+            print("hello3")
+
+        # Check if the player wins or loses
+        if slot1 == slot2 == slot3:
+            result = "You won! 🎉"
+        else:
+            result = "You lost. ☠️"
+
+        # Update the embed with the final result
+        embed.set_field_at(
+            0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n"
+        )
+        embed.add_field(name="Result:", value=f"**{result}**", inline=False)
+        await message.edit(embed=embed)
+        print("hello4")
+
     @commands.hybrid_command(name="coinflip", description="Flip a coin")
     @commands.guild_only()
     @app_commands.guild_only()
     async def coinflip(self, ctx: commands.Context) -> Embed:
-      result = random.choice(["Heads", "Tails"])
-      embed = Embed(
+        result = random.choice(["Heads", "Tails"])
+        embed = Embed(
             title="🪙 Coinflip",
             description=f"{ctx.author.mention} flipped a coin and got **{result}**",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
-      await ctx.send(embed=embed)
-  
+        await ctx.send(embed=embed)
+
     @commands.hybrid_command(name="rps", description="Play rock paper scissors")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def rps(self, ctx: commands.Context, choice: Optional[Literal["rock", "paper", "scissors"]]) -> Embed:
-      choices = ["rock", "paper", "scissors"]
-      bot_choice = random.choice(choices)
-      if choice is None or choice.lower() not in choices:
-        return await ctx.send("Please choose either rock, paper, or scissors.")
-      if choice.lower() not in choices:
-        return await ctx.send("Please choose either rock, paper, or scissors.")
-      if choice.lower() == bot_choice:
-        result = "It's a tie!"
-      elif choice.lower() == "rock":
-        if bot_choice == "paper":
-          result = "You lost. ☠️"
-        else:
-          result = "You won! 🎉"
-      elif choice.lower() == "paper":
-        if bot_choice == "scissors":
-          result = "You lost. ☠️"
-        else:
-          result = "You won! 🎉"
-      elif choice.lower() == "scissors":
-        if bot_choice == "rock":
-          result = "You lost. ☠️"
-        else:
-          result = "You won! 🎉"
-      embed = Embed(
+    async def rps(
+        self,
+        ctx: commands.Context,
+        choice: Optional[Literal["rock", "paper", "scissors"]],
+    ) -> Embed:
+        choices = ["rock", "paper", "scissors"]
+        bot_choice = random.choice(choices)
+        if choice is None or choice.lower() not in choices:
+            return await ctx.send("Please choose either rock, paper, or scissors.")
+        if choice.lower() not in choices:
+            return await ctx.send("Please choose either rock, paper, or scissors.")
+        if choice.lower() == bot_choice:
+            result = "It's a tie!"
+        elif choice.lower() == "rock":
+            if bot_choice == "paper":
+                result = "You lost. ☠️"
+            else:
+                result = "You won! 🎉"
+        elif choice.lower() == "paper":
+            if bot_choice == "scissors":
+                result = "You lost. ☠️"
+            else:
+                result = "You won! 🎉"
+        elif choice.lower() == "scissors":
+            if bot_choice == "rock":
+                result = "You lost. ☠️"
+            else:
+                result = "You won! 🎉"
+        embed = Embed(
             title="✂️ Rock Paper Scissors",
             description=f"{ctx.author.mention} chose **{choice}** and {self.client.user.mention} chose **{bot_choice}**\n\n{result}",
             color=0x2ECC71,
-            timestamp=ctx.message.created_at
+            timestamp=ctx.message.created_at,
         )
-      await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
-    @commands.hybrid_command(name="kira", description="Likelihood of you or someone being Kira")
+    @commands.hybrid_command(
+        name="kira", description="Likelihood of you or someone being Kira"
+    )
     @commands.guild_only()
     @app_commands.guild_only()
     async def kira(self, ctx: commands.Context, member: Member = None) -> Embed:
-      result = random.randint(0, 100)
-      if member is None:
-        member: Member = ctx.author
-      async with self.client.async_session() as session:
-        query = await session.execute(select(DiscordUser).where(DiscordUser.discord_id == member.id))
-        user = query.scalar_one_or_none()
-        if user is None:
-          new_user = DiscordUser(
-            discord_id=member.id,
-            username=member.name,
-            joined=member.joined_at,
-            kira_percentage=result
-          )
-          session.add(new_user)
-          await session.flush()
-          await session.commit()
-          embed = Embed(
-                title="✍️️️ Kira",
-                description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                color=0x2ECC71,
-                timestamp=ctx.message.created_at
+        result = random.randint(0, 100)
+        if member is None:
+            member: Member = ctx.author
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(DiscordUser).where(DiscordUser.discord_id == member.id)
             )
-          embed.set_footer(text="Try tagging someone else to see if they are Kira")
-          embed.set_thumbnail(url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg")
-          return await ctx.send(embed=embed)
-        
-        if user.kira_percentage == 0 or user.kira_percentage is None:
-          user.kira_percentage = result
-          await session.flush()
-          await session.commit()
-        else:
-          embed = Embed(
-                title="✍️️️ Kira",
-                description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
-                color=0x2ECC71,
-                timestamp=ctx.message.created_at
-            )
-          embed.set_footer(text="Try tagging someone else to see if they are Kira")
-          embed.set_thumbnail(url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg")
-          await ctx.send(embed=embed)
-        
+            user = query.scalar_one_or_none()
+            if user is None:
+                new_user = DiscordUser(
+                    discord_id=member.id,
+                    username=member.name,
+                    joined=member.joined_at,
+                    kira_percentage=result,
+                )
+                session.add(new_user)
+                await session.flush()
+                await session.commit()
+                embed = Embed(
+                    title="✍️️️ Kira",
+                    description=f"There is a **{result}%** chance that {member.mention} is Kira",
+                    color=0x2ECC71,
+                    timestamp=ctx.message.created_at,
+                )
+                embed.set_footer(
+                    text="Try tagging someone else to see if they are Kira"
+                )
+                embed.set_thumbnail(
+                    url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                )
+                return await ctx.send(embed=embed)
 
-      
+            if user.kira_percentage == 0 or user.kira_percentage is None:
+                user.kira_percentage = result
+                await session.flush()
+                await session.commit()
+            else:
+                embed = Embed(
+                    title="✍️️️ Kira",
+                    description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
+                    color=0x2ECC71,
+                    timestamp=ctx.message.created_at,
+                )
+                embed.set_footer(
+                    text="Try tagging someone else to see if they are Kira"
+                )
+                embed.set_thumbnail(
+                    url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                )
+                await ctx.send(embed=embed)
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Fun(client))

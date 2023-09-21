@@ -123,6 +123,18 @@ class General(commands.Cog, name="General"):
         )
         await ctx.send(embed=embed)
 
+    @commands.command("f", description="Press F to pay respects")
+    async def f(self, ctx: commands.Context):
+        message = await ctx.send("Press 🇫 to pay respect to the chat.")
+        await message.add_reaction("🇫")
+        wait = await self.client.wait_for(
+            "reaction_add",
+            check=lambda r, u: r.message == message
+            and r.emoji == "🇫"
+            and u != self.client.user,
+        )
+        await ctx.send(f"{wait[1].mention} is paying respect.")
+
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         gif_list = [
