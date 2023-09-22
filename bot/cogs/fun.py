@@ -1,11 +1,11 @@
 import random
 from inspect import getsourcelines
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 import asyncio
 
 import upsidedown
-from discord import app_commands, Embed, Member
-from discord.ext import commands, tasks
+from discord import app_commands, Embed, Member, Message
+from discord.ext import commands
 from sqlalchemy.future import select
 from models.users import DiscordUser
 
@@ -37,7 +37,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def bczs_photos(self, ctx: commands.Context) -> None:
+    async def bczs_photos(self, ctx: commands.Context) -> Message:
         """
         Get a random photo of Pat and Ash's cats from the twizy.dev API
         """
@@ -52,7 +52,7 @@ class Fun(commands.Cog, name="Fun"):
         name="meme", help="Get a random meme!", with_app_command=True
     )
     @commands.guild_only()
-    async def get_meme(self, ctx: commands.Context) -> None:
+    async def get_meme(self, ctx: commands.Context) -> Message:
         """
         Get a random meme from the meme-api.com API
         """
@@ -68,7 +68,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def gcat_talk(self, ctx: commands.Context, *, message: str) -> None:
+    async def gcat_talk(self, ctx: commands.Context, *, message: str) -> Message:
         """
         Translate your message into G Cat's language
         """
@@ -82,7 +82,7 @@ class Fun(commands.Cog, name="Fun"):
         self,
         ctx: commands.Context,
         category: Literal["waifu", "neko", "shinobu", "megumin", "bully", "cuddle"],
-    ) -> None:
+    ) -> Message:
         """
         Get a random waifu image from the waifu API
         """
@@ -96,7 +96,7 @@ class Fun(commands.Cog, name="Fun"):
             await ctx.send("Error getting waifu!")
 
     @commands.command(name="inspect")
-    async def inspect(self, ctx, *, command_name: str) -> None:
+    async def inspect(self, ctx, *, command_name: str) -> Message:
         """
         Print a link and the source code of a command
         """
@@ -116,7 +116,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(url + f"```python\n{sanitized}\n```")
 
     @commands.command(name="cat", description="Get a random cat image")
-    async def cat(self, ctx: commands.Context):
+    async def cat(self, ctx: commands.Context) -> Message:
         """
         Get a random cat image from the catapi
         """
@@ -206,7 +206,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="say", description="Make the bot say something")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def say(self, ctx: commands.Context, message: str) -> None:
+    async def say(self, ctx: commands.Context, message: str) -> Message:
         """
         Make the bot say something
         """
@@ -414,6 +414,30 @@ class Fun(commands.Cog, name="Fun"):
                     url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
                 )
                 await ctx.send(embed=embed)
+    
+    @commands.hybrid_command(name="xkcd", description="Get a Todays XKCD comic")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def xkcd(self, ctx: commands.Context) -> Union[Embed, Message]:
+        """
+        Get a random xkcd comic
+        """
+        response = await self.client.session.get(f"https://xkcd.com/info.0.json")
+        if response.status == 200:
+            comic = await response.json()
+            embed = Embed(
+                title=f"{comic['title']}",
+                description=f"{comic['alt']}",
+                color=0x2ECC71,
+                timestamp=ctx.message.created_at,
+            )
+            embed.set_image(url=comic["img"])
+            embed.set_footer(text=f"Provided by xkcd.com")
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("Error getting xkcd comic!")
+        
+
 
 
 async def setup(client: commands.Bot) -> None:
