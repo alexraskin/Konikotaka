@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from discord import Embed, app_commands, PartialEmoji

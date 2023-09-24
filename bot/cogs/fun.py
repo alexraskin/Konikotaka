@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from inspect import getsourcelines
 from typing import Literal, Optional, Union
@@ -400,6 +402,18 @@ class Fun(commands.Cog, name="Fun"):
                 user.kira_percentage = result
                 await session.flush()
                 await session.commit()
+                embed = Embed(
+                    title="✍️️️ Kira",
+                    description=f"There is a **{result}%** chance that {member.mention} is Kira",
+                    color=0x2ECC71,
+                    timestamp=ctx.message.created_at,
+                )
+                embed.set_footer(
+                    text="Try tagging someone else to see if they are Kira"
+                )
+                embed.set_thumbnail(
+                    url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                )
             else:
                 embed = Embed(
                     title="✍️️️ Kira",

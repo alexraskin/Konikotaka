@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from discord import Embed, HTTPException, Interaction, app_commands

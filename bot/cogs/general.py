@@ -29,11 +29,18 @@ class General(commands.Cog, name="General"):
             callback=self.report,
         )
         self.client.tree.add_command(self.message_report_ctx)
+        self.warn_user_ctx = app_commands.ContextMenu(
+            name="Warn User",
+            callback=self.warn,
+        )
 
     async def cog_unload(self) -> None:
         self.client.tree.remove_command(
             self.message_report_ctx.name, type=self.message_report_ctx.type
         )
+        self.client.tree.remove_command(
+            self.warn_user_ctx.name, type=self.warn_user_ctx.type
+          )
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -52,6 +59,22 @@ class General(commands.Cog, name="General"):
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+
+    async def warn(self, interaction: Interaction, user: Member) -> None:
+        await interaction.response.defer(ephemeral=True)
+        embed = Embed(
+            title="User Warned 🚨",
+            color=0x2ECC71,
+            timestamp=interaction.created_at,
+        )
+        embed.add_field(name="User:", value=user.mention, inline=False)
+        embed.add_field(
+            name="Moderator:",
+            value=f"{interaction.user.mention} ({interaction.user})",
+            inline=False,
+        )
+        embed.set_thumbnail(url=self.client.logo_url)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     async def report(self, interaction: Interaction, message: Message) -> None:
         await interaction.response.defer(ephemeral=True)
