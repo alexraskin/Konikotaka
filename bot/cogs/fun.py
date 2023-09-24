@@ -428,7 +428,7 @@ class Fun(commands.Cog, name="Fun"):
                     url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
                 )
                 await ctx.send(embed=embed)
-    
+
     @commands.hybrid_command(name="xkcd", description="Get a Todays XKCD comic")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -450,8 +450,6 @@ class Fun(commands.Cog, name="Fun"):
             await ctx.send(embed=embed)
         else:
             await ctx.send("Error getting xkcd comic!")
-        
-
 
 
 async def setup(client: commands.Bot) -> None:

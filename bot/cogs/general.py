@@ -40,7 +40,7 @@ class General(commands.Cog, name="General"):
         )
         self.client.tree.remove_command(
             self.warn_user_ctx.name, type=self.warn_user_ctx.type
-          )
+        )
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
