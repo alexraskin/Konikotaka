@@ -1,12 +1,98 @@
 from __future__ import annotations
 
 from datetime import datetime
+import asyncio
+from typing import Annotated, Optional
 
-from discord import Embed, app_commands, PartialEmoji
+import discord
+from discord import Embed, app_commands, PartialEmoji, TextStyle
 from discord.ext import commands, tasks
+from discord.interactions import Interaction
 from models.db import Base
 from models.tags import CustomTags
 from sqlalchemy.future import select
+
+
+class TagName(commands.clean_content):
+    def __init__(self, *, lower: bool = False):
+        self.lower: bool = lower
+        super().__init__()
+
+    async def convert(self, ctx: commands.Context, argument: str) -> str:
+        converted = await super().convert(ctx, argument)
+        lower = converted.lower().strip()
+
+        if not lower:
+            raise commands.BadArgument("Missing tag name.")
+
+        if len(lower) > 255:
+            raise commands.BadArgument("Tag name is a maximum of 100 characters.")
+
+        first_word, _, _ = lower.partition(" ")
+
+        # get tag command.
+        root: commands.GroupMixin = ctx.bot.get_command("tag")  # type: ignore
+        if first_word in root.all_commands:
+            raise commands.BadArgument("This tag name starts with a reserved word.")
+
+        return converted.strip() if not self.lower else lower
+
+
+class CreateTagModel(discord.ui.Modal, title="Create New Tag"):
+    tag_name = discord.ui.TextInput(
+        label="Tag Name",
+        style=TextStyle.short,
+        placeholder="Tag Name",
+        required=True,
+        max_length=1000,
+    )
+    tag_content = discord.ui.TextInput(
+        label="Tag Content",
+        style=TextStyle.paragraph,
+        placeholder="Tag Content",
+        required=True,
+        max_length=255,
+    )
+
+    def __init__(self, ctx: commands.Context, cog: Tags) -> None:
+        super().__init__(timeout=60.0)
+        self.cog: commands.Cog = cog
+        self.ctx: commands.Context = ctx
+
+    async def on_submit(self, interaction: Interaction) -> None:
+        name = str(self.tag_name.value)
+        await interaction.response.defer()
+        try:
+            name = await TagName().convert(self.ctx, name)
+        except commands.BadArgument as e:
+            await interaction.response.send_message(str(e), ephemeral=True)
+            return
+        content = str(self.tag_content.value)
+        if len(content) > 2000:
+            await interaction.response.send_message(
+                "Tag content is a maximum of 2000 characters.", ephemeral=True
+            )
+        await self.cog.add_tag(self.ctx, name, content)
+
+
+class EditTagModel(discord.ui.Modal, title="Edit Tag"):
+    tag_content = discord.ui.TextInput(
+        label="Tag Content",
+        style=TextStyle.paragraph,
+        placeholder="Tag Content",
+        required=True,
+        max_length=255,
+    )
+
+    def __init__(self, ctx: commands.Context, cog: Tags) -> None:
+        super().__init__(timeout=60.0)
+        self.cog: commands.Cog = cog
+        self.ctx: commands.Context = ctx
+
+    async def on_submit(self, interaction: Interaction) -> None:
+        self.interaction = interaction
+        self.text = str(self.tag_content)
+        self.stop()
 
 
 class Tags(commands.Cog, name="Custom Tags"):
@@ -25,6 +111,63 @@ class Tags(commands.Cog, name="Custom Tags"):
     async def init_database(self) -> None:
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+
+    async def add_tag(
+        self, ctx: commands.Context, tag_name: str, tag_content: str
+    ) -> None:
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
+            )
+            tag = query.scalar_one_or_none()
+            if tag:
+                return await ctx.reply(
+                    f"Tag `{tag_name}` already exists 👎", ephemeral=True
+                )
+            new_tag = CustomTags(
+                name=tag_name.strip().lower(),
+                content=tag_content,
+                discord_id=ctx.author.id,
+                date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
+            )
+            try:
+                session.add(new_tag)
+                await session.flush()
+                await session.commit()
+                await ctx.reply(f"Tag `{tag_name}` added! 👍")
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
+                await ctx.reply(
+                    "An error occurred while adding the tag.", ephemeral=True
+                )
+
+    async def edit_tag(
+        self, ctx: commands.Context, tag_name: str, tag_content: str
+    ) -> None:
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
+            )
+            tag = query.scalar_one_or_none()
+            if tag:
+                if int(str(tag.discord_id).strip()) != ctx.author.id:
+                    return await ctx.reply(
+                        "You are not the owner of this tag.", ephemeral=True
+                    )
+                tag.content = tag_content
+                try:
+                    await session.flush()
+                    await session.commit()
+                    await ctx.reply(f"Tag `{tag_name}` edited!")
+                except Exception as e:
+                    await ctx.reply(
+                        "An error occurred while editing the tag.", ephemeral=True
+                    )
+                    self.client.log.error(e)
+                    await session.rollback()
+            else:
+                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
     @commands.hybrid_group(fallback="get")
     @commands.guild_only()
@@ -69,83 +212,82 @@ class Tags(commands.Cog, name="Custom Tags"):
     @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
-    @app_commands.describe(tag_name="The tag to add")
-    @app_commands.describe(tag_content="The content of the tag")
-    async def add(
-        self, ctx: commands.Context, tag_name: str, *, tag_content: str
-    ) -> None:
+    async def add(self, ctx: commands.Context) -> None:
         """
         Add a new tag
         """
-        if len(tag_name) > 255:
-            return await ctx.reply("Tag name is too long. 👎", ephemeral=True)
-        if len(tag_content) > 1000:
-            return await ctx.reply("Tag content is too long. 👎", ephemeral=True)
-        async with self.client.async_session() as session:
-            query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name.lower())
-            )
-            tag = query.scalar_one_or_none()
-            if tag:
-                return await ctx.reply(
-                    f"Tag `{tag_name}` already exists 👎", ephemeral=True
-                )
-            new_tag = CustomTags(
-                name=tag_name.strip().lower(),
-                content=tag_content,
-                discord_id=ctx.author.id,
-                date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
-            )
-            try:
-                session.add(new_tag)
-                await session.flush()
-                await session.commit()
-                await ctx.reply(f"Tag `{tag_name}` added! 👍")
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-                await ctx.reply(
-                    "An error occurred while adding the tag.", ephemeral=True
-                )
+        if ctx.interaction is not None:
+            modal = CreateTagModel(ctx, self)
+            await ctx.interaction.response.send_modal(modal)
+            return
+
+        await ctx.send("Hello. What would you like the tag's name to be?")
+
+        def check(msg):
+            return msg.author == ctx.author and ctx.channel == msg.channel
+
+        try:
+            name = await TagName().convert(self.ctx, name)
+        except commands.BadArgument as e:
+            await ctx.send(str(e), ephemeral=True)
+            return
+
+        try:
+            name = await self.client.wait_for("message", timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await ctx.send("You took long. Goodbye.")
+
+        await ctx.send(
+            f"Neat. So the name is `{name}`. What about the tag's content? "
+            f"**You can type {ctx.prefix}abort to abort the tag make process.**"
+        )
+
+        try:
+            msg = await self.client.wait_for("message", timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await ctx.send("You took long. Goodbye.")
+
+        if msg.content == f"{ctx.prefix}abort":
+            return await ctx.send("Aborting...")
+        elif msg.content:
+            clean_content = await commands.clean_content().convert(ctx, msg.content)
+        else:
+            clean_content = msg.content
+
+        if msg.attachments:
+            clean_content = f"{clean_content}\n{msg.attachments[0].url}"
+
+        if len(clean_content) > 2000:
+            return await ctx.send("Tag content is a maximum of 2000 characters.")
+
+        self.add_tag(ctx, name, clean_content)
 
     @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
-    @app_commands.describe(tag_name="The tag to edit")
-    @app_commands.describe(tag_content="The new content of the tag")
+    @app_commands.describe(name="The tag to edit")
+    @app_commands.describe(content="The new content for the tag")
     async def edit(
-        self, ctx: commands.Context, tag_name: str, *, tag_content: str
+        self,
+        ctx: commands.Context,
+        name: Annotated[str, TagName(lower=True)],
+        *,
+        content: Annotated[Optional[str], commands.clean_content] = None,
     ) -> None:
         """
         Edit a tag
         """
-        if len(tag_name) > 255:
-            return await ctx.reply("Tag name is too long.", ephemeral=True)
-        if len(tag_content) > 1000:
-            return await ctx.reply("Tag content is too long.", ephemeral=True)
-        async with self.client.async_session() as session:
-            query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name.lower())
-            )
-            tag = query.scalar_one_or_none()
-            if tag:
-                if int(str(tag.discord_id).strip()) != ctx.author.id:
-                    return await ctx.reply(
-                        "You are not the owner of this tag.", ephemeral=True
-                    )
-                tag.content = tag_content
-                try:
-                    await session.flush()
-                    await session.commit()
-                    await ctx.reply(f"Tag `{tag_name}` edited!")
-                except Exception as e:
-                    await ctx.reply(
-                        "An error occurred while editing the tag.", ephemeral=True
-                    )
-                    self.client.log.error(e)
-                    await session.rollback()
-            else:
-                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
+        if content is None or "" and ctx.interaction is None:
+            raise commands.BadArgument("Missing content to edit tag with")
+        else:
+            await self.edit_tag(ctx, name, content)
+
+        if content is None and ctx.interaction is not None:
+            modal = EditTagModel(self, ctx)
+            await ctx.interaction.response.send_modal(modal)
+            await modal.wait()
+            content = modal.text
+            await self.edit_tag(ctx, name, content)
 
     @tag.command(description="Get info on a tag")
     @commands.guild_only()
@@ -182,6 +324,53 @@ class Tags(commands.Cog, name="Custom Tags"):
                     )
                 else:
                     await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
+
+    @tag.command(description="List all tags")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def list(self, ctx: commands.Context) -> None:
+        """
+        List all tags
+        """
+        async with self.client.async_session() as session:
+            query = await session.execute(select(CustomTags))
+            tags = query.scalars().all()
+            if tags:
+                if len(tags) > 2000:
+                    return await ctx.reply(
+                        "There are too many tags to list.", ephemeral=True
+                    )
+                await ctx.reply(
+                    content=f"Here are all the tags:\n"
+                    + "\n".join([f"{tag.name}" for tag in tags])
+                )
+            else:
+                await ctx.reply("There are no tags.", ephemeral=True)
+
+    @tag.command(description="Search for a tag")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    @app_commands.describe(tag_name="The tag to search for")
+    async def search(self, ctx: commands.Context, tag_name: str) -> None:
+        """
+        Search for a tag
+        """
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(CustomTags).where(CustomTags.name.like(f"%{tag_name.lower()}%"))
+            )
+            tags = query.scalars().all()
+            if tags:
+                if len(tags) > 2000:
+                    return await ctx.reply(
+                        "There are too many tags to list.", ephemeral=True
+                    )
+                await ctx.reply(
+                    content=f"Here are all the tags:\n"
+                    + "\n".join([f"{tag.name}" for tag in tags])
+                )
+            else:
+                await ctx.reply("There are no tags.", ephemeral=True)
 
     @tag.command()
     @commands.guild_only()

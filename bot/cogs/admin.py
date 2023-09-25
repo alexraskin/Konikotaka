@@ -71,9 +71,7 @@ class Admin(commands.Cog, name="Admin"):
     @commands.is_owner()
     @app_commands.describe(name="The name of the emoji.")
     @app_commands.describe(url="The URL of the emoji.")
-    async def add_emoji(
-        self, interaction: Interaction, name: str, url: str
-    ) -> None:
+    async def add_emoji(self, interaction: Interaction, name: str, url: str) -> None:
         """
         Adds an emoji to the server.
         """
