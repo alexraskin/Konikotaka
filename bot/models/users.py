@@ -13,3 +13,4 @@ class DiscordUser(Base):
     username = Column(VARCHAR(255), nullable=False)
     joined = Column(DATETIME, nullable=False)
     kira_percentage = Column(Integer, nullable=True)
+    guild_id = Column(VARCHAR(255), nullable=False)

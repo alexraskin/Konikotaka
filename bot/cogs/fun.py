@@ -97,6 +97,7 @@ class Fun(commands.Cog, name="Fun"):
         else:
             await ctx.send("Error getting waifu!")
 
+    @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.command(name="inspect")
     async def inspect(self, ctx, *, command_name: str) -> Message:
         """
@@ -117,6 +118,7 @@ class Fun(commands.Cog, name="Fun"):
             sanitized = sanitized[: 1950 - len(url)] + "\n[...]"
         await ctx.send(url + f"```python\n{sanitized}\n```")
 
+    @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.command(name="cat", description="Get a random cat image")
     async def cat(self, ctx: commands.Context) -> Message:
         """

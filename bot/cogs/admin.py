@@ -67,8 +67,35 @@ class Admin(commands.Cog, name="Admin"):
         await ctx.message.delete()
         await message.edit(content="Synced successfully! ✅")
 
-    @app_commands.command(name="purge")
+    @app_commands.command(name="add_emoji", description="Add an emoji to the server.")
     @commands.is_owner()
+    @app_commands.describe(name="The name of the emoji.")
+    @app_commands.describe(url="The URL of the emoji.")
+    async def add_emoji(
+        self, interaction: Interaction, name: str, url: str
+    ) -> None:
+        """
+        Adds an emoji to the server.
+        """
+        try:
+            await interaction.response.defer()
+            await interaction.guild.create_custom_emoji(name=name, image=url)
+            embed = Embed(
+                title="Emoji Added ✅",
+                description=f"Added the emoji `:{name}:` successfully.",
+                color=0x00FF00,
+                timestamp=interaction.message.created_at,
+            )
+            await interaction.followup.send(embed=embed)
+        except Exception as e:
+            self.client.log.error(f"Error: {e}")
+            await interaction.response.send_message(
+                "An error occurred while adding the emoji.", ephemeral=True
+            )
+            return
+
+    @app_commands.command(name="purge")
+    @app_commands.checks.has_permissions(manage_messages=True)
     @app_commands.describe(amount="The amount of messages to purge.")
     @app_commands.describe(reason="The reason for purging the messages.")
     async def purge(
