@@ -81,13 +81,12 @@ class EditTagModel(discord.ui.Modal, title="Edit Tag"):
         style=TextStyle.paragraph,
         placeholder="Tag Content",
         required=True,
-        max_length=255,
+        max_length=1000,
     )
 
-    def __init__(self, ctx: commands.Context, cog: Tags) -> None:
+    def __init__(self, text: str) -> None:
         super().__init__(timeout=60.0)
-        self.cog: commands.Cog = cog
-        self.ctx: commands.Context = ctx
+        self.content.default = text
 
     async def on_submit(self, interaction: Interaction) -> None:
         self.interaction = interaction
@@ -142,32 +141,6 @@ class Tags(commands.Cog, name="Custom Tags"):
                     "An error occurred while adding the tag.", ephemeral=True
                 )
 
-    async def edit_tag(
-        self, ctx: commands.Context, tag_name: str, tag_content: str
-    ) -> None:
-        async with self.client.async_session() as session:
-            query = await session.execute(
-                select(CustomTags).filter(CustomTags.name == tag_name.lower())
-            )
-            tag = query.scalar_one_or_none()
-            if tag:
-                if int(str(tag.discord_id).strip()) != ctx.author.id:
-                    return await ctx.reply(
-                        "You are not the owner of this tag.", ephemeral=True
-                    )
-                tag.content = tag_content
-                try:
-                    await session.flush()
-                    await session.commit()
-                    await ctx.reply(f"Tag `{tag_name}` edited!")
-                except Exception as e:
-                    await ctx.reply(
-                        "An error occurred while editing the tag.", ephemeral=True
-                    )
-                    self.client.log.error(e)
-                    await session.rollback()
-            else:
-                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
     @commands.hybrid_group(fallback="get")
     @commands.guild_only()
@@ -220,22 +193,27 @@ class Tags(commands.Cog, name="Custom Tags"):
             modal = CreateTagModel(ctx, self)
             await ctx.interaction.response.send_modal(modal)
             return
-
-        await ctx.send("Hello. What would you like the tag's name to be?")
-
+        
         def check(msg):
             return msg.author == ctx.author and ctx.channel == msg.channel
 
-        try:
-            name = await TagName().convert(self.ctx, name)
-        except commands.BadArgument as e:
-            await ctx.send(str(e), ephemeral=True)
-            return
+        await ctx.send("Hello. What would you like the tag's name to be?")
+
+        converter = TagName()
+        original = ctx.message
 
         try:
             name = await self.client.wait_for("message", timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await ctx.send("You took long. Goodbye.")
+        
+        try:
+            ctx.message = name
+            name = await converter.convert(ctx, name.content)
+        except commands.BadArgument as e:
+            return await ctx.send(f'{e}. Redo the command "{ctx.prefix}tag make" to retry.')
+        finally:
+            ctx.message = original
 
         await ctx.send(
             f"Neat. So the name is `{name}`. What about the tag's content? "
@@ -243,14 +221,18 @@ class Tags(commands.Cog, name="Custom Tags"):
         )
 
         try:
-            msg = await self.client.wait_for("message", timeout=30.0, check=check)
+            msg = await self.client.wait_for('message', check=check, timeout=300.0)
         except asyncio.TimeoutError:
-            return await ctx.send("You took long. Goodbye.")
+            return await ctx.send('You took too long. Goodbye.')
 
         if msg.content == f"{ctx.prefix}abort":
             return await ctx.send("Aborting...")
+        
         elif msg.content:
-            clean_content = await commands.clean_content().convert(ctx, msg.content)
+            try:
+              clean_content = await commands.clean_content().convert(ctx, msg.content)
+            except Exception as e:
+              return await ctx.send(f'{e}. Redo the command "{ctx.prefix}tag make" to retry.')          
         else:
             clean_content = msg.content
 
@@ -260,7 +242,7 @@ class Tags(commands.Cog, name="Custom Tags"):
         if len(clean_content) > 2000:
             return await ctx.send("Tag content is a maximum of 2000 characters.")
 
-        self.add_tag(ctx, name, clean_content)
+        await self.add_tag(ctx, name, clean_content)
 
     @tag.command()
     @commands.guild_only()
@@ -277,17 +259,50 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         Edit a tag
         """
-        if content is None or "" and ctx.interaction is None:
-            raise commands.BadArgument("Missing content to edit tag with")
-        else:
-            await self.edit_tag(ctx, name, content)
+        async with self.client.async_session() as session:
+          if ctx.interaction is not None:
+              await ctx.interaction.response.defer()
+              query = await session.execute(
+                  select(CustomTags).filter(CustomTags.name == name)
+                  )
+              tag = query.scalar_one_or_none()
+              if tag is None:
+                  return await ctx.reply(f"Tag `{name}` not found.", ephemeral=True)
+              if int(str(tag.discord_id).strip()) != ctx.author.id:
+                  return await ctx.reply(
+                      "You are not the owner of this tag.", ephemeral=True
+                  )
+              modal = EditTagModel(tag.content)
+              await ctx.interaction.response.send_modal(modal=modal)
+              await modal.wait()
+              ctx.interaction = modal.interaction
+              content = modal.text
 
-        if content is None and ctx.interaction is not None:
-            modal = EditTagModel(self, ctx)
-            await ctx.interaction.response.send_modal(modal)
-            await modal.wait()
-            content = modal.text
-            await self.edit_tag(ctx, name, content)
+          if content is None:
+              if ctx.interaction is None:
+                  raise commands.BadArgument('Missing content to edit tag with')
+              else:
+                  query = await session.execute(
+                      select(CustomTags).filter(CustomTags.name == name)
+                      )
+                  tag = query.scalar_one_or_none()
+                  if tag is None:
+                      return await ctx.reply(f"Tag `{name}` not found.", ephemeral=True)
+          if len(content) > 2000:
+              return await ctx.reply('Tag content can only be up to 1000 characters', ephemeral=True)
+          
+          try:
+              tag.content = content
+              await session.flush()
+              await session.commit()
+              await ctx.reply(f"Tag `{name}` edited!")
+          except Exception as e:
+              self.client.log.error(e)
+              await session.rollback()
+              await ctx.reply(
+                  "An error occurred while editing the tag. 👎", ephemeral=True
+              )
+
 
     @tag.command(description="Get info on a tag")
     @commands.guild_only()
