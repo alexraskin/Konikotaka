@@ -90,6 +90,7 @@ class EditTagModel(discord.ui.Modal, title="Edit Tag"):
         required=True,
         max_length=1000,
     )
+
     def __init__(self, ctx: commands.Context, cog: Tags) -> None:
         super().__init__(timeout=60.0)
         self.cog: commands.Cog = cog
@@ -157,8 +158,10 @@ class Tags(commands.Cog, name="Custom Tags"):
                 await ctx.reply(
                     "An error occurred while adding the tag.", ephemeral=True
                 )
-      
-    async def edit_tag(self, ctx: commands.Context, tag_name: str, tag_content: str) -> None:
+
+    async def edit_tag(
+        self, ctx: commands.Context, tag_name: str, tag_content: str
+    ) -> None:
         async with self.client.async_session() as session:
             query = await session.execute(
                 select(CustomTags).filter(CustomTags.name == tag_name)
@@ -169,27 +172,30 @@ class Tags(commands.Cog, name="Custom Tags"):
                     f"Tag `{tag_name}` does not exist 👎", ephemeral=True
                 )
             if tag:
-              if int(str(tag.discord_id).strip()) != ctx.author.id:
-                  return await ctx.reply(
-                      "You are not the owner of this tag.", ephemeral=True
-                  )
-              new_tag = CustomTags(
-                  name=tag_name.strip().lower(),
-                  content=tag_content,
-                  discord_id=ctx.author.id,
-                  date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
-              )
-              try:
-                  session.add(new_tag)
-                  await session.flush()
-                  await session.commit()
-                  await ctx.reply(f"Tag `{tag_name}` has been updated! 👍")
-              except Exception as e:
-                  self.client.log.error(e)
-                  await session.rollback()
-                  await ctx.reply(
-                      "An error occurred while updating the tag.", ephemeral=True)
-      
+                if int(str(tag.discord_id).strip()) != ctx.author.id:
+                    return await ctx.reply(
+                        "You are not the owner of this tag.", ephemeral=True
+                    )
+                new_tag = CustomTags(
+                    name=tag_name.strip().lower(),
+                    content=tag_content,
+                    discord_id=ctx.author.id,
+                    date_added=ctx.message.created_at.strftime(
+                        "%Y-%m-%d %H:%M:%S %Z%z"
+                    ),
+                )
+                try:
+                    session.add(new_tag)
+                    await session.flush()
+                    await session.commit()
+                    await ctx.reply(f"Tag `{tag_name}` has been updated! 👍")
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+                    await ctx.reply(
+                        "An error occurred while updating the tag.", ephemeral=True
+                    )
+
     async def lookup_similar_tags(self, tag_name: str) -> Optional[list[CustomTags]]:
         async with self.client.async_session() as session:
             query = await session.execute(
@@ -197,7 +203,6 @@ class Tags(commands.Cog, name="Custom Tags"):
             )
             tags = query.scalars().all()
             return tags
-
 
     @commands.hybrid_group(fallback="get")
     @commands.guild_only()
@@ -245,7 +250,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             modal = CreateTagModel(ctx, self)
             await ctx.interaction.response.send_modal(modal)
             return
-        
+
         def check(msg):
             return msg.author == ctx.author and ctx.channel == msg.channel
 
@@ -258,12 +263,14 @@ class Tags(commands.Cog, name="Custom Tags"):
             name = await self.client.wait_for("message", timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await ctx.send("You took long. Goodbye.")
-        
+
         try:
             ctx.message = name
             name = await converter.convert(ctx, name.content)
         except commands.BadArgument as e:
-            return await ctx.send(f'{e}. Redo the command "{ctx.prefix}tag make" to retry.')
+            return await ctx.send(
+                f'{e}. Redo the command "{ctx.prefix}tag make" to retry.'
+            )
         finally:
             ctx.message = original
 
@@ -273,18 +280,20 @@ class Tags(commands.Cog, name="Custom Tags"):
         )
 
         try:
-            msg = await self.client.wait_for('message', check=check, timeout=300.0)
+            msg = await self.client.wait_for("message", check=check, timeout=300.0)
         except asyncio.TimeoutError:
-            return await ctx.send('You took too long. Goodbye.')
+            return await ctx.send("You took too long. Goodbye.")
 
         if msg.content == f"{ctx.prefix}abort":
             return await ctx.send("Aborting...")
-        
+
         elif msg.content:
             try:
-              clean_content = await commands.clean_content().convert(ctx, msg.content)
+                clean_content = await commands.clean_content().convert(ctx, msg.content)
             except Exception as e:
-              return await ctx.send(f'{e}. Redo the command "{ctx.prefix}tag make" to retry.')          
+                return await ctx.send(
+                    f'{e}. Redo the command "{ctx.prefix}tag make" to retry.'
+                )
         else:
             clean_content = msg.content
 
@@ -307,10 +316,10 @@ class Tags(commands.Cog, name="Custom Tags"):
             modal = EditTagModel(ctx, self)
             await ctx.interaction.response.send_modal(modal)
             return
-        
+
         def check(msg):
             return msg.author == ctx.author and ctx.channel == msg.channel
-        
+
         await ctx.send("Hello. Which tag would you like to edit?")
 
         converter = TagName()
@@ -320,42 +329,46 @@ class Tags(commands.Cog, name="Custom Tags"):
             name = await self.client.wait_for("message", timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await ctx.send("You took long. Goodbye.")
-        
+
         try:
             ctx.message = name
             name = await converter.convert(ctx, name.content)
         except commands.BadArgument as e:
-            return await ctx.send(f'{e}. Redo the command "{ctx.prefix}tag edit" to retry.')
+            return await ctx.send(
+                f'{e}. Redo the command "{ctx.prefix}tag edit" to retry.'
+            )
         finally:
             ctx.message = original
-        
+
         await ctx.send(
             f"Neat. So the tag you would like to edit is `{name}`. What about the tag's content? "
             f"**You can type {ctx.prefix}abort to abort the tag edit process.**"
         )
-        
+
         try:
-            msg = await self.client.wait_for('message', check=check, timeout=300.0)
+            msg = await self.client.wait_for("message", check=check, timeout=300.0)
         except asyncio.TimeoutError:
-            return await ctx.send('You took too long. Goodbye.')
-        
+            return await ctx.send("You took too long. Goodbye.")
+
         if msg.content == f"{ctx.prefix}abort":
             return await ctx.send("Aborting...")
-        
+
         elif msg.content:
             try:
-              clean_content = await commands.clean_content().convert(ctx, msg.content)
+                clean_content = await commands.clean_content().convert(ctx, msg.content)
             except Exception as e:
-              return await ctx.send(f'{e}. Redo the command "{ctx.prefix}tag edit" to retry.')
-        else: 
+                return await ctx.send(
+                    f'{e}. Redo the command "{ctx.prefix}tag edit" to retry.'
+                )
+        else:
             clean_content = msg.content
 
         if msg.attachments:
             clean_content = f"{clean_content}\n{msg.attachments[0].url}"
-        
+
         if len(clean_content) > 1000:
             return await ctx.send("Tag content is a maximum of 1000 characters.")
-        
+
         await self.edit_tag(ctx, name, clean_content)
 
     @tag.command(description="Get info on a tag")
