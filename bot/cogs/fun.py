@@ -109,7 +109,7 @@ class Fun(commands.Cog, name="Fun"):
         module = cmd.module
         saucelines, startline = getsourcelines(cmd.callback)
         url = (
-            "<https://github.com/alexraskin/WiseOldManBot/blob/main/bot"
+            "<https://github.com/alexraskin/WiseOldManBot/blob/main/bot/"
             f'{"/".join(module.split("."))}.py#L{startline}>\n'
         )
         sauce = "".join(saucelines)
