@@ -125,7 +125,9 @@ class Admin(commands.Cog, name="Admin"):
             )
             return
 
-    @commands.hybrid_command(name="lockdown", description="Lockdowns a specified channel.")
+    @commands.hybrid_command(
+        name="lockdown", description="Lockdowns a specified channel."
+    )
     @commands.has_permissions(manage_channels=True)
     @commands.guild_only()
     @app_commands.describe(
@@ -134,7 +136,11 @@ class Admin(commands.Cog, name="Admin"):
     @app_commands.describe(reason="The reason for locking down the channel.")
     @app_commands.checks.has_permissions(manage_channels=True)
     async def lockdown(
-        self, ctx: commands.Context, channel: Optional[TextChannel] = None, *, reason: Optional[str] = None
+        self,
+        ctx: commands.Context,
+        channel: Optional[TextChannel] = None,
+        *,
+        reason: Optional[str] = None,
     ) -> None:
         """
         Lockdowns a specified channel.
@@ -149,7 +155,7 @@ class Admin(commands.Cog, name="Admin"):
                 timestamp=ctx.message.created_at,
             )
             if reason:
-              embed.add_field(name="Reason:", value=reason)
+                embed.add_field(name="Reason:", value=reason)
             embed.set_footer(text="Please be patient and follow server rules")
             await ctx.send(embed=embed)
         except Exception as e:
@@ -158,7 +164,7 @@ class Admin(commands.Cog, name="Admin"):
                 "An error occurred while locking down the channel.", ephemeral=True
             )
             return
-      
+
     @commands.hybrid_command(name="unlock", description="Unlocks a specified channel.")
     @commands.has_permissions(manage_channels=True)
     @commands.guild_only()
@@ -168,7 +174,11 @@ class Admin(commands.Cog, name="Admin"):
     @app_commands.describe(reason="The reason for unlocking the channel.")
     @app_commands.checks.has_permissions(manage_channels=True)
     async def unlock(
-        self, ctx: commands.Context, channel: Optional[TextChannel] = None, *, reason: Optional[str] = None
+        self,
+        ctx: commands.Context,
+        channel: Optional[TextChannel] = None,
+        *,
+        reason: Optional[str] = None,
     ) -> None:
         """
         Unlocks a specified channel.
@@ -185,7 +195,7 @@ class Admin(commands.Cog, name="Admin"):
                 timestamp=ctx.message.created_at,
             )
             if reason:
-              embed.add_field(name="Reason:", value=reason)
+                embed.add_field(name="Reason:", value=reason)
             embed.set_footer(text="Please be patient and follow server rules")
             await ctx.send(embed=embed)
         except Exception as e:

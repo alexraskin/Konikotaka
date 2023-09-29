@@ -9,7 +9,7 @@ from discord import (
     Message,
     app_commands,
     PartialEmoji,
-    Guild
+    Guild,
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
@@ -125,7 +125,7 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-        
+
     @commands.Cog.listener()
     async def on_member_remove(self, member: Member) -> None:
         if member.guild.id != self.cosmo_guild:
@@ -141,7 +141,7 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-    
+
     @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member) -> None:
         if before.guild.id != self.cosmo_guild:
@@ -157,7 +157,7 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-      
+
     @commands.Cog.listener()
     async def on_member_ban(self, guild: Guild, user: Member) -> None:
         if guild.id != self.cosmo_guild:

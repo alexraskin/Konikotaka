@@ -1,14 +1,13 @@
-import asyncio
-
+import datetime
 from aiohttp import web
-from discord import __version__ as discord_version, Webhook
+from discord import __version__ as discord_version, Webhook, Embed
 from discord.ext import commands
 
 
 class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         print("Webserver is running!")
@@ -27,12 +26,23 @@ class WebServer(commands.Cog, name="WebServer"):
         return web.Response(text="SUP")
 
     async def webhook(self, request: web.Request) -> None:
+        data = await request.json()
+        status_mapping = {"down": ":x: Down", "up": ":white_check_mark: Up"}
+        status = data["status"]
         channel = self.client.get_channel(1152780745270644738)
-        webhook = await channel.create_webhook(name="WiseOldMan")
+        webhook = await channel.create_webhook(
+            name="WiseOldMan",
+            reason="Webhook for WiseOldMan",
+            avatar=self.client.user.avatar.url,
+        )
         async with self.client.session as session:
-          discord_webhook = Webhook.from_url(webhook.url, session=session)
-          await discord_webhook.send('Hello World', username='Foo')
-          return web.Response(text="SUP")
+            discord_webhook = Webhook.from_url(webhook.url, session=session)
+            embed = Embed(title=data["name"], color=242424, timestamp=datetime.datetime.utcnow())
+            if status in status_mapping:
+                embed.add_embed_field(name="Status", value=status_mapping[status])
+                embed.set_author(name="Health Check - WiseOldMan")
+            await discord_webhook.send()
+            return web.Response(text="SUP")
 
     async def webserver(self) -> None:
         app: web.Application = web.Application()
