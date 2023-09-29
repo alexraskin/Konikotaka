@@ -30,11 +30,7 @@ class WebServer(commands.Cog, name="WebServer"):
         status_mapping = {"down": ":x: Down", "up": ":white_check_mark: Up"}
         status = data["status"]
         channel = self.client.get_channel(1152780745270644738)
-        webhook = await channel.create_webhook(
-            name="WiseOldMan",
-            reason="Webhook for WiseOldMan",
-            avatar=self.client.logo_url,
-        )
+        webhook = await channel.create_webhook()
         async with self.client.session as session:
             discord_webhook = Webhook.from_url(webhook.url, session=session)
             embed = Embed(title=data["name"], color=242424, timestamp=datetime.datetime.utcnow())
@@ -42,7 +38,7 @@ class WebServer(commands.Cog, name="WebServer"):
                 embed.add_embed_field(name="Status", value=status_mapping[status])
                 embed.set_author(name="Health Check - WiseOldMan")
             embed.set_footer(text="Provided by healthchecks.io")
-            await discord_webhook.send()
+            await discord_webhook.send(username="WiseOldMan", embeds=[embed], avatar_url=self.client.logo_url)
             return web.Response(text="SUP")
 
     async def webserver(self) -> None:
