@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from typing import Optional
 
-from discord import Embed, HTTPException, Interaction, app_commands
+from discord import Embed, HTTPException, Interaction, app_commands, TextChannel
 from discord.ext import commands
 
 
 class Admin(commands.Cog, name="Admin"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
+
+    def check_if_owner(ctx: commands.Ctx) -> bool:
+        return ctx.author.id == 297398689415168000
 
     @commands.command(name="reload", hidden=True)
     @commands.is_owner()
@@ -71,6 +74,7 @@ class Admin(commands.Cog, name="Admin"):
     @commands.is_owner()
     @app_commands.describe(name="The name of the emoji.")
     @app_commands.describe(url="The URL of the emoji.")
+    @app_commands.check(check_if_owner)
     async def add_emoji(self, interaction: Interaction, name: str, url: str) -> None:
         """
         Adds an emoji to the server.
@@ -122,6 +126,76 @@ class Admin(commands.Cog, name="Admin"):
             self.client.log.error(f"Error: {e}")
             await interaction.response.send_message(
                 "An error occurred while purging messages.", ephemeral=True
+            )
+            return
+
+    @commands.hybrid_command(name="lockdown", description="Lockdowns a specified channel.")
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
+    @app_commands.describe(
+        channel="The channel to lockdown. Defaults to the current channel."
+    )
+    @app_commands.describe(reason="The reason for locking down the channel.")
+    @app_commands.check(check_if_owner)
+    async def lockdown(
+        self, ctx: commands.Context, channel: Optional[TextChannel] = None, *, reason: Optional[str] = None
+    ) -> None:
+        """
+        Lockdowns a specified channel.
+        """
+        channel = channel or ctx.channel
+        try:
+            await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+            embed = Embed(
+                title="Lockdown Notice 🔒",
+                description=f"This channel is currently under lockdown.",
+                color=0x00FF00,
+                timestamp=ctx.message.created_at,
+            )
+            if reason:
+              embed.add_field(name="Reason:", value=reason)
+            embed.set_footer(text="Please be patient and follow server rules")
+            await ctx.send(embed=embed)
+        except Exception as e:
+            self.client.log.error(f"Error: {e}")
+            await ctx.send(
+                "An error occurred while locking down the channel.", ephemeral=True
+            )
+            return
+      
+    @commands.hybrid_command(name="unlock", description="Unlocks a specified channel.")
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
+    @app_commands.describe(
+        channel="The channel to unlock. Defaults to the current channel."
+    )
+    @app_commands.describe(reason="The reason for unlocking the channel.")
+    @app_commands.check(check_if_owner)
+    async def unlock(
+        self, ctx: commands.Context, channel: Optional[TextChannel] = None, *, reason: Optional[str] = None
+    ) -> None:
+        """
+        Unlocks a specified channel.
+        """
+        channel = channel or ctx.channel
+        try:
+            await channel.set_permissions(
+                ctx.guild.default_role, send_messages=True, reason=reason
+            )
+            embed = Embed(
+                title="Lockdown Ended 🔓",
+                description=f"The lockdown has been lifted.",
+                color=0x00FF00,
+                timestamp=ctx.message.created_at,
+            )
+            if reason:
+              embed.add_field(name="Reason:", value=reason)
+            embed.set_footer(text="Please be patient and follow server rules")
+            await ctx.send(embed=embed)
+        except Exception as e:
+            self.client.log.error(f"Error: {e}")
+            await ctx.send(
+                "An error occurred while unlocking the channel.", ephemeral=True
             )
             return
 
