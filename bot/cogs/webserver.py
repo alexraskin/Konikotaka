@@ -33,7 +33,7 @@ class WebServer(commands.Cog, name="WebServer"):
         webhook = await channel.create_webhook(
             name="WiseOldMan",
             reason="Webhook for WiseOldMan",
-            avatar=self.client.user.avatar.url,
+            avatar=self.client.logo_url,
         )
         async with self.client.session as session:
             discord_webhook = Webhook.from_url(webhook.url, session=session)
@@ -41,6 +41,7 @@ class WebServer(commands.Cog, name="WebServer"):
             if status in status_mapping:
                 embed.add_embed_field(name="Status", value=status_mapping[status])
                 embed.set_author(name="Health Check - WiseOldMan")
+            embed.set_footer(text="Provided by healthchecks.io")
             await discord_webhook.send()
             return web.Response(text="SUP")
 
