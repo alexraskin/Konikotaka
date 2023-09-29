@@ -35,7 +35,7 @@ class WebServer(commands.Cog, name="WebServer"):
             discord_webhook = Webhook.from_url(webhook.url, session=session)
             embed = Embed(title=data["name"], color=242424, timestamp=datetime.datetime.utcnow())
             if status in status_mapping:
-                embed.add_embed_field(name="Status", value=status_mapping[status])
+                embed.add_field(name="Status", value=status_mapping[status])
                 embed.set_author(name="Health Check - WiseOldMan")
             embed.set_footer(text="Provided by healthchecks.io")
             await discord_webhook.send(username="WiseOldMan", embeds=[embed], avatar_url=self.client.logo_url)
