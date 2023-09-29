@@ -11,7 +11,6 @@ activities = [
     "?bczs",
     "with Bartholomeow",
     "Annoying Seaira",
-    "/newpet",
     "/waifu",
     "?year",
 ]
