@@ -9,6 +9,7 @@ from discord import (
     Message,
     app_commands,
     PartialEmoji,
+    Guild
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
@@ -23,13 +24,13 @@ class General(commands.Cog, name="General"):
         self.client: commands.Bot = client
         self.guild: str = os.getenv("GUILD_ID")
         self.message_reports_channel: int = 1152498407416533053
-        self.general_channel: GuildChannel = self.client.get_channel(825189935476637729)
-        self.message_report_ctx = app_commands.ContextMenu(
+        self.general_channel: GuildChannel = 825189935476637729
+        self.message_report_ctx: app_commands.ContextMenu = app_commands.ContextMenu(
             name="Report Message",
             callback=self.report,
         )
         self.client.tree.add_command(self.message_report_ctx)
-        self.warn_user_ctx = app_commands.ContextMenu(
+        self.warn_user_ctx: app_commands.ContextMenu = app_commands.ContextMenu(
             name="Warn User",
             callback=self.warn,
         )
@@ -62,7 +63,7 @@ class General(commands.Cog, name="General"):
 
     async def warn(self, interaction: Interaction, user: Member) -> None:
         await interaction.response.defer(ephemeral=True)
-        embed = Embed(
+        embed: Embed = Embed(
             title="User Warned 🚨",
             color=0x2ECC71,
             timestamp=interaction.created_at,
@@ -116,6 +117,7 @@ class General(commands.Cog, name="General"):
             discord_id=member.id,
             username=member.name,
             joined=member.joined_at,
+            guild_id=member.guild.id,
         )
         async with self.client.async_session() as session:
             try:
@@ -125,18 +127,66 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-        embed = Embed(
-            title="New Member 🎉",
-            description=f"Welcome {member.mention} to {member.guild.name}! {self.display_emoji}",
-            color=0x2ECC71,
-            timestamp=member.joined_at,
-        )
-        embed.set_thumbnail(url=member.avatar.url)
-        await self.general_channel.send(embed=embed)
+        
+    @commands.Cog.listener()
+    async def on_member_remove(self, member: Member) -> None:
+        if member.guild.id != self.cosmo_guild:
+            return
+        async with self.client.async_session() as session:
+            try:
+                user = await session.query(DiscordUser, member.id)
+                if user is None:
+                    return
+                session.delete(user)
+                await session.flush()
+                await session.commit()
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
+    
+    @commands.Cog.listener()
+    async def on_member_update(self, before: Member, after: Member) -> None:
+        if before.guild.id != self.cosmo_guild:
+            return
+        async with self.client.async_session() as session:
+            try:
+                user = await session.query(DiscordUser, before.id)
+                if user is None:
+                    return
+                user.username = after.name
+                await session.flush()
+                await session.commit()
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
+      
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild: Guild, user: Member) -> None:
+        if guild.id != self.cosmo_guild:
+            return
+        async with self.client.async_session() as session:
+            try:
+                user = await session.query(DiscordUser, user.id)
+                if user is None:
+                    return
+                session.delete(user)
+                await session.flush()
+                await session.commit()
+                embed = Embed(
+                    title="User Banned 🚨",
+                    color=0x2ECC71,
+                )
+                embed.add_field(name="User:", value=user.mention, inline=False)
+                channel: GuildChannel = self.client.get_channel(self.general_channel)
+                await channel.send(embed=embed)
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
+        
 
     @commands.hybrid_command(name="year", description="Show the year progress")
     async def year(self, ctx: commands.Context):
-        embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
+        embed: Embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
         embed.set_author(
             name="Year Progress",
             icon_url="https://i.gyazo.com/db74b90ebf03429e4cc9873f2990d01e.png",
@@ -160,7 +210,7 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
-        gif_list = [
+        gif_list: list = [
             "https://media.tenor.com/0He0W1M2LFcAAAAC/lost-gnome.gif",
             "https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif",
             "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif",

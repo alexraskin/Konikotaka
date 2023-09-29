@@ -11,7 +11,7 @@ class myHelpCommand(HelpCommand):
     def __init__(self, **options) -> None:
         super().__init__(**options)
         self.paginator = None
-        self.spacer = " "
+        self.spacer: str = " "
 
     async def send_pages(self, header=False, footer=False):
         destination = self.get_destination()

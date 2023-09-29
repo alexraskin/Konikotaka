@@ -55,7 +55,7 @@ class Admin(commands.Cog, name="Admin"):
             await ctx.send(embed=embed)
 
     @commands.command(name="sync", hidden=True)
-    @commands.is_owner()
+    @commands.has_permissions(administrator=True)
     async def sync(self, ctx: commands.Context) -> None:
         """
         Sync app commands with Discord.
@@ -71,10 +71,9 @@ class Admin(commands.Cog, name="Admin"):
         await message.edit(content="Synced successfully! ✅")
 
     @app_commands.command(name="add_emoji", description="Add an emoji to the server.")
-    @commands.is_owner()
     @app_commands.describe(name="The name of the emoji.")
     @app_commands.describe(url="The URL of the emoji.")
-    @app_commands.check(check_if_owner)
+    @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
     async def add_emoji(self, interaction: Interaction, name: str, url: str) -> None:
         """
         Adds an emoji to the server.
@@ -136,7 +135,7 @@ class Admin(commands.Cog, name="Admin"):
         channel="The channel to lockdown. Defaults to the current channel."
     )
     @app_commands.describe(reason="The reason for locking down the channel.")
-    @app_commands.check(check_if_owner)
+    @app_commands.checks.has_permissions(manage_channels=True)
     async def lockdown(
         self, ctx: commands.Context, channel: Optional[TextChannel] = None, *, reason: Optional[str] = None
     ) -> None:
@@ -170,7 +169,7 @@ class Admin(commands.Cog, name="Admin"):
         channel="The channel to unlock. Defaults to the current channel."
     )
     @app_commands.describe(reason="The reason for unlocking the channel.")
-    @app_commands.check(check_if_owner)
+    @app_commands.checks.has_permissions(manage_channels=True)
     async def unlock(
         self, ctx: commands.Context, channel: Optional[TextChannel] = None, *, reason: Optional[str] = None
     ) -> None:
