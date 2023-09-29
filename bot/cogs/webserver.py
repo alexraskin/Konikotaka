@@ -30,7 +30,7 @@ class WebServer(commands.Cog, name="WebServer"):
         channel = self.client.get_channel(1152780745270644738)
         webhook = await channel.create_webhook(name="WiseOldMan")
         async with self.client.session as session:
-          discord_webhook = Webhook.from_url(webhook, session=session)
+          discord_webhook = Webhook.from_url(webhook.url, session=session)
           await discord_webhook.send('Hello World', username='Foo')
           return web.Response(text="SUP")
 
