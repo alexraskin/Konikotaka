@@ -30,7 +30,7 @@ class WebServer(commands.Cog, name="WebServer"):
         status_mapping = {"down": ":x: Down", "up": ":white_check_mark: Up"}
         status = data["status"]
         channel = self.client.get_channel(1152780745270644738)
-        webhook = await channel.create_webhook()
+        webhook = await channel.create_webhook(name="Health Check")
         async with self.client.session as session:
             discord_webhook = Webhook.from_url(webhook.url, session=session)
             embed = Embed(title=data["name"], color=242424, timestamp=datetime.datetime.utcnow())
