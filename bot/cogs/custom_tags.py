@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 import asyncio
-from typing import Annotated, Optional
+from typing import Optional
 
 import discord
 from discord import Embed, app_commands, PartialEmoji, TextStyle
@@ -30,7 +30,6 @@ class TagName(commands.clean_content):
 
         first_word, _, _ = lower.partition(" ")
 
-        # get tag command.
         root: commands.GroupMixin = ctx.bot.get_command("tag")  # type: ignore
         if first_word in root.all_commands:
             raise commands.BadArgument("This tag name starts with a reserved word.")

@@ -16,8 +16,6 @@ from discord.ext import commands, tasks
 from models.db import Base
 from models.users import DiscordUser
 
-from .utils.utils import get_year_round, progress_bar
-
 
 class General(commands.Cog, name="General"):
     def __init__(self, client: commands.Bot) -> None:
@@ -182,31 +180,6 @@ class General(commands.Cog, name="General"):
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()
-        
-
-    @commands.hybrid_command(name="year", description="Show the year progress")
-    async def year(self, ctx: commands.Context):
-        embed: Embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
-        embed.set_author(
-            name="Year Progress",
-            icon_url="https://i.gyazo.com/db74b90ebf03429e4cc9873f2990d01e.png",
-        )
-        embed.add_field(
-            name="Progress:", value=progress_bar(get_year_round()), inline=True
-        )
-        await ctx.send(embed=embed)
-
-    @commands.command("f", description="Press F to pay respects")
-    async def f(self, ctx: commands.Context):
-        message = await ctx.send("Press 🇫 to pay respect to the chat.")
-        await message.add_reaction("🇫")
-        wait = await self.client.wait_for(
-            "reaction_add",
-            check=lambda r, u: r.message == message
-            and r.emoji == "🇫"
-            and u != self.client.user,
-        )
-        await ctx.send(f"{wait[1].mention} is paying respect.")
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):

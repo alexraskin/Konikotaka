@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import random
-from inspect import getsourcelines
 from typing import Literal, Optional, Union
 import asyncio
 
@@ -10,6 +9,8 @@ from discord import app_commands, Embed, Member, Message
 from discord.ext import commands
 from sqlalchemy.future import select
 from models.users import DiscordUser
+
+from .utils.utils import get_year_round, progress_bar
 
 
 class Fun(commands.Cog, name="Fun"):
@@ -98,27 +99,6 @@ class Fun(commands.Cog, name="Fun"):
             await ctx.send("Error getting waifu!")
 
     @commands.cooldown(1, 15, commands.BucketType.user)
-    @commands.command(name="inspect")
-    async def inspect(self, ctx, *, command_name: str) -> Message:
-        """
-        Print a link and the source code of a command
-        """
-        cmd = self.client.get_command(command_name)
-        if cmd is None:
-            return
-        module = cmd.module
-        saucelines, startline = getsourcelines(cmd.callback)
-        url = (
-            "<https://github.com/alexraskin/WiseOldManBot/blob/main/bot/"
-            f'{"/".join(module.split("."))}.py#L{startline}>\n'
-        )
-        sauce = "".join(saucelines)
-        sanitized = sauce.replace("`", "\u200B`")
-        if len(url) + len(sanitized) > 1950:
-            sanitized = sanitized[: 1950 - len(url)] + "\n[...]"
-        await ctx.send(url + f"```python\n{sanitized}\n```")
-
-    @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.command(name="cat", description="Get a random cat image")
     async def cat(self, ctx: commands.Context) -> Message:
         """
@@ -164,7 +144,7 @@ class Fun(commands.Cog, name="Fun"):
             "It is certain.",
             "It is decidedly so.",
             "Without a doubt.",
-            "Yes – definitely.",
+            "Yes, definitely.",
             "You may rely on it.",
             "As I see it, yes.",
             "Most likely.",
@@ -453,6 +433,30 @@ class Fun(commands.Cog, name="Fun"):
             await ctx.send(embed=embed)
         else:
             await ctx.send("Error getting xkcd comic!")
+
+    @commands.hybrid_command(name="year", description="Show the year progress")
+    async def year(self, ctx: commands.Context):
+        embed: Embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
+        embed.set_author(
+            name="Year Progress",
+            icon_url="https://i.gyazo.com/db74b90ebf03429e4cc9873f2990d01e.png",
+        )
+        embed.add_field(
+            name="Progress:", value=progress_bar(get_year_round()), inline=True
+        )
+        await ctx.send(embed=embed)
+
+    @commands.command("f", description="Press F to pay respects")
+    async def f(self, ctx: commands.Context):
+        message = await ctx.send("Press 🇫 to pay respect to the chat.")
+        await message.add_reaction("🇫")
+        wait = await self.client.wait_for(
+            "reaction_add",
+            check=lambda r, u: r.message == message
+            and r.emoji == "🇫"
+            and u != self.client.user,
+        )
+        await ctx.send(f"{wait[1].mention} is paying respect.")
 
 
 async def setup(client: commands.Bot) -> None:

@@ -10,9 +10,6 @@ class Admin(commands.Cog, name="Admin"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
-    def check_if_owner(ctx: commands.Ctx) -> bool:
-        return ctx.author.id == 297398689415168000
-
     @commands.command(name="reload", hidden=True)
     @commands.is_owner()
     @commands.guild_only()
