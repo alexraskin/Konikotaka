@@ -448,6 +448,7 @@ class Fun(commands.Cog, name="Fun"):
 
     @commands.command("f", description="Press F to pay respects")
     async def f(self, ctx: commands.Context):
+        await ctx.message.delete()
         message = await ctx.send("Press 🇫 to pay respect to the chat.")
         await message.add_reaction("🇫")
         wait = await self.client.wait_for(
