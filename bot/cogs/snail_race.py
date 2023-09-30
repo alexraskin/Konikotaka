@@ -16,7 +16,7 @@ running_guilds: List = []
 snail_positions: Dict = {}
 
 
-class JoinRaceButton(discord.ui.View):
+class RaceButton(discord.ui.View):
     def __init__(self, *, timeout: int = 45):
         super().__init__(timeout=timeout)
         global shuffled_participants
@@ -142,7 +142,7 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     @app_commands.guild_only()
     async def race(self, interaction: Interaction, delay: Optional[int] = 10) -> None:
         global running_guilds
-        view: JoinRaceButton = JoinRaceButton(timeout=delay)
+        view: RaceButton = RaceButton(timeout=delay)
         if interaction.guild.id in running_guilds:
             await interaction.response.send_message(
                 content="A race is already running in this server!",
