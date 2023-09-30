@@ -27,11 +27,12 @@ class General(commands.Cog, name="General"):
             name="Report Message",
             callback=self.report,
         )
-        self.client.tree.add_command(self.message_report_ctx)
         self.warn_user_ctx: app_commands.ContextMenu = app_commands.ContextMenu(
             name="Warn User",
             callback=self.warn,
         )
+        self.client.tree.add_command(self.message_report_ctx)
+        self.client.tree.add_command(self.warn_user_ctx)
 
     async def cog_unload(self) -> None:
         self.client.tree.remove_command(
