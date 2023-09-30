@@ -109,7 +109,7 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_memeber_join(self, member: Member) -> None:
-        if member.guild.id != self.cosmo_guild:
+        if member.guild.id != self.client.cosmo_guild:
             return
         user = DiscordUser(
             discord_id=member.id,
@@ -128,7 +128,7 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: Member) -> None:
-        if member.guild.id != self.cosmo_guild:
+        if member.guild.id != self.client.cosmo_guild:
             return
         async with self.client.async_session() as session:
             try:
@@ -144,7 +144,7 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member) -> None:
-        if before.guild.id != self.cosmo_guild:
+        if before.guild.id != self.client.cosmo_guild:
             return
         async with self.client.async_session() as session:
             try:
@@ -160,7 +160,7 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: Guild, user: Member) -> None:
-        if guild.id != self.cosmo_guild:
+        if guild.id != self.client.cosmo_guild:
             return
         async with self.client.async_session() as session:
             try:
