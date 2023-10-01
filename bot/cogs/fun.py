@@ -140,35 +140,35 @@ class Fun(commands.Cog, name="Fun"):
         """
         Ask the magic 8ball a question
         """
-        responses = [
-            "It is certain.",
-            "It is decidedly so.",
-            "Without a doubt.",
-            "Yes, definitely.",
-            "You may rely on it.",
-            "As I see it, yes.",
-            "Most likely.",
-            "Outlook good.",
-            "Yes.",
-            "Signs point to yes.",
-            "Reply hazy, try again.",
-            "Ask again later.",
-            "Better not tell you now.",
-            "Cannot predict now.",
-            "Concentrate and ask again.",
-            "Don't count on it.",
-            "My reply is no.",
-            "My sources say no.",
-            "Outlook not so good.",
-            "Very doubtful.",
-        ]
+        data = await self.client.session.get("https://nekos.life/api/v2/8ball")
+        json_data = await data.json()
         embed = Embed(
-            title="🎱 8ball",
-            description=f"Question: {question}\n\nAnswer: {random.choice(responses)}",
+            title="🎱 Meowgical 8ball",
+            description=f"Question: {question}\n\nAnswer: {json_data['response']}",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at,
+        )
+        embed.set_image(url=json_data['url'])
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="fact", description="Get a random fact")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def fact(self, ctx: commands.Context) -> Embed:
+        """
+        Get a random fact
+        """
+        data = await self.client.session.get("https://nekos.life/api/v2/fact")
+        json_data = await data.json()
+        embed = Embed(
+            title="📖 Fact",
+            description=f"{json_data['fact']}",
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
         embed.set_footer(text=f"{ctx.author}")
+        embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="reverse", description="Reverse a string")
@@ -221,13 +221,16 @@ class Fun(commands.Cog, name="Fun"):
         """
         Hug someone
         """
+        data = await self.client.session.get("https://nekos.life/api/v2/img/hug")
+        json_data = await data.json()
         embed = Embed(
             title="🫂 Hug",
             description=f"{ctx.author.mention} hugged {member.mention} 😊",
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url="https://media.tenor.com/b3Qvt--s_i0AAAAC/hugs.gif")
+        embed.set_image(url=json_data['url'])
+        embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="slap", description="Slap someone")
@@ -237,16 +240,44 @@ class Fun(commands.Cog, name="Fun"):
         """
         Slap someone
         """
+        data = await self.client.session.get("https://nekos.life/api/v2/img/slap")
+        json_data = await data.json()
         embed = Embed(
             title="👊 Slap",
             description=f"{ctx.author.mention} slapped {member.mention} 😡",
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(
-            url="https://media.tenor.com/XiYuU9h44-AAAAAC/anime-slap-mad.gif"
-        )
+        embed.set_image(url=json_data['url'])
+        embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
+    
+    @commands.hybrid_command(name="pat", description="Pat someone")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def pat(self, ctx: commands.Context, member: Member) -> Embed:
+        """
+        Pat someone
+        """
+        data = await self.client.session.get("https://nekos.life/api/v2/img/pat")
+        json_data = await data.json()
+        embed = Embed(
+            title="👋 Pat",
+            description=f"{ctx.author.mention} patted {member.mention} 😊",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at,
+        )
+        embed.set_image(url=json_data['url'])
+        embed.set_footer(text="Provided by nekos.life api")
+        await ctx.send(embed=embed)
+    
+    @commands.hybrid_command(name="textcat")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def textcat(self, ctx: commands.Context) -> Message:
+        data = await self.client.session.get("https://nekos.life/api/v2/cat")
+        json_data = await data.json()
+        await ctx.send(json_data['cat'])
 
     @commands.hybrid_command(name="slots", description="Play the slots")
     @commands.guild_only()
