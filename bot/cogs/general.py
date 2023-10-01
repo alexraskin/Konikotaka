@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 import os
 import random
 
 from discord import (
     DMChannel,
     Embed,
+    Guild,
     Interaction,
     Member,
     Message,
-    app_commands,
     PartialEmoji,
-    Guild,
+    app_commands,
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
@@ -238,11 +240,12 @@ class General(commands.Cog, name="General"):
     async def on_command_error(
         self, ctx: commands.Context, error: commands.errors
     ) -> None:
+        message = "oopsie whoopsie UwU you made a fucky wucky"
         if isinstance(error, commands.errors.CheckFailure):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct role."
             )
-            await ctx.send("You do not have the correct role for this command.")
+            await ctx.send(message)
         elif isinstance(error, commands.errors.CommandNotFound):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} which does not exist."
@@ -251,7 +254,7 @@ class General(commands.Cog, name="General"):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."
             )
-            await ctx.send("Missing required argument.")
+            await ctx.send(message)
 
 
 async def setup(client: commands.Bot) -> None:

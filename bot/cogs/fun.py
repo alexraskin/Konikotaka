@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+import asyncio
 import random
 from typing import Literal, Optional, Union
-import asyncio
 
 import upsidedown
-from discord import app_commands, Embed, Member, Message
+from discord import Embed, Member, Message, app_commands
 from discord.ext import commands
-from sqlalchemy.future import select
 from models.users import DiscordUser
+from sqlalchemy.future import select
 
 from .utils.utils import get_year_round, progress_bar
 
@@ -148,7 +148,7 @@ class Fun(commands.Cog, name="Fun"):
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url=json_data['url'])
+        embed.set_image(url=json_data["url"])
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
 
@@ -229,7 +229,7 @@ class Fun(commands.Cog, name="Fun"):
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url=json_data['url'])
+        embed.set_image(url=json_data["url"])
         embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
 
@@ -248,10 +248,10 @@ class Fun(commands.Cog, name="Fun"):
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url=json_data['url'])
+        embed.set_image(url=json_data["url"])
         embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
-    
+
     @commands.hybrid_command(name="pat", description="Pat someone")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -267,17 +267,17 @@ class Fun(commands.Cog, name="Fun"):
             color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url=json_data['url'])
+        embed.set_image(url=json_data["url"])
         embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
-    
+
     @commands.hybrid_command(name="textcat")
     @commands.guild_only()
     @app_commands.guild_only()
     async def textcat(self, ctx: commands.Context) -> Message:
         data = await self.client.session.get("https://nekos.life/api/v2/cat")
         json_data = await data.json()
-        await ctx.send(json_data['cat'])
+        await ctx.send(json_data["cat"])
 
     @commands.hybrid_command(name="slots", description="Play the slots")
     @commands.guild_only()
