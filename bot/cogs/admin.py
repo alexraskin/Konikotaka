@@ -94,7 +94,7 @@ class Admin(commands.Cog, name="Admin"):
             return
 
     
-    @commands.command(hidden=True)
+    @commands.command(name="git", aliases=["gr"], hidden=True)
     @commands.is_owner()
     async def git_revision(self, ctx: commands.Context):
         """
