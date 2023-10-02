@@ -130,22 +130,6 @@ class General(commands.Cog, name="General"):
                 await session.rollback()
 
     @commands.Cog.listener()
-    async def on_member_remove(self, member: Member) -> None:
-        if member.guild.id != self.client.cosmo_guild:
-            return
-        async with self.client.async_session() as session:
-            try:
-                user = await session.query(DiscordUser, member.id)
-                if user is None:
-                    return
-                session.delete(user)
-                await session.flush()
-                await session.commit()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-
-    @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member) -> None:
         if before.guild.id != self.client.cosmo_guild:
             return
@@ -192,12 +176,6 @@ class General(commands.Cog, name="General"):
             "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif",
         ]
         if message.author == self.client.user:
-            return
-
-        if message.content.__contains__("?gothgf"):
-            await message.channel.send(
-                "https://i.gyazo.com/83858c9e4b22334ee8b514fb232b2f4a.jpg"
-            )
             return
 
         if message.content.__contains__("?servericon"):
