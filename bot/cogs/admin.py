@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from discord import Embed, HTTPException, Interaction, TextChannel, app_commands
+from discord import (Embed, HTTPException, Interaction, TextChannel,
+                     app_commands)
 from discord.ext import commands
 
 
