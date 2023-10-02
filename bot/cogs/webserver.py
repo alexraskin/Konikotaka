@@ -1,4 +1,6 @@
 import asyncio
+from datetime import datetime
+import pytz
 
 from aiohttp import web
 from discord import __version__ as discord_version
@@ -8,19 +10,32 @@ from discord.ext import commands
 class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
-        self.status_channel = 1152780745270644738
 
     @commands.Cog.listener()
     async def on_ready(self):
         print("Webserver is running!")
 
     async def index_handler(self, request: web.Request) -> dict:
+        discord_status = await self.client.session.get("https://discordstatus.com/api/v2/status.json")
+        data = await discord_status.json()
+        indicator = data["status"]["indicator"]
+        description = data["status"]["description"]
+        last_updated = data["page"]["updated_at"]
+        input_datetime = datetime.fromisoformat(last_updated)
+        input_datetime_utc = input_datetime.astimezone(pytz.utc)
+        pretty_datetime_str = input_datetime_utc.strftime("%Y-%m-%d %H:%M:%S %Z")
         return web.json_response(
             {
                 "botStatus": "online",
                 "discordVersion": discord_version,
                 "botLatency": f"{self.client.get_bot_latency}ms",
                 "botUptime": self.client.get_uptime,
+                "discordStatus":
+                    {
+                        "indicator": indicator,
+                        "description": description,
+                        "lastUpdated": pretty_datetime_str
+                    }
             }
         )
 
