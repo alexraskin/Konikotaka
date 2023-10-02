@@ -58,6 +58,7 @@ class Admin(commands.Cog, name="Admin"):
         """
         Sync app commands with Discord.
         """
+        await ctx.message.delete()
         message = await ctx.send(content="Syncing... 🔄")
         try:
             await self.client.tree.sync()
@@ -65,8 +66,8 @@ class Admin(commands.Cog, name="Admin"):
             self.client.log.error(f"Error: {e}")
             await ctx.send("An error occurred while syncing.", ephemeral=True)
             return
-        await ctx.message.delete()
-        await message.edit(content="Synced successfully! ✅")
+        sync_message = await message.edit(content="Synced successfully! ✅")
+        await sync_message.delete(delay=5)
 
     @app_commands.command(name="add_emoji", description="Add an emoji to the server.")
     @app_commands.describe(name="The name of the emoji.")
