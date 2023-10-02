@@ -30,7 +30,7 @@ class WebServer(commands.Cog, name="WebServer"):
         last_updated = data["page"]["updated_at"]
         input_datetime = datetime.fromisoformat(last_updated)
         input_datetime_utc = input_datetime.astimezone(pytz.utc)
-        pretty_datetime_str = input_datetime_utc.strftime("%Y-%m-%d %H:%M:%S %Z") 
+        pretty_datetime_str = input_datetime_utc.strftime("%Y-%m-%d %H:%M:%S %Z")
         return web.json_response(
             {
                 "botStatus": "online",

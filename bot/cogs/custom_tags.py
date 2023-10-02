@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import random
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 import discord
 from discord import Embed, PartialEmoji, TextStyle, app_commands
@@ -50,7 +51,7 @@ class CreateTagModel(discord.ui.Modal, title="Create New Tag"):
         style=TextStyle.paragraph,
         placeholder="Tag Content",
         required=True,
-        max_length=1000,
+        max_length=2000,
     )
 
     def __init__(self, ctx: commands.Context, cog: Tags) -> None:
@@ -69,7 +70,7 @@ class CreateTagModel(discord.ui.Modal, title="Create New Tag"):
         content = str(self.tag_content.value)
         if len(content) > 2000:
             await interaction.response.send_message(
-                "Tag content is a maximum of 1000 characters.", ephemeral=True
+                "Tag content is a maximum of 2000 characters.", ephemeral=True
             )
         await self.cog.add_tag(self.ctx, name, content)
 
@@ -87,7 +88,7 @@ class EditTagModel(discord.ui.Modal, title="Edit Tag"):
         style=TextStyle.paragraph,
         placeholder="Tag Content",
         required=True,
-        max_length=1000,
+        max_length=2000,
     )
 
     def __init__(self, ctx: commands.Context, cog: Tags) -> None:
@@ -106,7 +107,7 @@ class EditTagModel(discord.ui.Modal, title="Edit Tag"):
             return
         if len(content) > 2000:
             await interaction.response.send_message(
-                "Tag content is a maximum of 1000 characters.", ephemeral=True
+                "Tag content is a maximum of 2000 characters.", ephemeral=True
             )
         await self.cog.edit_tag(self.ctx, name, content)
 
@@ -365,8 +366,8 @@ class Tags(commands.Cog, name="Custom Tags"):
         if msg.attachments:
             clean_content = f"{clean_content}\n{msg.attachments[0].url}"
 
-        if len(clean_content) > 1000:
-            return await ctx.send("Tag content is a maximum of 1000 characters.")
+        if len(clean_content) > 2000:
+            return await ctx.send("Tag content is a maximum of 2000 characters.")
 
         await self.edit_tag(ctx, name, clean_content)
 
@@ -447,6 +448,60 @@ class Tags(commands.Cog, name="Custom Tags"):
                 )
             else:
                 await ctx.reply("There are no tags.", ephemeral=True)
+
+    @tag.command(description="Get a random tag")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def random(self, ctx: commands.Context) -> None:
+        """
+        Get a random tag
+        """
+        async with self.client.async_session() as session:
+            query = await session.execute(select(CustomTags))
+            tags = query.scalars().all()
+            if tags:
+                tag = tags[random.randint(0, len(tags) - 1)]
+                await ctx.reply(f"TagName:{tag.name}\nTagContent{tag.content}")
+            else:
+                await ctx.reply("There are no tags.", ephemeral=True)
+
+    @tag.command(description="Transfer a tag to another user")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    @app_commands.describe(tag_name="The tag to transfer")
+    @app_commands.describe(member="The member to transfer the tag to")
+    async def transfer(
+        self,
+        ctx: commands.Context,
+        tag_name: str,
+        member: Union[discord.Member, discord.User],
+    ) -> None:
+        """
+        Transfer a tag to another user
+        """
+        async with self.client.async_session() as session:
+            query = await session.execute(
+                select(CustomTags).filter(CustomTags.name == tag_name.lower())
+            )
+            tag = query.scalar_one_or_none()
+            if tag:
+                try:
+                    tag.discord_id = member.id
+                    await session.flush()
+                    await session.commit()
+                    await ctx.reply(f"Tag `{tag_name}` transferred!")
+                    self.client.log.info(
+                        f"User {ctx.author} transferred a tag named {tag_name}"
+                    )
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+                    await ctx.reply(
+                        "An error occurred while transferring the tag. 👎",
+                        ephemeral=True,
+                    )
+            else:
+                await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
     @tag.command()
     @commands.guild_only()
