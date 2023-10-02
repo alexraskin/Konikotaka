@@ -1,6 +1,6 @@
 from __future__ import annotations
-import os
 
+import os
 from typing import Optional
 
 from discord import Embed, HTTPException, Interaction, app_commands

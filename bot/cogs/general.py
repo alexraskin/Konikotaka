@@ -2,17 +2,10 @@ from __future__ import annotations
 
 import os
 import random
+from typing import Union
 
-from discord import (
-    DMChannel,
-    Embed,
-    Guild,
-    Interaction,
-    Member,
-    Message,
-    PartialEmoji,
-    app_commands,
-)
+from discord import (DMChannel, Embed, Guild, Interaction, Member, Message,
+                     PartialEmoji, User, app_commands)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base
@@ -62,7 +55,7 @@ class General(commands.Cog, name="General"):
         async with self.client.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    async def warn(self, interaction: Interaction, user: Member) -> None:
+    async def warn(self, interaction: Interaction, user: Union[Member, User]) -> None:
         await interaction.response.defer(ephemeral=True)
         embed: Embed = Embed(
             title="User Warned 🚨",
@@ -111,7 +104,7 @@ class General(commands.Cog, name="General"):
         return PartialEmoji(name="cosmo")
 
     @commands.Cog.listener()
-    async def on_memeber_join(self, member: Member) -> None:
+    async def on_memeber_join(self, member: Union[Member, User]) -> None:
         if member.guild.id != self.client.cosmo_guild:
             return
         user = DiscordUser(
