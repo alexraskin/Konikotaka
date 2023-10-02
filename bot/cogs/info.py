@@ -20,7 +20,7 @@ class Info(commands.Cog, name="Info"):
     @app_commands.guild_only()
     async def get_info(self, ctx: commands.Context) -> None:
         embed = Embed(
-            title="WiseOldManBot",
+            title="RoboTwizy",
             description=self.client.description,
             color=0x42F56C,
             timestamp=ctx.message.created_at,

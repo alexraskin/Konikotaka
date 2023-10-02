@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("Discord")
 
 
-class WiseOldManBot(Bot):
+class RoboTwizy(Bot):
     bot_app_info: discord.AppInfo
 
     def __init__(self, *args, **options) -> None:
@@ -85,11 +85,11 @@ class WiseOldManBot(Bot):
         )
 
 
-client: WiseOldManBot = WiseOldManBot(
+client: RoboTwizy = RoboTwizy(
     command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
     intents=discord.Intents.all(),
     max_messages=10000,
-    description="Hello, I am WiseOldManBot!",
+    description="Hello, I am RoboTwizy!",
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )
 
