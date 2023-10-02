@@ -92,10 +92,8 @@ class Admin(commands.Cog, name="Admin"):
                 "An error occurred while adding the emoji.", ephemeral=True
             )
             return
-
     
     @commands.command(name="git", aliases=["gr"], hidden=True)
-    @commands.is_owner()
     async def git_revision(self, ctx: commands.Context):
         """
         Get the current git revision.
@@ -104,7 +102,10 @@ class Admin(commands.Cog, name="Admin"):
         if latest_revision is None:
             await ctx.send("Git revision not found.")
             return
-        await ctx.send(f"Git Revision: `{latest_revision[:7]}`")
+        short = latest_revision[:7]
+        url = f"https://github.com/alexraskin/RoboTwizy/commit/{short}"
+        message = f"[{short}]({url})"
+        await ctx.send(f"Git Revision: {message} _(Show more data at once)_")
 
 async def setup(client: commands.Bot):
     await client.add_cog(Admin(client))
