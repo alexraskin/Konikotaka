@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 
 from typing import Optional
 
@@ -92,6 +93,18 @@ class Admin(commands.Cog, name="Admin"):
             )
             return
 
+    
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def git_revision(self, ctx: commands.Context):
+        """
+        Get the current git revision.
+        """
+        latest_revision = os.getenv('RAILWAY_GIT_COMMIT_SHA')
+        if latest_revision is None:
+            await ctx.send("Git revision not found.")
+            return
+        await ctx.send(f"Git Revision: `{latest_revision[:7]}`")
 
 async def setup(client: commands.Bot):
     await client.add_cog(Admin(client))
