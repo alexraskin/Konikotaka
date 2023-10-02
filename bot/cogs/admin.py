@@ -102,8 +102,7 @@ class Admin(commands.Cog, name="Admin"):
         if latest_revision is None:
             await ctx.send("Git revision not found.")
             return
-        short = latest_revision[:7]
-        url = f"https://github.com/alexraskin/RoboTwizy/commit/{short}"
+        url = f"<https://github.com/alexraskin/RoboTwizy/commit/{(short := latest_revision[:7])}>"
         message = f"[{short}]({url})"
         await ctx.send(f"Git Revision: {message} _(Show more data at once)_")
 
