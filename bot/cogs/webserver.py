@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 
 import pytz
+import time
 from aiohttp import web
 from discord import __version__ as discord_version
 from discord.ext import commands
@@ -16,6 +17,10 @@ class WebServer(commands.Cog, name="WebServer"):
         print("Webserver is running!")
 
     async def index_handler(self, request: web.Request) -> dict:
+        start_time = time.time()
+        await self.client.session.get("https://api.twizy.dev/health")
+        end_time = time.time()
+        latency = round((end_time - start_time) * 1000)
         discord_status = await self.client.session.get(
             "https://discordstatus.com/api/v2/status.json"
         )
@@ -25,12 +30,13 @@ class WebServer(commands.Cog, name="WebServer"):
         last_updated = data["page"]["updated_at"]
         input_datetime = datetime.fromisoformat(last_updated)
         input_datetime_utc = input_datetime.astimezone(pytz.utc)
-        pretty_datetime_str = input_datetime_utc.strftime("%Y-%m-%d %H:%M:%S %Z")
+        pretty_datetime_str = input_datetime_utc.strftime("%Y-%m-%d %H:%M:%S %Z") 
         return web.json_response(
             {
                 "botStatus": "online",
                 "discordVersion": discord_version,
-                "botLatency": f"{self.client.get_bot_latency}ms",
+                "WsLatency": f"{self.client.get_bot_latency}ms",
+                "apiLatency": f"{latency}ms",
                 "botUptime": self.client.get_uptime,
                 "discordStatus": {
                     "indicator": indicator,
