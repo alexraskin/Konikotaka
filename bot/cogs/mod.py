@@ -10,7 +10,7 @@ from discord.ext import commands
 class Mod(commands.Cog, name="Mod"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
-    
+
     @app_commands.command(name="ban", description="Ban a user")
     @app_commands.describe(member="The member to ban")
     @app_commands.describe(reason="The reason for the ban")
@@ -18,21 +18,27 @@ class Mod(commands.Cog, name="Mod"):
     async def _ban(self, interaction: Interaction, member: Member, reason: str) -> None:
         await interaction.guild.ban(member, reason=reason)
         await interaction.response.send_message(f"Banned {member.name}", ephemeral=True)
-    
+
     @app_commands.command(name="softban", description="Softban a user")
     @app_commands.describe(member="The member to softban")
     @app_commands.describe(reason="The reason for the softban")
     @app_commands.checks.has_permissions(ban_members=True)
-    async def _softban(self, interaction: Interaction, member: Member, reason: str) -> None:
+    async def _softban(
+        self, interaction: Interaction, member: Member, reason: str
+    ) -> None:
         await interaction.guild.ban(member, reason=reason)
         await interaction.guild.unban(member, reason=reason)
-        await interaction.response.send_message(f"Softbanned {member.name}", ephemeral=True)
-    
+        await interaction.response.send_message(
+            f"Softbanned {member.name}", ephemeral=True
+        )
+
     @app_commands.command(name="kick", description="Kick a user")
     @app_commands.describe(member="The member to kick")
     @app_commands.describe(reason="The reason for the kick")
     @app_commands.checks.has_permissions(kick_members=True)
-    async def _kick(self, interaction: Interaction, member: Member, reason: str) -> None:
+    async def _kick(
+        self, interaction: Interaction, member: Member, reason: str
+    ) -> None:
         await interaction.guild.kick(member, reason=reason)
         await interaction.response.send_message(f"Kicked {member.name}", ephemeral=True)
 
@@ -41,19 +47,27 @@ class Mod(commands.Cog, name="Mod"):
     @app_commands.describe(reason="The reason for the timeout")
     @app_commands.describe(duration="The duration of the timeout")
     @app_commands.checks.has_permissions(manage_roles=True)
-    async def _timeout(self, interaction: Interaction, member: Member, reason: str, duration: int) -> None:
+    async def _timeout(
+        self, interaction: Interaction, member: Member, reason: str, duration: int
+    ) -> None:
         unmute_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
         await member.timeout(until=unmute_time, reason=reason)
-        await interaction.response.send_message(f"Timed out {member.name}", ephemeral=True)
-    
+        await interaction.response.send_message(
+            f"Timed out {member.name}", ephemeral=True
+        )
+
     @app_commands.command(name="unban", description="Unban a user")
     @app_commands.describe(member="The member to unban")
     @app_commands.describe(reason="The reason for the unban")
     @app_commands.checks.has_permissions(ban_members=True)
-    async def _unban(self, interaction: Interaction, member: Member, reason: str) -> None:
+    async def _unban(
+        self, interaction: Interaction, member: Member, reason: str
+    ) -> None:
         await interaction.guild.unban(member, reason=reason)
-        await interaction.response.send_message(f"Unbanned {member.name}", ephemeral=True)
-    
+        await interaction.response.send_message(
+            f"Unbanned {member.name}", ephemeral=True
+        )
+
     @app_commands.command(name="purge")
     @app_commands.describe(amount="The amount of messages to purge.")
     @app_commands.describe(reason="The reason for purging the messages.")
@@ -86,6 +100,7 @@ class Mod(commands.Cog, name="Mod"):
                 "An error occurred while purging messages.", ephemeral=True
             )
             return
+
     @commands.hybrid_command(
         name="lockdown", description="Lockdowns a specified channel."
     )
@@ -167,6 +182,7 @@ class Mod(commands.Cog, name="Mod"):
                 "An error occurred while unlocking the channel.", ephemeral=True
             )
             return
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Mod(client))
