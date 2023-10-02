@@ -32,7 +32,7 @@ class RoboTwizy(Bot):
         self.cosmo_guild: int = 1020830000104099860
         self.lavalink_uri = os.getenv("LAVALINK_URI")
         self.lavalink_password = os.getenv("LAVALINK_PASSWORD")
-        self.logo_url = "https://i.gyazo.com/b44411736275628586cc8b3ff4239789.jpg"
+        self.logo_url = "https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"
         self.engine: create_async_engine = create_async_engine(
             os.getenv("MYSQL_URL"), echo=True, future=True
         )

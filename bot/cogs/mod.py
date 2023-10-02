@@ -13,10 +13,17 @@ class Mod(commands.Cog, name="Mod"):
 
     @app_commands.command(name="amimod", description="Check if you are a mod")
     async def _amimod(self, interaction: Interaction) -> None:
-        if interaction.user.guild_permissions.administrator or interaction.user.guild_permissions.manage_guild:
-            await interaction.response.send_message("Yes", ephemeral=True, delete_after=5)
+        if (
+            interaction.user.guild_permissions.administrator
+            or interaction.user.guild_permissions.manage_guild
+        ):
+            await interaction.response.send_message(
+                "Yes", ephemeral=True, delete_after=5
+            )
         else:
-            await interaction.response.send_message("No", ephemeral=True, delete_after=5)
+            await interaction.response.send_message(
+                "No", ephemeral=True, delete_after=5
+            )
 
     @app_commands.command(name="ban", description="Ban a user")
     @app_commands.describe(member="The member to ban")

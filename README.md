@@ -1,6 +1,6 @@
 # RoboTwizy
 
-<a href="https://gyazo.com/b44411736275628586cc8b3ff4239789"><img src="https://i.gyazo.com/b44411736275628586cc8b3ff4239789.jpg" alt="Image from Gyazo" width="200"/></a>
+<a href="https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"><img src="https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg" alt="Image from Gyazo" width="200"/></a>
 
 View the [Wiki](https://robowiki.twizy.dev/)
 
