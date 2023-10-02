@@ -168,7 +168,6 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.set_footer(text=f"{ctx.author}")
-        embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="reverse", description="Reverse a string")
@@ -230,7 +229,6 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.set_image(url=json_data["url"])
-        embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="slap", description="Slap someone")
@@ -249,7 +247,24 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.set_image(url=json_data["url"])
-        embed.set_footer(text="Provided by nekos.life api")
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="kiss", description="Kiss someone")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def kiss(self, ctx: commands.Context, member: Member) -> Embed:
+        """
+        Kiss someone
+        """
+        data = await self.client.session.get("https://nekos.life/api/v2/img/kiss")
+        json_data = await data.json()
+        embed = Embed(
+            title="💋 Kiss",
+            description=f"{ctx.author.mention} kissed {member.mention} 😘",
+            color=0x2ECC71,
+            timestamp=ctx.message.created_at,
+        )
+        embed.set_image(url=json_data["url"])
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="pat", description="Pat someone")
@@ -268,7 +283,6 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.set_image(url=json_data["url"])
-        embed.set_footer(text="Provided by nekos.life api")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="textcat")
@@ -278,6 +292,22 @@ class Fun(commands.Cog, name="Fun"):
         data = await self.client.session.get("https://nekos.life/api/v2/cat")
         json_data = await data.json()
         await ctx.send(json_data["cat"])
+
+    @commands.hybrid_command(name="coffee", description="Get a random coffee image")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def coffee(self, ctx: commands.Context) -> Message:
+        """
+        Get a random coffee image from the twizy.dev API
+        """
+        async with self.client.session.get(
+            "https://coffee.alexflipnote.dev/random.json"
+        ) as response:
+            if response.status == 200:
+                coffee = await response.json()
+                await ctx.send(coffee["file"])
+            else:
+                await ctx.send("Error getting coffee!")
 
     @commands.hybrid_command(name="slots", description="Play the slots")
     @commands.guild_only()
