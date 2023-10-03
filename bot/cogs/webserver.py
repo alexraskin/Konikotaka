@@ -1,20 +1,29 @@
 import asyncio
 import time
 from datetime import datetime
+import psutil
+import os
 
 import pytz
 from aiohttp import web
 from discord import __version__ as discord_version
 from discord.ext import commands
 
+API_KEY = os.getenv("X-API-KEY")
 
 class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
+        self.pid = os.getpid()
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is running!")
+    
+    def get_memory_usage(self):
+        process = psutil.Process(self.pid)
+        memory_info = process.memory_info()
+        return round(memory_info.rss / (1024 ** 2))
 
     async def get_discord_status(self) -> dict:
         discord_status = await self.client.session.get(
@@ -41,13 +50,21 @@ class WebServer(commands.Cog, name="WebServer"):
         return latency
 
     async def index_handler(self, request: web.Request) -> web.json_response:
+        return web.json_response({"status": "healthy"})
+
+    async def stats_handler(self, request: web.Request) -> web.json_response:
+        if request.headers.get("X-API-KEY") != API_KEY:
+            return web.json_response({"error": "Invalid API key"})
         return web.json_response(
             {
                 "botStatus": "online",
                 "discordVersion": discord_version,
                 "WsLatency": f"{self.client.get_bot_latency}ms",
-                "apiLatency": f"{await self.get_api_latency()}ms",
+                "restLatency": f"{await self.get_api_latency()}ms",
                 "botUptime": self.client.get_uptime,
+                "memoryUsage": f"{self.get_memory_usage()}MB",
+                "avatarUrl": self.client.user.avatar.url,
+                "botName": self.client.user.name,
                 "discordStatus": await self.get_discord_status(),
             }
         )
@@ -58,6 +75,7 @@ class WebServer(commands.Cog, name="WebServer"):
     async def webserver(self) -> None:
         app: web.Application = web.Application()
         app.router.add_get("/", self.index_handler)
+        app.router.add_get("/stats", self.stats_handler)
         app.router.add_get("/health", self.health_check)
         runner: web.AppRunner = web.AppRunner(app)
         await runner.setup()

@@ -179,7 +179,7 @@ class General(commands.Cog, name="General"):
 
         if message.content.__contains__("?snadcaught"):
             await message.channel.send(
-                "https://i.imgur.com/N6bI2DQ.png <@!253223272328462338> <a:JBF_actingSusNotMeOwO:1145086854467686501>"
+                "<@!253223272328462338> https://i.imgur.com/N6bI2DQ.png"
             )
             return
 
@@ -225,6 +225,8 @@ class General(commands.Cog, name="General"):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."
             )
+        else:
+            self.client.log.error("Something happened!")
             await ctx.send(message)
 
 
