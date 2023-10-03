@@ -234,6 +234,7 @@ class General(commands.Cog, name="General"):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."
             )
+            await ctx.send("Missing Required Arguments")
         else:
             self.client.log.error(f"Something happened! {error}")
             await ctx.send(message)
