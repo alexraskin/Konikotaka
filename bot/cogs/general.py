@@ -156,7 +156,7 @@ class General(commands.Cog, name="General"):
                 user = await session.query(DiscordUser, user.id)
                 if user is None:
                     return
-                session.delete(user)
+                await session.delete(user)
                 await session.flush()
                 await session.commit()
                 embed = Embed(
