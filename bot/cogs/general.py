@@ -237,7 +237,6 @@ class General(commands.Cog, name="General"):
             await ctx.send("Missing Required Arguments")
         else:
             self.client.log.error(f"Something happened! {error}")
-            await ctx.send(message)
 
 
 async def setup(client: commands.Bot) -> None:

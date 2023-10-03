@@ -99,13 +99,8 @@ class Admin(commands.Cog, name="Admin"):
         """
         Get the current git revision.
         """
-        latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
-        if latest_revision is None:
-            await ctx.send("Git revision not found.")
-            return
-        url = f"<https://github.com/alexraskin/RoboTwizy/commit/{(short := latest_revision[:7])}>"
-        message = f"[{short}]({url})"
-        await ctx.send(f"Git Revision: {message} _(Show more data at once)_")
+        
+        await ctx.send(f"Git Revision: {self.client.git_revision} _(Show more data at once)_")
 
 
 async def setup(client: commands.Bot):
