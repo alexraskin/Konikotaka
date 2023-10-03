@@ -4,8 +4,17 @@ import os
 import random
 from typing import Union
 
-from discord import (DMChannel, Embed, Guild, Interaction, Member, Message,
-                     PartialEmoji, User, app_commands)
+from discord import (
+    DMChannel,
+    Embed,
+    Guild,
+    Interaction,
+    Member,
+    Message,
+    PartialEmoji,
+    User,
+    app_commands,
+)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.db import Base

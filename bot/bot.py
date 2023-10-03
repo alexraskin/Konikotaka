@@ -30,16 +30,17 @@ class RoboTwizy(Bot):
         self.session = None
         self.start_time = time.time()
         self.cosmo_guild: int = 1020830000104099860
-        self.lavalink_uri = os.getenv("LAVALINK_URI")
-        self.lavalink_password = os.getenv("LAVALINK_PASSWORD")
-        self.logo_url = "https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"
+        self.version: str = "1.0.6"
+        self.lavalink_uri: str = os.getenv("LAVALINK_URI")
+        self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
+        self.logo_url: str = "https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"
         self.engine: create_async_engine = create_async_engine(
             os.getenv("MYSQL_URL"), echo=True, future=True
         )
 
     async def start(self, *args, **kwargs) -> None:
-        self.session = ClientSession(timeout=ClientTimeout(total=30))
-        self.async_session = sessionmaker(
+        self.session: ClientSession = ClientSession(timeout=ClientTimeout(total=30))
+        self.async_session: sessionmaker = sessionmaker(
             self.engine, expire_on_commit=False, class_=AsyncSession
         )
         await super().start(*args, **kwargs)

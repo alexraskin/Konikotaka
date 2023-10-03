@@ -1,15 +1,16 @@
 import asyncio
+import os
 import time
 from datetime import datetime
-import psutil
-import os
 
+import psutil
 import pytz
 from aiohttp import web
 from discord import __version__ as discord_version
 from discord.ext import commands
 
 API_KEY = os.getenv("X-API-KEY")
+
 
 class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
@@ -19,11 +20,11 @@ class WebServer(commands.Cog, name="WebServer"):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is running!")
-    
+
     def get_memory_usage(self):
         process = psutil.Process(self.pid)
         memory_info = process.memory_info()
-        return round(memory_info.rss / (1024 ** 2))
+        return round(memory_info.rss / (1024**2))
 
     async def get_discord_status(self) -> dict:
         discord_status = await self.client.session.get(
@@ -58,6 +59,7 @@ class WebServer(commands.Cog, name="WebServer"):
         return web.json_response(
             {
                 "botStatus": "online",
+                "botVersion": self.client.version,
                 "discordVersion": discord_version,
                 "WsLatency": f"{self.client.get_bot_latency}ms",
                 "restLatency": f"{await self.get_api_latency()}ms",

@@ -27,7 +27,7 @@ class Info(commands.Cog, name="Info"):
         )
         embed.add_field(name="Node Name", value=os.getenv("NODE_NAME"))
         embed.add_field(name="Uptime", value=self.client.get_uptime)
-        embed.add_field(name="Bot Version", value="1.0.1")
+        embed.add_field(name="Bot Version", value=self.client.version)
         embed.add_field(name="Python Version", value=platform.python_version())
         embed.add_field(name="Discord.py Version", value=discord_version)
         embed.set_footer(text=f"Made with 💖 with Discord.py")
