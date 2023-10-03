@@ -235,7 +235,7 @@ class General(commands.Cog, name="General"):
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."
             )
         else:
-            self.client.log.error("Something happened!")
+            self.client.log.error(f"Something happened! {error}")
             await ctx.send(message)
 
 

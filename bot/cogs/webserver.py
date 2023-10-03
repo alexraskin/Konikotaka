@@ -3,7 +3,6 @@ import os
 import time
 from datetime import datetime
 
-import psutil
 import pytz
 from aiohttp import web
 from discord import __version__ as discord_version
@@ -20,11 +19,6 @@ class WebServer(commands.Cog, name="WebServer"):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is running!")
-
-    def get_memory_usage(self):
-        process = psutil.Process(self.pid)
-        memory_info = process.memory_info()
-        return round(memory_info.rss / (1024**2))
 
     async def get_discord_status(self) -> dict:
         discord_status = await self.client.session.get(
@@ -64,7 +58,7 @@ class WebServer(commands.Cog, name="WebServer"):
                 "WsLatency": f"{self.client.get_bot_latency}ms",
                 "restLatency": f"{await self.get_api_latency()}ms",
                 "botUptime": self.client.get_uptime,
-                "memoryUsage": f"{self.get_memory_usage()}MB",
+                "memoryUsage": f"{self.client.memory_usage}MB",
                 "avatarUrl": self.client.user.avatar.url,
                 "botName": self.client.user.name,
                 "discordStatus": await self.get_discord_status(),

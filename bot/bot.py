@@ -4,6 +4,7 @@ import os
 import random
 import time
 
+import psutil
 import discord
 import wavelink
 from aiohttp import ClientSession, ClientTimeout
@@ -28,6 +29,7 @@ class RoboTwizy(Bot):
         super().__init__(*args, **options)
         self.log = log
         self.session = None
+        self.pid = os.getpid()
         self.start_time = time.time()
         self.cosmo_guild: int = 1020830000104099860
         self.version: str = "1.0.6"
@@ -84,6 +86,12 @@ class RoboTwizy(Bot):
         return str(
             datetime.timedelta(seconds=int(round(time.time() - self.start_time)))
         )
+
+    @property
+    def memory_usage(self):
+      process = psutil.Process(self.pid)
+      memory_info = process.memory_info()
+      return round(memory_info.rss / (1024**2))
 
 
 client: RoboTwizy = RoboTwizy(

@@ -26,6 +26,7 @@ class Info(commands.Cog, name="Info"):
             timestamp=ctx.message.created_at,
         )
         embed.add_field(name="Node Name", value=os.getenv("NODE_NAME"))
+        embed.add_field(name="Ram Usage", value=f"{self.client.memory_usage}MB")
         embed.add_field(name="Uptime", value=self.client.get_uptime)
         embed.add_field(name="Bot Version", value=self.client.version)
         embed.add_field(name="Python Version", value=platform.python_version())
