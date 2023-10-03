@@ -202,7 +202,10 @@ class Tags(commands.Cog, name="Custom Tags"):
                 select(CustomTags).where(CustomTags.name.like(f"%{tag_name.lower()}%"))
             )
             tags = query.scalars().all()
-            return tags
+            if tags:
+                return tags
+            else:
+                return None
 
     @commands.hybrid_group(fallback="get")
     @commands.guild_only()
