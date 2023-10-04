@@ -6,7 +6,10 @@ from datetime import datetime
 import pytz
 from aiohttp import web
 from discord import __version__ as discord_version
-from discord.ext import commands
+from discord.ext import commands, tasks
+from sqlalchemy.future import select
+from models.db import Base
+from models.ping import Ping
 
 API_KEY = os.getenv("X-API-KEY")
 
@@ -16,9 +19,49 @@ class WebServer(commands.Cog, name="WebServer"):
         self.client: commands.Bot = client
         self.pid = os.getpid()
 
+    @tasks.loop(count=1)
+    async def init_database(self) -> None:
+        async with self.client.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+    @tasks.loop(minutes=1)
+    async def update_latency(self):
+        ping = Ping(
+            ping_ws=self.client.get_bot_latency,
+            ping_rest=await self.get_api_latency(),
+            date=datetime.utcnow(),
+        )
+        async with self.client.async_session() as session:
+            try:
+                session.add(ping)
+                await session.flush()
+                await session.commit()
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
+
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is running!")
+        self.init_database.start()
+        self.update_latency.start()
+
+    async def get_ping_history(self) -> list:
+        async with self.client.async_session() as session:
+            query = select(Ping).order_by(Ping.id.desc()).limit(25)
+            try:
+                result = await session.execute(query)
+            except Exception as e:
+                self.client.log.error(e)
+                return []
+            data = result.scalars().all()
+            for k, v in enumerate(data):
+                data[k] = {
+                    "ping_ws": v.ping_ws,
+                    "ping_rest": v.ping_rest,
+                    "date": v.date.strftime("%Y-%m-%d %H:%M:%S"),
+                }
+            return data
 
     async def get_discord_status(self) -> dict:
         discord_status = await self.client.session.get(
@@ -44,26 +87,45 @@ class WebServer(commands.Cog, name="WebServer"):
         latency: int = round((end_time - start_time) * 1000)
         return latency
 
+    def str_datetime(self, timestamp: str):
+        return datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+
+    def unix_timestamp(self, timestamp):
+        if isinstance(timestamp, str):
+            return time.mktime(self.str_datetime(timestamp).timetuple())
+        elif isinstance(timestamp, datetime):
+            return time.mktime(timestamp.timetuple())
+        else:
+            return timestamp
+
     async def index_handler(self, request: web.Request) -> web.json_response:
         return web.json_response({"status": "healthy"})
 
     async def stats_handler(self, request: web.Request) -> web.json_response:
         if request.headers.get("X-API-KEY") != API_KEY:
             return web.json_response({"error": "Invalid API key"})
-        return web.json_response(
-            {
-                "botStatus": "online",
-                "botVersion": self.client.version,
-                "discordVersion": discord_version,
-                "WsLatency": f"{self.client.get_bot_latency}ms",
-                "restLatency": f"{await self.get_api_latency()}ms",
-                "botUptime": self.client.get_uptime,
-                "memoryUsage": f"{self.client.memory_usage}MB",
-                "avatarUrl": self.client.user.avatar.url,
-                "botName": self.client.user.name,
+        data = {
+            "_data": {
+                "@me": {
+                    "botStatus": 200,
+                    "avatarUrl": self.client.user.avatar.url,
+                    "botName": self.client.user.name,
+                    "discriminator": self.client.user.discriminator,
+                    "botId": self.client.user.id,
+                },
+                "ram": f"{self.client.memory_usage}MB",
+                "_last_fetch": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+                "cache": 60,
+                "ping": {
+                    "type": "ms",
+                    "bot": self.client.get_bot_latency,
+                    "rest": await self.get_api_latency(),
+                },
                 "discordStatus": await self.get_discord_status(),
+                "history": [await self.get_ping_history()],
             }
-        )
+        }
+        return web.json_response(data)
 
     async def health_check(self, request: web.Request) -> web.json_response:
         return web.json_response({"status": "healthy"})
