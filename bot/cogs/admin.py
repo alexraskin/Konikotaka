@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from typing import Optional
 
 from discord import Embed, HTTPException, Interaction, app_commands
@@ -99,8 +98,9 @@ class Admin(commands.Cog, name="Admin"):
         """
         Get the current git revision.
         """
-        
-        await ctx.send(f"Git Revision: {self.client.git_revision} _(Show more data at once)_")
+        await ctx.send(
+            f"Git Revision: {self.client.git_revision} _(Show more data at once)_"
+        )
 
 
 async def setup(client: commands.Bot):

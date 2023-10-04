@@ -26,7 +26,9 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random photo of Cosmo the Cat from the twizy.dev API
         """
-        async with self.client.session.get("https://api.twizy.dev/cats/cosmo") as response:
+        async with self.client.session.get(
+            "https://api.twizy.dev/cats/cosmo"
+        ) as response:
             if response.status == 200:
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
@@ -44,7 +46,9 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random photo of Pat and Ash's cats from the twizy.dev API
         """
-        async with self.client.session.get("https://api.twizy.dev/cats/bczs") as response:
+        async with self.client.session.get(
+            "https://api.twizy.dev/cats/bczs"
+        ) as response:
             if response.status == 200:
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
@@ -519,6 +523,22 @@ class Fun(commands.Cog, name="Fun"):
             and u != self.client.user,
         )
         await ctx.send(f"{wait[1].mention} is paying respect.")
+
+    @commands.hybrid_command(name="inspiro", description="Get a random inspiro quote")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def inspiro(self, ctx: commands.Context) -> Message:
+        """
+        Get a random inspiro quote
+        """
+        async with self.client.session.get(
+            "https://inspirobot.me/api?generate=true"
+        ) as response:
+            if response.status == 200:
+                quote = await response.text()
+                await ctx.send(quote)
+            else:
+                await ctx.send("Error getting quote!")
 
 
 async def setup(client: commands.Bot) -> None:

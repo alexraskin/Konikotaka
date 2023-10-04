@@ -74,7 +74,7 @@ class RoboTwizy(Bot):
                 )
 
     @property
-    def get_bot_latency(self) -> float:
+    def get_bot_latency(self) -> int:
         """
         Returns the websocket latency in seconds.
         """
@@ -89,22 +89,21 @@ class RoboTwizy(Bot):
 
     @property
     def memory_usage(self):
-      process = psutil.Process(self.pid)
-      memory_info = process.memory_info()
-      return round(memory_info.rss / (1024**2))
-    
+        process = psutil.Process(self.pid)
+        memory_info = process.memory_info()
+        return round(memory_info.rss / (1024**2))
+
     @property
     def cpu_usage(self):
-      return psutil.cpu_percent(interval=1)
-    
+        return psutil.cpu_percent(interval=1)
+
     @property
     def git_revision(self):
-      latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
-      if latest_revision is None:
-          return None
-      url = f"<https://github.com/alexraskin/RoboTwizy/commit/{(short := latest_revision[:7])}>"
-      return f"[{short}]({url})"
-
+        latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
+        if latest_revision is None:
+            return None
+        url = f"<https://github.com/alexraskin/RoboTwizy/commit/{(short := latest_revision[:7])}>"
+        return f"[{short}]({url})"
 
 
 client: RoboTwizy = RoboTwizy(

@@ -520,24 +520,24 @@ class Tags(commands.Cog, name="Custom Tags"):
             )
             tag = query.scalar_one_or_none()
             if tag:
-              if int(str(tag.discord_id).strip()) != ctx.author.id:
-                return await ctx.reply(
-                    "You are not the owner of this tag.", ephemeral=True
-                )
-              try:
-                  await session.delete(tag)
-                  await session.flush()
-                  await session.commit()
-                  await ctx.reply(f"Tag `{tag_name}` deleted!")
-                  self.client.log.info(
-                      f"User {ctx.author} deleted a tag named {tag_name}"
-                  )
-              except Exception as e:
-                  self.client.log.error(e)
-                  await session.rollback()
-                  await ctx.reply(
-                      "An error occurred while deleting the tag. 👎", ephemeral=True
-                  )
+                if int(str(tag.discord_id).strip()) != ctx.author.id:
+                    return await ctx.reply(
+                        "You are not the owner of this tag.", ephemeral=True
+                    )
+                try:
+                    await session.delete(tag)
+                    await session.flush()
+                    await session.commit()
+                    await ctx.reply(f"Tag `{tag_name}` deleted!")
+                    self.client.log.info(
+                        f"User {ctx.author} deleted a tag named {tag_name}"
+                    )
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+                    await ctx.reply(
+                        "An error occurred while deleting the tag. 👎", ephemeral=True
+                    )
             else:
                 await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
