@@ -17,7 +17,6 @@ from discord import (
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
-from models.db import Base
 from models.users import DiscordUser
 
 
@@ -111,10 +110,10 @@ class General(commands.Cog, name="General"):
         if member.guild.id != self.client.cosmo_guild:
             return
         user = DiscordUser(
-            discord_id=member.id,
+            discord_id=str(member.id),
             username=member.name,
             joined=member.joined_at,
-            guild_id=member.guild.id,
+            guild_id=str(member.guild.id),
         )
         async with self.client.async_session() as session:
             try:
@@ -147,7 +146,7 @@ class General(commands.Cog, name="General"):
             return
         async with self.client.async_session() as session:
             try:
-                user = await session.query(DiscordUser, user.id)
+                user = await session.query(DiscordUser, str(user.id))
                 if user is None:
                     return
                 await session.delete(user)

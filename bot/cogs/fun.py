@@ -418,16 +418,16 @@ class Fun(commands.Cog, name="Fun"):
             member: Member = ctx.author
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(DiscordUser).where(DiscordUser.discord_id == member.id)
+                select(DiscordUser).where(DiscordUser.discord_id == str(member.id))
             )
             user = query.scalar_one_or_none()
             if user is None:
                 new_user = DiscordUser(
-                    discord_id=member.id,
+                    discord_id=str(member.id),
                     username=member.name,
                     joined=member.joined_at,
                     kira_percentage=result,
-                    guild_id=member.guild.id,
+                    guild_id=str(member.guild.id,)
                 )
                 session.add(new_user)
                 await session.flush()

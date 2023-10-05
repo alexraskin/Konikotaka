@@ -106,6 +106,7 @@ class WebServer(commands.Cog, name="WebServer"):
                     "botId": self.client.user.id,
                 },
                 "ram": f"{self.client.memory_usage}MB",
+                "git_revision": self.client.git_revision,
                 "_last_fetch": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
                 "cache": 60,
                 "ping": {

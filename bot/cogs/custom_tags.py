@@ -134,7 +134,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             new_tag = CustomTags(
                 name=tag_name.strip().lower(),
                 content=tag_content,
-                discord_id=ctx.author.id,
+                discord_id=str(ctx.author.id),
                 date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
             )
             try:
@@ -169,7 +169,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                 new_tag = CustomTags(
                     name=tag_name.strip().lower(),
                     content=tag_content,
-                    discord_id=ctx.author.id,
+                    discord_id=str(ctx.author.id),
                     date_added=ctx.message.created_at.strftime(
                         "%Y-%m-%d %H:%M:%S %Z%z"
                     ),

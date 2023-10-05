@@ -66,13 +66,13 @@ class SnailRace(commands.Cog, name="Snail Racing"):
 
     async def update_leaderboard(self, winner: Member) -> None:
         updated_racer = Races(
-            discord_id=winner.id,
+            discord_id=str(winner.id),
             wins=1,
             points=1,
         )
         async with self.client.async_session() as session:
             query = await session.execute(
-                select(Races).filter(Races.discord_id == winner.id)
+                select(Races).filter(Races.discord_id == str(winner.id))
             )
             racer = query.scalar_one_or_none()
             if racer:
