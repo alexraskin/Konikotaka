@@ -3,6 +3,7 @@ import os
 import time
 from datetime import datetime
 
+import aiohttp_cors
 import pytz
 from aiohttp import web
 from discord.ext import commands, tasks
@@ -116,6 +117,16 @@ class WebServer(commands.Cog, name="WebServer"):
         app.router.add_get("/", self.index_handler)
         app.router.add_get("/stats", self.stats_handler)
         app.router.add_get("/health", self.health_check)
+        cors = aiohttp_cors.setup(app, defaults={
+            "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+            allow_methods=["GET"],
+            )
+          })
+        for route in list(app.router.routes()):
+            cors.add(route)
         runner: web.AppRunner = web.AppRunner(app)
         await runner.setup()
         self.site: web.TCPSite = web.TCPSite(runner, "0.0.0.0", 8000)
