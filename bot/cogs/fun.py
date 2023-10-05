@@ -570,11 +570,11 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="didyoumean", description="Make a did you mean image")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def didyoumean(self, ctx: commands.Context, *, text: str) -> Message:
+    async def didyoumean(self, ctx: commands.Context, *, top: str, bottom: str) -> Message:
         """
         Make a did you mean image
         """
-        await ctx.send(f"https://api.alexflipnote.dev/didyoumean?top={text}")
+        await ctx.send(f"https://api.alexflipnote.dev/didyoumean?top={top}&bottom={bottom}")
 
 
 async def setup(client: commands.Bot) -> None:
