@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-import datetime
-import itertools
 import os
 import platform
-from typing import Optional
 
 import pkg_resources
-import pygit2
 from discord import Colour, Embed, app_commands
 from discord.ext import commands
 
@@ -16,40 +12,6 @@ class Info(commands.Cog, name="Info"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
-    def format_dt(self, dt: datetime.datetime, style: Optional[str] = None) -> str:
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.timezone.utc)
-
-        if style is None:
-            return f"<t:{int(dt.timestamp())}>"
-        return f"<t:{int(dt.timestamp())}:{style}>"
-
-    def format_relative(self, dt: datetime.datetime) -> str:
-        return self.format_dt(dt, "R")
-
-    def format_commit(self, commit: pygit2.Commit) -> str:
-        short, _, _ = commit.message.partition("\n")
-        short_sha2 = commit.hex[0:6]
-        commit_tz = datetime.timezone(
-            datetime.timedelta(minutes=commit.commit_time_offset)
-        )
-        commit_time = datetime.datetime.fromtimestamp(commit.commit_time).astimezone(
-            commit_tz
-        )
-
-        # [`hash`](url) message (offset)
-        offset = self.format_relative(commit_time.astimezone(datetime.timezone.utc))
-        return f"[`{short_sha2}`](https://github.com/alexraskin/RoboTwizy/commit/{commit.hex}) {short} ({offset})"
-
-    def get_last_commits(self, count=3):
-        repo = pygit2.Repository(".git")
-        commits = list(
-            itertools.islice(
-                repo.walk(repo.head.target, pygit2.GIT_SORT_TOPOLOGICAL), count
-            )
-        )
-        return "\n".join(self.format_commit(c) for c in commits)
-
     @commands.hybrid_command(
         name="info", help="Get info about the bot", with_app_command=True
     )
@@ -57,10 +19,9 @@ class Info(commands.Cog, name="Info"):
     @app_commands.guild_only()
     async def get_info(self, ctx: commands.Context) -> None:
         version = pkg_resources.get_distribution("discord.py").version
-        revision = self.get_last_commits()
         embed = Embed(
             title="RoboTwizy",
-            description="Latest Changes:\n" + revision,
+            description=self.client.description,
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
