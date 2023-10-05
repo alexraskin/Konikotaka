@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 import discord
 from discord import Embed, PartialEmoji, TextStyle, app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 from discord.interactions import Interaction
 from models.tags import CustomTags
 from sqlalchemy.future import select
