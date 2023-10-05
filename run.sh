@@ -2,7 +2,6 @@
 
 set -e
 
-# change working directory to this script's path
 cd "$(dirname "$0")"
       
 

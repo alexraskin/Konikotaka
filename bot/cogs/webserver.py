@@ -9,13 +9,12 @@ from discord.ext import commands, tasks
 from models.ping import Ping
 from sqlalchemy.future import select
 
-API_KEY = os.getenv("X-API-KEY")
-
 
 class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.pid = os.getpid()
+        self.api_key = os.getenv("X-API-KEY")
 
     @tasks.loop(minutes=1)
     async def update_latency(self):
@@ -79,22 +78,11 @@ class WebServer(commands.Cog, name="WebServer"):
         latency: int = round((end_time - start_time) * 1000)
         return latency
 
-    def str_datetime(self, timestamp: str):
-        return datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-
-    def unix_timestamp(self, timestamp):
-        if isinstance(timestamp, str):
-            return time.mktime(self.str_datetime(timestamp).timetuple())
-        elif isinstance(timestamp, datetime):
-            return time.mktime(timestamp.timetuple())
-        else:
-            return timestamp
-
     async def index_handler(self, request: web.Request) -> web.json_response:
         return web.json_response({"status": "healthy"})
 
     async def stats_handler(self, request: web.Request) -> web.json_response:
-        if request.headers.get("X-API-KEY") != API_KEY:
+        if request.headers.get("X-API-KEY") != self.api_key:
             return web.json_response({"error": "Invalid API key"})
         data = {
             "_data": {
