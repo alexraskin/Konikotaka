@@ -10,6 +10,8 @@ import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from cogs.utils.lists import activities
+from models.db import Base
+from models.ping import Ping
 from discord.ext import tasks
 from discord.ext.commands import Bot, NoEntryPointError, when_mentioned_or
 from dotenv import load_dotenv
@@ -37,7 +39,7 @@ class RoboTwizy(Bot):
         self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
         self.logo_url: str = "https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"
         self.engine: create_async_engine = create_async_engine(
-            os.getenv("MYSQL_URL"), echo=True, future=True
+            os.getenv("POSTGRES_URL"), echo=True, future=True
         )
 
     async def start(self, *args, **kwargs) -> None:
@@ -119,11 +121,17 @@ client: RoboTwizy = RoboTwizy(
 async def change_activity() -> None:
     await client.change_presence(activity=discord.Game(name=random.choice(activities)))
 
+@tasks.loop(count=1)
+async def init_database() -> None:
+    async with client.engine.begin() as conn:
+        # await conn.run_sync(Ping.__table__.drop)
+        await conn.run_sync(Base.metadata.create_all)
 
 @client.event
 async def on_ready() -> None:
     client.log.info(f"{client.user.name} has connected to Discord!")
     change_activity.start()
+    init_database.start()
 
 
 client.run(token=os.getenv("DISCORD_TOKEN"), reconnect=True, log_handler=None)

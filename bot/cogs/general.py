@@ -48,7 +48,6 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.init_database.start()
         self.health_check.start()
 
     @tasks.loop(hours=1)
@@ -58,11 +57,6 @@ class General(commands.Cog, name="General"):
             self.client.log.info("Health check successful.")
         else:
             self.client.log.error("Health check failed.")
-
-    @tasks.loop(count=1)
-    async def init_database(self) -> None:
-        async with self.client.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
 
     async def warn(self, interaction: Interaction, user: Union[Member, User]) -> None:
         await interaction.response.defer(ephemeral=True)

@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import Column, Integer, DATETIME
+from sqlalchemy import Column, Integer, DATE
 
 
 class Ping(Base):
@@ -11,4 +11,4 @@ class Ping(Base):
     id = Column(Integer, primary_key=True)
     ping_ws = Column(Integer, nullable=False)
     ping_rest = Column(Integer, nullable=False)
-    date = Column(DATETIME, nullable=False)
+    date = Column(DATE, nullable=False)

@@ -9,7 +9,6 @@ import discord
 from discord import Embed, PartialEmoji, TextStyle, app_commands
 from discord.ext import commands, tasks
 from discord.interactions import Interaction
-from models.db import Base
 from models.tags import CustomTags
 from sqlalchemy.future import select
 
@@ -116,18 +115,9 @@ class Tags(commands.Cog, name="Custom Tags"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.init_database.start()
-
     @property
     def display_emoji(self) -> PartialEmoji:
         return PartialEmoji(name="cosmo")
-
-    @tasks.loop(count=1)
-    async def init_database(self) -> None:
-        async with self.client.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
 
     async def add_tag(
         self, ctx: commands.Context, tag_name: str, tag_content: str

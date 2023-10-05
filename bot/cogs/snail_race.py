@@ -6,8 +6,7 @@ from typing import Dict, List, Optional
 
 import discord
 from discord import Interaction, Member, app_commands
-from discord.ext import commands, tasks
-from models.db import Base
+from discord.ext import commands
 from models.races import Races
 from sqlalchemy.future import select
 
@@ -57,15 +56,6 @@ class RaceButton(discord.ui.View):
 class SnailRace(commands.Cog, name="Snail Racing"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
-
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.init_database.start()
-
-    @tasks.loop(count=1)
-    async def init_database(self) -> None:
-        async with self.client.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
 
     async def randomize_snails(self) -> None:
         global shuffled_participants

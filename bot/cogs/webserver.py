@@ -5,10 +5,8 @@ from datetime import datetime
 
 import pytz
 from aiohttp import web
-from discord import __version__ as discord_version
 from discord.ext import commands, tasks
 from sqlalchemy.future import select
-from models.db import Base
 from models.ping import Ping
 
 API_KEY = os.getenv("X-API-KEY")
@@ -18,11 +16,6 @@ class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.pid = os.getpid()
-
-    @tasks.loop(count=1)
-    async def init_database(self) -> None:
-        async with self.client.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
 
     @tasks.loop(minutes=1)
     async def update_latency(self):
@@ -43,7 +36,6 @@ class WebServer(commands.Cog, name="WebServer"):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is running!")
-        self.init_database.start()
         self.update_latency.start()
 
     async def get_ping_history(self) -> list:

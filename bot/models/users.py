@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import DATETIME, VARCHAR, Column, Integer
+from sqlalchemy import DATE, VARCHAR, Column, Integer
 
 
 class DiscordUser(Base):
@@ -11,6 +11,6 @@ class DiscordUser(Base):
     id = Column(Integer, primary_key=True)
     discord_id = Column(VARCHAR(255), nullable=False)
     username = Column(VARCHAR(255), nullable=False)
-    joined = Column(DATETIME, nullable=False)
+    joined = Column(DATE, nullable=False)
     guild_id = Column(VARCHAR(255), nullable=False)
     kira_percentage = Column(Integer, nullable=True)
