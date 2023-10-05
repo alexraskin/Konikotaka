@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import random
+import urllib.parse
 from typing import Literal, Optional, Union
 
 import upsidedown
@@ -565,7 +566,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a supreme image
         """
-        await ctx.send(f"https://api.alexflipnote.dev/supreme?text={text}")
+        await ctx.send(urllib.parse.quote(f"https://api.alexflipnote.dev/supreme?text={text}"))
     
     @commands.hybrid_command(name="didyoumean", description="Make a did you mean image")
     @commands.guild_only()
@@ -574,7 +575,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a did you mean image
         """
-        await ctx.send(f"https://api.alexflipnote.dev/didyoumean?top={top}&bottom={bottom}")
+        await ctx.send(urllib.parse.quote(f"https://api.alexflipnote.dev/didyoumean?top={top}&bottom={bottom}"))
 
 
 async def setup(client: commands.Bot) -> None:
