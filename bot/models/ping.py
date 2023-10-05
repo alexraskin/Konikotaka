@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import Column, Integer, DATE
+from sqlalchemy import DATE, Column, Integer
 
 
 class Ping(Base):

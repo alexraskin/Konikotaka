@@ -4,17 +4,17 @@ import os
 import random
 import time
 
-import psutil
 import discord
+import psutil
 import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from cogs.utils.lists import activities
-from models.db import Base
-from models.ping import Ping
 from discord.ext import tasks
 from discord.ext.commands import Bot, NoEntryPointError, when_mentioned_or
 from dotenv import load_dotenv
+from models.db import Base
+from models.ping import Ping
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -121,11 +121,13 @@ client: RoboTwizy = RoboTwizy(
 async def change_activity() -> None:
     await client.change_presence(activity=discord.Game(name=random.choice(activities)))
 
+
 @tasks.loop(count=1)
 async def init_database() -> None:
     async with client.engine.begin() as conn:
         await conn.run_sync(Ping.__table__.drop)
         await conn.run_sync(Base.metadata.create_all)
+
 
 @client.event
 async def on_ready() -> None:

@@ -427,7 +427,9 @@ class Fun(commands.Cog, name="Fun"):
                     username=member.name,
                     joined=member.joined_at,
                     kira_percentage=result,
-                    guild_id=str(member.guild.id,)
+                    guild_id=str(
+                        member.guild.id,
+                    ),
                 )
                 session.add(new_user)
                 await session.flush()

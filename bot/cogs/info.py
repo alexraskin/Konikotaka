@@ -1,15 +1,14 @@
 from __future__ import annotations
 
+import datetime
+import itertools
 import os
 import platform
-import pkg_resources
-import datetime
 from typing import Optional
 
+import pkg_resources
 import pygit2
-import itertools
-from discord import Embed, Colour
-from discord import app_commands
+from discord import Colour, Embed, app_commands
 from discord.ext import commands
 
 
@@ -22,26 +21,34 @@ class Info(commands.Cog, name="Info"):
             dt = dt.replace(tzinfo=datetime.timezone.utc)
 
         if style is None:
-            return f'<t:{int(dt.timestamp())}>'
-        return f'<t:{int(dt.timestamp())}:{style}>'
+            return f"<t:{int(dt.timestamp())}>"
+        return f"<t:{int(dt.timestamp())}:{style}>"
 
     def format_relative(self, dt: datetime.datetime) -> str:
-        return self.format_dt(dt, 'R')
-    
+        return self.format_dt(dt, "R")
+
     def format_commit(self, commit: pygit2.Commit) -> str:
-        short, _, _ = commit.message.partition('\n')
+        short, _, _ = commit.message.partition("\n")
         short_sha2 = commit.hex[0:6]
-        commit_tz = datetime.timezone(datetime.timedelta(minutes=commit.commit_time_offset))
-        commit_time = datetime.datetime.fromtimestamp(commit.commit_time).astimezone(commit_tz)
+        commit_tz = datetime.timezone(
+            datetime.timedelta(minutes=commit.commit_time_offset)
+        )
+        commit_time = datetime.datetime.fromtimestamp(commit.commit_time).astimezone(
+            commit_tz
+        )
 
         # [`hash`](url) message (offset)
         offset = self.format_relative(commit_time.astimezone(datetime.timezone.utc))
-        return f'[`{short_sha2}`](https://github.com/alexraskin/RoboTwizy/commit/{commit.hex}) {short} ({offset})'
+        return f"[`{short_sha2}`](https://github.com/alexraskin/RoboTwizy/commit/{commit.hex}) {short} ({offset})"
 
     def get_last_commits(self, count=3):
-      repo = pygit2.Repository('.git')
-      commits = list(itertools.islice(repo.walk(repo.head.target, pygit2.GIT_SORT_TOPOLOGICAL), count))
-      return '\n'.join(self.format_commit(c) for c in commits)
+        repo = pygit2.Repository(".git")
+        commits = list(
+            itertools.islice(
+                repo.walk(repo.head.target, pygit2.GIT_SORT_TOPOLOGICAL), count
+            )
+        )
+        return "\n".join(self.format_commit(c) for c in commits)
 
     @commands.hybrid_command(
         name="info", help="Get info about the bot", with_app_command=True
@@ -49,17 +56,27 @@ class Info(commands.Cog, name="Info"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def get_info(self, ctx: commands.Context) -> None:
-        version = pkg_resources.get_distribution('discord.py').version
+        version = pkg_resources.get_distribution("discord.py").version
         revision = self.get_last_commits()
-        embed = Embed(title="RoboTwizy", description='Latest Changes:\n' + revision, timestamp=ctx.message.created_at)
+        embed = Embed(
+            title="RoboTwizy",
+            description="Latest Changes:\n" + revision,
+            timestamp=ctx.message.created_at,
+        )
         embed.colour = Colour.blurple()
         embed.add_field(name="Node Name", value=os.getenv("NODE_NAME"))
-        embed.add_field(name='Process', value=f'{self.client.memory_usage:.2f} MiB\n{self.client.cpu_usage:.2f}% CPU')
+        embed.add_field(
+            name="Process",
+            value=f"{self.client.memory_usage:.2f} MiB\n{self.client.cpu_usage:.2f}% CPU",
+        )
         embed.add_field(name="Uptime", value=self.client.get_uptime)
         embed.add_field(name="Bot Version", value=self.client.version)
         embed.add_field(name="Git Revision", value=self.client.git_revision)
         embed.add_field(name="Python Version", value=platform.python_version())
-        embed.set_footer(text=f'Made with discord.py v{version}', icon_url='http://i.imgur.com/5BFecvA.png')
+        embed.set_footer(
+            text=f"Made with discord.py v{version}",
+            icon_url="http://i.imgur.com/5BFecvA.png",
+        )
         embed.set_thumbnail(url=self.client.logo_url)
         await ctx.send(embed=embed)
 

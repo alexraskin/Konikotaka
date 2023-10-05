@@ -6,8 +6,8 @@ from datetime import datetime
 import pytz
 from aiohttp import web
 from discord.ext import commands, tasks
-from sqlalchemy.future import select
 from models.ping import Ping
+from sqlalchemy.future import select
 
 API_KEY = os.getenv("X-API-KEY")
 

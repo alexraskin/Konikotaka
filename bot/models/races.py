@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import Column, Integer, VARCHAR
+from sqlalchemy import VARCHAR, Column, Integer
 
 
 class Races(Base):
