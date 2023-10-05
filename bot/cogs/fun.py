@@ -565,14 +565,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a supreme image
         """
-        async with self.client.session.get(
-            f"https://api.alexflipnote.dev/supreme?text={text}"
-        ) as response:
-            if response.status == 200:
-                supreme = await response.json()
-                await ctx.send(supreme["message"])
-            else:
-                await ctx.send("Error making a supreme image!")
+        await ctx.send(f"https://api.alexflipnote.dev/supreme?text={text}")
     
     @commands.hybrid_command(name="didyoumean", description="Make a did you mean image")
     @commands.guild_only()
@@ -581,14 +574,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a did you mean image
         """
-        async with self.client.session.get(
-            f"https://api.alexflipnote.dev/didyoumean?top={text}"
-        ) as response:
-            if response.status == 200:
-                didyoumean_ = await response.json()
-                await ctx.send(didyoumean_["message"])
-            else:
-                await ctx.send("Error making a did you mean image!")
+        await ctx.send(f"https://api.alexflipnote.dev/didyoumean?top={text}")
 
 
 async def setup(client: commands.Bot) -> None:
