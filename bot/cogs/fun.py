@@ -140,7 +140,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="8ball", description="Ask the magic 8ball a question")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def eight_ball(self, ctx: commands.Context, question: str) -> Embed:
+    async def eight_ball(self, ctx: commands.Context, *, question: str) -> Embed:
         """
         Ask the magic 8ball a question
         """
@@ -541,6 +541,54 @@ class Fun(commands.Cog, name="Fun"):
                 await ctx.send(quote)
             else:
                 await ctx.send("Error getting quote!")
+    
+    @commands.hybrid_command(name="dog", description="Get a random dog image")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def dog(self, ctx: commands.Context) -> Message:
+        """
+        Get a random dog image
+        """
+        async with self.client.session.get(
+            "https://dog.ceo/api/breeds/image/random"
+        ) as response:
+            if response.status == 200:
+                dog = await response.json()
+                await ctx.send(dog["message"])
+            else:
+                await ctx.send("Error getting a random dog!")
+    
+    @commands.hybrid_command(name="supreme", description="Make a supreme image")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def supreme(self, ctx: commands.Context, *, text: str) -> Message:
+        """
+        Make a supreme image
+        """
+        async with self.client.session.get(
+            f"https://api.alexflipnote.dev/supreme?text={text}"
+        ) as response:
+            if response.status == 200:
+                supreme = await response.json()
+                await ctx.send(supreme["message"])
+            else:
+                await ctx.send("Error making a supreme image!")
+    
+    @commands.hybrid_command(name="didyoumean", description="Make a did you mean image")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def didyoumean(self, ctx: commands.Context, *, text: str) -> Message:
+        """
+        Make a did you mean image
+        """
+        async with self.client.session.get(
+            f"https://api.alexflipnote.dev/didyoumean?top={text}"
+        ) as response:
+            if response.status == 200:
+                didyoumean_ = await response.json()
+                await ctx.send(didyoumean_["message"])
+            else:
+                await ctx.send("Error making a did you mean image!")
 
 
 async def setup(client: commands.Bot) -> None:
