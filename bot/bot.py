@@ -124,7 +124,7 @@ async def change_activity() -> None:
 @tasks.loop(count=1)
 async def init_database() -> None:
     async with client.engine.begin() as conn:
-        # await conn.run_sync(Ping.__table__.drop)
+        await conn.run_sync(Ping.__table__.drop)
         await conn.run_sync(Base.metadata.create_all)
 
 @client.event
