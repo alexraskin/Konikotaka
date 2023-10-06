@@ -97,25 +97,6 @@ class General(commands.Cog, name="General"):
         return PartialEmoji(name="cosmo")
 
     @commands.Cog.listener()
-    async def on_memeber_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id != self.client.cosmo_guild:
-            return
-        user = DiscordUser(
-            discord_id=str(member.id),
-            username=member.name,
-            joined=member.joined_at,
-            guild_id=str(member.guild.id),
-        )
-        async with self.client.async_session() as session:
-            try:
-                session.add(user)
-                await session.flush()
-                await session.commit()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-
-    @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member) -> None:
         if before.guild.id != self.client.cosmo_guild:
             return

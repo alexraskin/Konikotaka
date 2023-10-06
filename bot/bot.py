@@ -34,6 +34,7 @@ class RoboTwizy(Bot):
         self.pid = os.getpid()
         self.start_time = time.time()
         self.cosmo_guild: int = 1020830000104099860
+        self.general_channel: int = 1145087802141315093
         self.version: str = "1.0.6"
         self.lavalink_uri: str = os.getenv("LAVALINK_URI")
         self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
@@ -63,6 +64,7 @@ class RoboTwizy(Bot):
         )
         await wavelink.NodePool.connect(client=self, nodes=[node])
         self.bot_app_info = await self.application_info()
+        self.owner_id = self.bot_app_info.owner.id
         for cog in EXTENSIONS:
             try:
                 await self.load_extension(cog)
