@@ -6,11 +6,12 @@ import urllib.parse
 from typing import Literal, Optional, Union
 
 import upsidedown
-from discord import Embed, Member, Message, app_commands
+from discord import Colour, Embed, Member, Message, app_commands, utils
 from discord.ext import commands
 from models.users import DiscordUser
 from sqlalchemy.future import select
 
+from .utils.map_cords import map_cords
 from .utils.utils import get_year_round, progress_bar
 
 
@@ -542,7 +543,7 @@ class Fun(commands.Cog, name="Fun"):
                 await ctx.send(quote)
             else:
                 await ctx.send("Error getting quote!")
-    
+
     @commands.hybrid_command(name="dog", description="Get a random dog image")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -553,12 +554,9 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get(
             "https://dog.ceo/api/breeds/image/random"
         ) as response:
-            if response.status == 200:
-                dog = await response.json()
-                await ctx.send(dog["message"])
-            else:
-                await ctx.send("Error getting a random dog!")
-    
+            dog = await response.json()
+            await ctx.send(dog["message"])
+
     @commands.hybrid_command(name="supreme", description="Make a supreme image")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -566,16 +564,41 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a supreme image
         """
-        await ctx.send(urllib.parse.quote(f"https://api.alexflipnote.dev/supreme?text={text}"))
-    
+        await ctx.send(
+            f"https://api.alexflipnote.dev/supreme?text={urllib.parse.quote(text)}"
+        )
+
     @commands.hybrid_command(name="didyoumean", description="Make a did you mean image")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def didyoumean(self, ctx: commands.Context, *, top: str, bottom: str) -> Message:
+    async def didyoumean(
+        self, ctx: commands.Context, *, top: str, bottom: str
+    ) -> Message:
         """
         Make a did you mean image
         """
-        await ctx.send(urllib.parse.quote(f"https://api.alexflipnote.dev/didyoumean?top={top}&bottom={bottom}"))
+        await ctx.send(
+            f"https://api.alexflipnote.dev/didyoumean?top={urllib.parse.quote(top)}&bottom={urllib.parse.quote(bottom)}"
+        )
+
+    @commands.hybrid_command(
+        name="wherewedropping", description="Get a random location to drop in Fortnite"
+    )
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def where_we_dropping(self, ctx: commands.Context):
+        data = await self.client.session.get("https://fortnite-api.com/v1/map")
+        json_data = await data.json()
+        random_location = random.choice(list(map_cords.keys()))
+        embed = Embed(
+            title="🪂 Where We Droppin'?",
+            description=f"We droppin' **{str(random_location).lower().capitalize()}**",
+        )
+        embed.colour = Colour.blurple()
+        embed.timestamp = utils.utcnow()
+        embed.set_image(url=json_data["data"]["images"]["pois"])
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
 
 
 async def setup(client: commands.Bot) -> None:

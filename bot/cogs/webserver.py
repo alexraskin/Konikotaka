@@ -14,12 +14,17 @@ from sqlalchemy.future import select
 class WebServer(commands.Cog, name="WebServer"):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
-        self.pid = os.getpid()
-        self.api_key = os.getenv("X-API-KEY")
+        self.pid: int = os.getpid()
+        self.api_key: str = os.getenv("X-API-KEY")
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        self.client.log.info("Webserver is running!")
+        self.update_latency.start()
 
     @tasks.loop(minutes=1)
     async def update_latency(self):
-        ping = Ping(
+        ping: Ping = Ping(
             ping_ws=self.client.get_bot_latency,
             ping_rest=await self.get_api_latency(),
             date=datetime.utcnow(),
@@ -33,14 +38,9 @@ class WebServer(commands.Cog, name="WebServer"):
                 self.client.log.error(e)
                 await session.rollback()
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.client.log.info("Webserver is running!")
-        self.update_latency.start()
-
     async def get_ping_history(self) -> list:
         async with self.client.async_session() as session:
-            query = select(Ping).order_by(Ping.id.desc()).limit(25)
+            query: select = select(Ping).order_by(Ping.id.desc()).limit(25)
             try:
                 result = await session.execute(query)
             except Exception as e:
@@ -85,7 +85,7 @@ class WebServer(commands.Cog, name="WebServer"):
     async def stats_handler(self, request: web.Request) -> web.json_response:
         if request.headers.get("X-API-KEY") != self.api_key:
             return web.json_response({"error": "Invalid API key"})
-        data = {
+        data: dict = {
             "_data": {
                 "@me": {
                     "botStatus": 200,
@@ -117,14 +117,18 @@ class WebServer(commands.Cog, name="WebServer"):
         app.router.add_get("/", self.index_handler)
         app.router.add_get("/stats", self.stats_handler)
         app.router.add_get("/health", self.health_check)
-        cors = aiohttp_cors.setup(app, defaults={
-            "*": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*",
-            allow_methods=["GET"],
-            )
-          })
+        cors: aiohttp_cors = aiohttp_cors.setup(
+            app,
+            defaults={
+                "*": aiohttp_cors.ResourceOptions(
+                    allow_credentials=True,
+                    expose_headers="*",
+                    allow_headers="*",
+                    allow_methods=["GET"],
+                    max_age=3600,
+                )
+            },
+        )
         for route in list(app.router.routes()):
             cors.add(route)
         runner: web.AppRunner = web.AppRunner(app)
