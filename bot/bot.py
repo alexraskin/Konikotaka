@@ -62,6 +62,7 @@ class RoboTwizy(Bot):
             uri=self.lavalink_uri, password=self.lavalink_password
         )
         await wavelink.NodePool.connect(client=self, nodes=[node])
+        self.bot_app_info = await self.application_info()
         for cog in EXTENSIONS:
             try:
                 await self.load_extension(cog)
@@ -98,6 +99,10 @@ class RoboTwizy(Bot):
     @property
     def cpu_usage(self):
         return psutil.cpu_percent(interval=1)
+
+    @property
+    def owner(self) -> discord.User:
+        return self.bot_app_info.owner
 
     @property
     def git_revision(self):

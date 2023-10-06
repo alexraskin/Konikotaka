@@ -145,8 +145,8 @@ class General(commands.Cog, name="General"):
                 await session.commit()
                 embed = Embed(
                     title="User Banned 🚨",
-                    color=0x2ECC71,
                 )
+                embed.colour = Colour.blurple()
                 embed.add_field(name="User:", value=user.mention, inline=False)
                 channel: GuildChannel = self.client.get_channel(self.general_channel)
                 await channel.send(embed=embed)
