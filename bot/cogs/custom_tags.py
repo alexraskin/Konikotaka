@@ -380,6 +380,7 @@ class Tags(commands.Cog, name="Custom Tags"):
             if tag:
                 time = datetime.strptime(tag.date_added, "%Y-%m-%d %H:%M:%S %Z%z")
                 embed = Embed(title=f"Tag: {tag.name}", description=tag.content)
+                embed.colour = Colour.blurple()
                 embed.add_field(name="Owner", value=f"<@{tag.discord_id}>")
                 embed.add_field(name="Date Added", value=time.strftime("%B %d, %Y"))
                 embed.add_field(name="Times Called", value=tag.called)

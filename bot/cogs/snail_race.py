@@ -182,9 +182,9 @@ class SnailRace(commands.Cog, name="Snail Racing"):
             embed = discord.Embed(
                 title="Snail Racing Leaderboard 🏆",
                 description=leaderboard,
-                color=discord.Color.green(),
                 timestamp=interaction.created_at,
             )
+            embed.colour = Colour.blurple()
             await interaction.response.send_message(embed=embed)
 
 

@@ -134,9 +134,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="🎲 Roll Dice",
             description=f"{ctx.author.name} threw a **{result}** ({rolls}-{limit})",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="8ball", description="Ask the magic 8ball a question")
@@ -151,9 +151,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="🎱 Meowgical 8ball",
             description=f"Question: {question}\n\nAnswer: {json_data['response']}",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_image(url=json_data["url"])
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
@@ -170,9 +170,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="📖 Fact",
             description=f"{json_data['fact']}",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
 
@@ -186,9 +186,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="🔁 Reverse",
             description=f"String: {string}\nReversed: {string[::-1]}",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
 
@@ -213,9 +213,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="📝 Embed",
             description=f"{message}",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed)
 
@@ -231,9 +231,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="🫂 Hug",
             description=f"{ctx.author.mention} hugged {member.mention} 😊",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_image(url=json_data["url"])
         await ctx.send(embed=embed)
 
@@ -249,9 +249,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="👊 Slap",
             description=f"{ctx.author.mention} slapped {member.mention} 😡",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_image(url=json_data["url"])
         await ctx.send(embed=embed)
 
@@ -267,9 +267,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="💋 Kiss",
             description=f"{ctx.author.mention} kissed {member.mention} 😘",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_image(url=json_data["url"])
         await ctx.send(embed=embed)
 
@@ -285,9 +285,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="👋 Pat",
             description=f"{ctx.author.mention} patted {member.mention} 😊",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_image(url=json_data["url"])
         await ctx.send(embed=embed)
 
@@ -321,8 +321,9 @@ class Fun(commands.Cog, name="Fun"):
     async def slots(self, ctx: commands.Context) -> Embed:
         emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
         embed = Embed(
-            title="🎰 Slot Machine", color=0x00FF00, timestamp=ctx.message.created_at
+            title="🎰 Slot Machine", timestamp=ctx.message.created_at
         )
+        embed.colour = Colour.blurple()
         embed.add_field(
             name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n",
             value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n",
@@ -341,7 +342,6 @@ class Fun(commands.Cog, name="Fun"):
                 0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{slot1} {slot2} {slot3}\n\n"
             )
             await message.edit(embed=embed)
-            print("hello3")
 
         # Check if the player wins or loses
         if slot1 == slot2 == slot3:
@@ -365,9 +365,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="🪙 Coinflip",
             description=f"{ctx.author.mention} flipped a coin and got **{result}**",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="rps", description="Play rock paper scissors")
@@ -404,9 +404,9 @@ class Fun(commands.Cog, name="Fun"):
         embed = Embed(
             title="✂️ Rock Paper Scissors",
             description=f"{ctx.author.mention} chose **{choice}** and {self.client.user.mention} chose **{bot_choice}**\n\n{result}",
-            color=0x2ECC71,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(
@@ -439,9 +439,9 @@ class Fun(commands.Cog, name="Fun"):
                 embed = Embed(
                     title="✍️️️ Kira",
                     description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                    color=0x2ECC71,
                     timestamp=ctx.message.created_at,
                 )
+                embed.colour = Colour.blurple()
                 embed.set_footer(
                     text="Try tagging someone else to see if they are Kira"
                 )
@@ -457,9 +457,9 @@ class Fun(commands.Cog, name="Fun"):
                 embed = Embed(
                     title="✍️️️ Kira",
                     description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                    color=0x2ECC71,
                     timestamp=ctx.message.created_at,
                 )
+                embed.colour = Colour.blurple()
                 embed.set_footer(
                     text="Try tagging someone else to see if they are Kira"
                 )
@@ -470,9 +470,9 @@ class Fun(commands.Cog, name="Fun"):
                 embed = Embed(
                     title="✍️️️ Kira",
                     description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
-                    color=0x2ECC71,
                     timestamp=ctx.message.created_at,
                 )
+                embed.colour = Colour.blurple()
                 embed.set_footer(
                     text="Try tagging someone else to see if they are Kira"
                 )
@@ -494,9 +494,9 @@ class Fun(commands.Cog, name="Fun"):
             embed = Embed(
                 title=f"{comic['title']}",
                 description=f"{comic['alt']}",
-                color=0x2ECC71,
                 timestamp=ctx.message.created_at,
             )
+            embed.colour = Colour.blurple()
             embed.set_image(url=comic["img"])
             embed.set_footer(text=f"Provided by xkcd.com")
             await ctx.send(embed=embed)
@@ -505,7 +505,8 @@ class Fun(commands.Cog, name="Fun"):
 
     @commands.hybrid_command(name="year", description="Show the year progress")
     async def year(self, ctx: commands.Context):
-        embed: Embed = Embed(color=0x42F56C, timestamp=ctx.message.created_at)
+        embed: Embed = Embed(timestamp=ctx.message.created_at)
+        embed.colour = Colour.blurple()
         embed.set_author(
             name="Year Progress",
             icon_url="https://i.gyazo.com/db74b90ebf03429e4cc9873f2990d01e.png",

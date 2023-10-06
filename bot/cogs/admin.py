@@ -34,9 +34,9 @@ class Admin(commands.Cog, name="Admin"):
             embed = Embed(
                 title="Cog Reload 🔃",
                 description="I have reloaded all the cogs successfully ✅",
-                color=0x00FF00,
                 timestamp=ctx.message.created_at,
             )
+            embed.colour = Colour.blurple()
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
         else:
@@ -45,9 +45,9 @@ class Admin(commands.Cog, name="Admin"):
             embed = Embed(
                 title="Cog Reload 🔃",
                 description=f"I have reloaded the **{str(extension).upper()}** cog successfully ✅",
-                color=0x00FF00,
                 timestamp=ctx.message.created_at,
             )
+            embed.colour = Colour.blurple()
             embed.add_field(name="Requested by:", value=f"<@!{ctx.author.id}>")
             await ctx.send(embed=embed)
 
@@ -82,9 +82,9 @@ class Admin(commands.Cog, name="Admin"):
             embed = Embed(
                 title="Emoji Added ✅",
                 description=f"Added the emoji `:{name}:` successfully.",
-                color=0x00FF00,
                 timestamp=interaction.message.created_at,
             )
+            embed.colour = Colour.blurple()
             await interaction.followup.send(embed=embed)
         except Exception as e:
             self.client.log.error(f"Error: {e}")
