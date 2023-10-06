@@ -320,9 +320,7 @@ class Fun(commands.Cog, name="Fun"):
     @app_commands.guild_only()
     async def slots(self, ctx: commands.Context) -> Embed:
         emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
-        embed = Embed(
-            title="🎰 Slot Machine", timestamp=ctx.message.created_at
-        )
+        embed = Embed(title="🎰 Slot Machine", timestamp=ctx.message.created_at)
         embed.colour = Colour.blurple()
         embed.add_field(
             name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n",

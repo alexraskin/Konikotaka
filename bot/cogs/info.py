@@ -23,10 +23,12 @@ class Info(commands.Cog, name="Info"):
             description=self.client.description,
             timestamp=ctx.message.created_at,
         )
-        embed.title = 'RoboTwizy'
-        embed.url = 'https://status.twizy.dev/'
+        embed.title = "RoboTwizy"
+        embed.url = "https://status.twizy.dev/"
         embed.colour = Colour.blurple()
-        embed.set_author(name=str(self.client.owner), icon_url=self.client.owner.display_avatar.url)
+        embed.set_author(
+            name=str(self.client.owner), icon_url=self.client.owner.display_avatar.url
+        )
         embed.add_field(name="Node Name", value=os.getenv("NODE_NAME"))
         embed.add_field(
             name="Process",
