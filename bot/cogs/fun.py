@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import os
 import asyncio
 import random
 import urllib.parse
 from typing import Literal, Optional, Union
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
 
 import upsidedown
-from discord import Colour, Embed, Member, Message, app_commands, utils
+from discord import Colour, Embed, Member, Message, app_commands, File
 from discord.ext import commands
 from models.users import DiscordUser
 from sqlalchemy.future import select
@@ -586,18 +589,33 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def where_we_dropping(self, ctx: commands.Context):
-        data = await self.client.session.get("https://fortnite-api.com/v1/map")
-        json_data = await data.json()
+        file_path = os.path.dirname(os.path.abspath(__file__))
+        data = await self.client.session.get("https://fortnite-api.com/images/map.png")
+        map = Image.open(BytesIO(await data.read()))
+        width, height = map.size
+        background_color = (255, 255, 255)
+        image = Image.new("RGB", (width, height), background_color)
+        image.paste(map, (0, 0))
+        draw = ImageDraw.Draw(image)
         random_location = random.choice(list(map_cords.keys()))
+        draw.text(
+            map_cords[random_location],
+            random_location,
+            fill=(255, 255, 255),
+            font=ImageFont.truetype(
+                f"{file_path}/files/AROneSans.ttf", size=60,
+            ),
+        )
+        image.save(f"{file_path}/files/map.png")
         embed = Embed(
-            title="🪂 Where We Droppin'?",
-            description=f"We droppin' **{str(random_location).lower().capitalize()}**",
+            title="🗺️ Where We Droppin'?",
+            description=f"**{random_location}**",
+            timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
-        embed.timestamp = utils.utcnow()
-        embed.set_image(url=json_data["data"]["images"]["pois"])
         embed.set_footer(text=f"{ctx.author}")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, file=File(f"{file_path}/files/map.png"))
+        os.remove(f"{file_path}/files/map.png")
 
 
 async def setup(client: commands.Bot) -> None:
