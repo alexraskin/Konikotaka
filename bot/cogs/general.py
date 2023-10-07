@@ -4,8 +4,16 @@ import os
 import random
 from typing import Union
 
-from discord import (DMChannel, Embed, Guild, Interaction, Member, Message,
-                     PartialEmoji, User, app_commands)
+from discord import (
+    DMChannel,
+    Embed,
+    Interaction,
+    Member,
+    Message,
+    PartialEmoji,
+    User,
+    app_commands,
+)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 from models.users import DiscordUser
@@ -108,29 +116,6 @@ class General(commands.Cog, name="General"):
                 user.username = after.name
                 await session.flush()
                 await session.commit()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-
-    @commands.Cog.listener()
-    async def on_member_ban(self, guild: Guild, user: Member) -> None:
-        if guild.id != self.client.cosmo_guild:
-            return
-        async with self.client.async_session() as session:
-            try:
-                user = await session.query(DiscordUser, str(user.id))
-                if user is None:
-                    return
-                await session.delete(user)
-                await session.flush()
-                await session.commit()
-                embed = Embed(
-                    title="User Banned 🚨",
-                )
-                embed.colour = Colour.blurple()
-                embed.add_field(name="User:", value=user.mention, inline=False)
-                channel: GuildChannel = self.client.get_channel(self.general_channel)
-                await channel.send(embed=embed)
             except Exception as e:
                 self.client.log.error(e)
                 await session.rollback()

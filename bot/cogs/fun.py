@@ -603,7 +603,8 @@ class Fun(commands.Cog, name="Fun"):
             random_location,
             fill=(255, 255, 255),
             font=ImageFont.truetype(
-                f"{file_path}/files/AROneSans.ttf", size=60,
+                f"{file_path}/files/AROneSans.ttf",
+                size=60,
             ),
         )
         image.save(f"{file_path}/files/map.png")

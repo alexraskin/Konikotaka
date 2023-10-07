@@ -5,9 +5,10 @@ import random
 from io import BytesIO
 from typing import Union
 
-from discord import File, Member, User
+from discord import File, Member, User, Guild, Embed, Colour
 from discord.ext import commands
 from models.users import DiscordUser
+from discord.abc import GuildChannel
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -16,8 +17,7 @@ class Meta(commands.Cog, name="Meta"):
         self.client: commands.Bot = client
         self.sex = random.choice(["M", "F", "Never"])
         self.random_number = random.randint(10**9, (10**10) - 1)
-        self.abs_path = os.path.abspath(__file__)
-        self.file_path = os.path.dirname(self.abs_path)
+        self.file_path = os.path.dirname(os.path.abspath(__file__))
         self.rand_number = (
             f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"
         )
@@ -60,23 +60,22 @@ class Meta(commands.Cog, name="Meta"):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id != self.client.cosmo_guild:
-            return
-        user = DiscordUser(
-            discord_id=str(member.id),
-            username=member.name,
-            joined=member.joined_at,
-            guild_id=str(member.guild.id),
-        )
-        async with self.client.async_session() as session:
-            try:
-                session.add(user)
-                await session.flush()
-                await session.commit()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-        try:
+        if member.guild.id == self.client.cosmo_guild:
+            user = DiscordUser(
+                discord_id=str(member.id),
+                username=member.name,
+                joined=member.joined_at,
+                guild_id=str(member.guild.id),
+            )
+            async with self.client.async_session() as session:
+                try:
+                    session.add(user)
+                    await session.flush()
+                    await session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+
             discord_avatar = await self.client.session.get(member.avatar.url)
             discord_avatar = Image.open(BytesIO(await discord_avatar.read()))
             discord_avatar = discord_avatar.resize((150, 200))
@@ -96,14 +95,36 @@ class Meta(commands.Cog, name="Meta"):
             )
             self.image.paste(discord_avatar, (100, 589))
             self.image.save(f"{self.file_path}/files/{member.id}.jpg")
-            channel = await self.client.fetch_channel(self.client.general_channel)
+            channel = await self.client.fetch_channel(
+                self.client.guilds[0].system_channel.id
+            )
             await channel.send(
                 file=File(f"{self.file_path}/files/{member.id}.jpg"),
             )
             os.remove(f"{self.file_path}/files/{member.id}.jpg")
-        except Exception as e:
-            self.client.log.error(e)
+
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild: Guild, user: Member) -> None:
+        if guild.id != self.client.cosmo_guild:
             return
+        async with self.client.async_session() as session:
+            try:
+                user = await session.query(DiscordUser, str(user.id))
+                if user is None:
+                    return
+                await session.delete(user)
+                await session.flush()
+                await session.commit()
+                embed = Embed(
+                    title="User Banned 🚨",
+                )
+                embed.colour = Colour.blurple()
+                embed.add_field(name="User:", value=user.mention, inline=False)
+                channel: GuildChannel = self.client.get_channel(self.general_channel)
+                await channel.send(embed=embed)
+            except Exception as e:
+                self.client.log.error(e)
+                await session.rollback()
 
 
 async def setup(client: commands.Bot) -> None:
