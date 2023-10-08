@@ -4,16 +4,8 @@ import os
 import random
 from typing import Union
 
-from discord import (
-    DMChannel,
-    Embed,
-    Interaction,
-    Member,
-    Message,
-    PartialEmoji,
-    User,
-    app_commands,
-)
+from discord import (DMChannel, Embed, Interaction, Member, Message,
+                     PartialEmoji, User, app_commands)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 
@@ -163,6 +155,7 @@ class General(commands.Cog, name="General"):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} which does not exist."
             )
+            await ctx.send("Command not found! UwU")
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             self.client.log.error(
                 f"User {ctx.author} tried to run command {ctx.command} without the correct arguments."

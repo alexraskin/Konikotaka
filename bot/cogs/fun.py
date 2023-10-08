@@ -298,6 +298,9 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def textcat(self, ctx: commands.Context) -> Message:
+        """
+        Get a random text cat
+        """
         data = await self.client.session.get("https://nekos.life/api/v2/cat")
         json_data = await data.json()
         await ctx.send(json_data["cat"])
@@ -322,6 +325,9 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def slots(self, ctx: commands.Context) -> Embed:
+        """
+        Play the slots
+        """
         emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
         embed = Embed(title="🎰 Slot Machine", timestamp=ctx.message.created_at)
         embed.colour = Colour.blurple()
@@ -362,6 +368,9 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def coinflip(self, ctx: commands.Context) -> Embed:
+        """
+        Flip a coin
+        """
         result = random.choice(["Heads", "Tails"])
         embed = Embed(
             title="🪙 Coinflip",
@@ -379,6 +388,9 @@ class Fun(commands.Cog, name="Fun"):
         ctx: commands.Context,
         choice: Optional[Literal["rock", "paper", "scissors"]],
     ) -> Embed:
+        """
+        Play rock paper scissors
+        """
         choices = ["rock", "paper", "scissors"]
         bot_choice = random.choice(choices)
         if choice is None or choice.lower() not in choices:
@@ -416,6 +428,9 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def kira(self, ctx: commands.Context, member: Member = None) -> Embed:
+        """
+        Likelihood of you or someone being Kira
+        """
         result = random.randint(0, 100)
         if member is None:
             member: Member = ctx.author
@@ -520,6 +535,9 @@ class Fun(commands.Cog, name="Fun"):
 
     @commands.command("f", description="Press F to pay respects")
     async def f(self, ctx: commands.Context):
+        """
+        Press F to pay respects
+        """
         await ctx.message.delete()
         message = await ctx.send("Press 🇫 to pay respect to the chat.")
         await message.add_reaction("🇫")
@@ -590,6 +608,9 @@ class Fun(commands.Cog, name="Fun"):
     @commands.guild_only()
     @app_commands.guild_only()
     async def where_we_dropping(self, ctx: commands.Context):
+        """
+        Get a random location to drop in Fortnite
+        """
         file_path = os.path.dirname(os.path.abspath(__file__))
         data = await self.client.session.get("https://fortnite-api.com/images/map.png")
         map = Image.open(BytesIO(await data.read()))
@@ -618,24 +639,6 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed, file=File(f"{file_path}/files/map.png"))
         os.remove(f"{file_path}/files/map.png")
-
-    @commands.hybrid_command(name="pfp", description="Get a random profile picture")
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def pfp(self, ctx: commands.Context, member: Member = None):
-        """
-        Get a random profile picture
-        """
-        if member is None:
-            member: Member = ctx.author
-        embed = Embed(
-            title="🖼️ Profile Picture",
-            description=f"{member.mention}'s profile picture",
-            timestamp=ctx.message.created_at,
-        )
-        embed.colour = Colour.blurple()
-        embed.set_image(url=member.avatar_url)
-        await ctx.send(embed=embed)
 
     @commands.hybrid_command(aliases=["roul"])
     async def roulette(self, ctx: commands.Context, picked_colour: str = None):
