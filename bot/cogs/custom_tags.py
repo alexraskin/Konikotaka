@@ -124,81 +124,85 @@ class Tags(commands.Cog, name="Custom Tags"):
     ) -> None:
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).filter(CustomTags.name == tag_name.lower())
-              )
-              tag = query.scalar_one_or_none()
-              if tag:
-                  return await ctx.reply(
-                      f"Tag `{tag_name}` already exists 👎", ephemeral=True
-                  )
-              new_tag = CustomTags(
-                  name=tag_name.strip().lower(),
-                  content=tag_content,
-                  discord_id=str(ctx.author.id),
-                  date_added=ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S %Z%z"),
-              )
-              try:
-                  session.add(new_tag)
-                  await session.flush()
-                  await session.commit()
-                  await ctx.reply(f"Tag `{tag_name}` added! 👍")
-              except Exception as e:
-                  self.client.log.error(e)
-                  await session.rollback()
-                  await ctx.reply(
-                      "An error occurred while adding the tag.", ephemeral=True
-                  )
+                query = await session.execute(
+                    select(CustomTags).filter(CustomTags.name == tag_name.lower())
+                )
+                tag = query.scalar_one_or_none()
+                if tag:
+                    return await ctx.reply(
+                        f"Tag `{tag_name}` already exists 👎", ephemeral=True
+                    )
+                new_tag = CustomTags(
+                    name=tag_name.strip().lower(),
+                    content=tag_content,
+                    discord_id=str(ctx.author.id),
+                    date_added=ctx.message.created_at.strftime(
+                        "%Y-%m-%d %H:%M:%S %Z%z"
+                    ),
+                )
+                try:
+                    session.add(new_tag)
+                    await session.flush()
+                    await session.commit()
+                    await ctx.reply(f"Tag `{tag_name}` added! 👍")
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+                    await ctx.reply(
+                        "An error occurred while adding the tag.", ephemeral=True
+                    )
 
     async def edit_tag(
         self, ctx: commands.Context, tag_name: str, tag_content: str
     ) -> None:
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).filter(CustomTags.name == tag_name)
-              )
-              tag = query.scalar_one_or_none()
-              if tag is None:
-                  return await ctx.reply(
-                      f"Tag `{tag_name}` does not exist 👎", ephemeral=True
-                  )
-              if tag:
-                  if int(str(tag.discord_id).strip()) != ctx.author.id:
-                      return await ctx.reply(
-                          "You are not the owner of this tag.", ephemeral=True
-                      )
-                  new_tag = CustomTags(
-                      name=tag_name.strip().lower(),
-                      content=tag_content,
-                      discord_id=str(ctx.author.id),
-                      date_added=ctx.message.created_at.strftime(
-                          "%Y-%m-%d %H:%M:%S %Z%z"
-                      ),
-                  )
-                  try:
-                      session.add(new_tag)
-                      await session.flush()
-                      await session.commit()
-                      await ctx.reply(f"Tag `{tag_name}` has been updated! 👍")
-                  except Exception as e:
-                      self.client.log.error(e)
-                      await session.rollback()
-                      await ctx.reply(
-                          "An error occurred while updating the tag.", ephemeral=True
-                      )
+                query = await session.execute(
+                    select(CustomTags).filter(CustomTags.name == tag_name)
+                )
+                tag = query.scalar_one_or_none()
+                if tag is None:
+                    return await ctx.reply(
+                        f"Tag `{tag_name}` does not exist 👎", ephemeral=True
+                    )
+                if tag:
+                    if int(str(tag.discord_id).strip()) != ctx.author.id:
+                        return await ctx.reply(
+                            "You are not the owner of this tag.", ephemeral=True
+                        )
+                    new_tag = CustomTags(
+                        name=tag_name.strip().lower(),
+                        content=tag_content,
+                        discord_id=str(ctx.author.id),
+                        date_added=ctx.message.created_at.strftime(
+                            "%Y-%m-%d %H:%M:%S %Z%z"
+                        ),
+                    )
+                    try:
+                        session.add(new_tag)
+                        await session.flush()
+                        await session.commit()
+                        await ctx.reply(f"Tag `{tag_name}` has been updated! 👍")
+                    except Exception as e:
+                        self.client.log.error(e)
+                        await session.rollback()
+                        await ctx.reply(
+                            "An error occurred while updating the tag.", ephemeral=True
+                        )
 
     async def lookup_similar_tags(self, tag_name: str) -> Optional[list[CustomTags]]:
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).where(CustomTags.name.like(f"%{tag_name.lower()}%"))
-              )
-              tags = query.scalars().all()
-              if tags:
-                  return tags
-              else:
-                  return None
+                query = await session.execute(
+                    select(CustomTags).where(
+                        CustomTags.name.like(f"%{tag_name.lower()}%")
+                    )
+                )
+                tags = query.scalars().all()
+                if tags:
+                    return tags
+                else:
+                    return None
 
     @commands.hybrid_group(fallback="get")
     @commands.guild_only()
@@ -210,31 +214,32 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).filter(CustomTags.name == tag_name.lower())
-              )
-              tag = query.scalar_one_or_none()
-              if tag:
-                  tag.called = int(str(tag.called).strip()) + 1
-                  await ctx.send(str(tag.content))
-                  try:
-                      await session.flush()
-                      await session.commit()
-                  except Exception as e:
-                      self.client.log.error(e)
-                      await session.rollback()
-                      await ctx.reply(
-                          "An error occurred while fetching the tag. 👎", ephemeral=True
-                      )
-              else:
-                  tags = await self.lookup_similar_tags(tag_name)
-                  if tags:
-                      await ctx.reply(
-                          content=f"Tag `{tag_name}` not found. Did you mean one of these?\n"
-                          + "\n".join([f"{tag.name}" for tag in tags])
-                      )
-                  else:
-                      await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
+                query = await session.execute(
+                    select(CustomTags).filter(CustomTags.name == tag_name.lower())
+                )
+                tag = query.scalar_one_or_none()
+                if tag:
+                    tag.called = int(str(tag.called).strip()) + 1
+                    await ctx.send(str(tag.content))
+                    try:
+                        await session.flush()
+                        await session.commit()
+                    except Exception as e:
+                        self.client.log.error(e)
+                        await session.rollback()
+                        await ctx.reply(
+                            "An error occurred while fetching the tag. 👎",
+                            ephemeral=True,
+                        )
+                else:
+                    tags = await self.lookup_similar_tags(tag_name)
+                    if tags:
+                        await ctx.reply(
+                            content=f"Tag `{tag_name}` not found. Did you mean one of these?\n"
+                            + "\n".join([f"{tag.name}" for tag in tags])
+                        )
+                    else:
+                        await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
 
     @tag.command()
     @commands.guild_only()
@@ -409,19 +414,19 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(select(CustomTags))
-              tags = query.scalars().all()
-              if tags:
-                  if len(tags) > 2000:
-                      return await ctx.reply(
-                          "There are too many tags to list.", ephemeral=True
-                      )
-                  await ctx.reply(
-                      content=f"Here are all the tags:\n"
-                      + "\n".join([f"`{tag.name}`" for tag in tags])
-                  )
-              else:
-                  await ctx.reply("There are no tags.", ephemeral=True)
+                query = await session.execute(select(CustomTags))
+                tags = query.scalars().all()
+                if tags:
+                    if len(tags) > 2000:
+                        return await ctx.reply(
+                            "There are too many tags to list.", ephemeral=True
+                        )
+                    await ctx.reply(
+                        content=f"Here are all the tags:\n"
+                        + "\n".join([f"`{tag.name}`" for tag in tags])
+                    )
+                else:
+                    await ctx.reply("There are no tags.", ephemeral=True)
 
     @tag.command(description="Search for a tag")
     @commands.guild_only()
@@ -433,21 +438,23 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).where(CustomTags.name.like(f"%{tag_name.lower()}%"))
-              )
-              tags = query.scalars().all()
-              if tags:
-                  if len(tags) > 2000:
-                      return await ctx.reply(
-                          "There are too many tags to list.", ephemeral=True
-                      )
-                  await ctx.reply(
-                      content=f"Here are all the tags:\n"
-                      + "\n".join([f"`{tag.name}`" for tag in tags])
-                  )
-              else:
-                  await ctx.reply("There are no tags.", ephemeral=True)
+                query = await session.execute(
+                    select(CustomTags).where(
+                        CustomTags.name.like(f"%{tag_name.lower()}%")
+                    )
+                )
+                tags = query.scalars().all()
+                if tags:
+                    if len(tags) > 2000:
+                        return await ctx.reply(
+                            "There are too many tags to list.", ephemeral=True
+                        )
+                    await ctx.reply(
+                        content=f"Here are all the tags:\n"
+                        + "\n".join([f"`{tag.name}`" for tag in tags])
+                    )
+                else:
+                    await ctx.reply("There are no tags.", ephemeral=True)
 
     @tag.command(description="Get a random tag")
     @commands.guild_only()
@@ -458,13 +465,13 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(select(CustomTags))
-              tags = query.scalars().all()
-              if tags:
-                  tag = tags[random.randint(0, len(tags) - 1)]
-                  await ctx.reply(f"TagName:{tag.name}\nTagContent{tag.content}")
-              else:
-                  await ctx.reply("There are no tags.", ephemeral=True)
+                query = await session.execute(select(CustomTags))
+                tags = query.scalars().all()
+                if tags:
+                    tag = tags[random.randint(0, len(tags) - 1)]
+                    await ctx.reply(f"TagName:{tag.name}\nTagContent{tag.content}")
+                else:
+                    await ctx.reply("There are no tags.", ephemeral=True)
 
     @tag.command(description="Transfer a tag to another user")
     @commands.guild_only()
@@ -482,28 +489,28 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).filter(CustomTags.name == tag_name.lower())
-              )
-              tag = query.scalar_one_or_none()
-              if tag:
-                  try:
-                      tag.discord_id = member.id
-                      await session.flush()
-                      await session.commit()
-                      await ctx.reply(f"Tag `{tag_name}` transferred!")
-                      self.client.log.info(
-                          f"User {ctx.author} transferred a tag named {tag_name}"
-                      )
-                  except Exception as e:
-                      self.client.log.error(e)
-                      await session.rollback()
-                      await ctx.reply(
-                          "An error occurred while transferring the tag. 👎",
-                          ephemeral=True,
-                      )
-              else:
-                  await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
+                query = await session.execute(
+                    select(CustomTags).filter(CustomTags.name == tag_name.lower())
+                )
+                tag = query.scalar_one_or_none()
+                if tag:
+                    try:
+                        tag.discord_id = member.id
+                        await session.flush()
+                        await session.commit()
+                        await ctx.reply(f"Tag `{tag_name}` transferred!")
+                        self.client.log.info(
+                            f"User {ctx.author} transferred a tag named {tag_name}"
+                        )
+                    except Exception as e:
+                        self.client.log.error(e)
+                        await session.rollback()
+                        await ctx.reply(
+                            "An error occurred while transferring the tag. 👎",
+                            ephemeral=True,
+                        )
+                else:
+                    await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
     @tag.command()
     @commands.guild_only()
@@ -515,31 +522,32 @@ class Tags(commands.Cog, name="Custom Tags"):
         """
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(CustomTags).filter(CustomTags.name == tag_name.lower())
-              )
-              tag = query.scalar_one_or_none()
-              if tag:
-                  if int(str(tag.discord_id).strip()) != ctx.author.id:
-                      return await ctx.reply(
-                          "You are not the owner of this tag.", ephemeral=True
-                      )
-                  try:
-                      await session.delete(tag)
-                      await session.flush()
-                      await session.commit()
-                      await ctx.reply(f"Tag `{tag_name}` deleted!")
-                      self.client.log.info(
-                          f"User {ctx.author} deleted a tag named {tag_name}"
-                      )
-                  except Exception as e:
-                      self.client.log.error(e)
-                      await session.rollback()
-                      await ctx.reply(
-                          "An error occurred while deleting the tag. 👎", ephemeral=True
-                      )
-              else:
-                  await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
+                query = await session.execute(
+                    select(CustomTags).filter(CustomTags.name == tag_name.lower())
+                )
+                tag = query.scalar_one_or_none()
+                if tag:
+                    if int(str(tag.discord_id).strip()) != ctx.author.id:
+                        return await ctx.reply(
+                            "You are not the owner of this tag.", ephemeral=True
+                        )
+                    try:
+                        await session.delete(tag)
+                        await session.flush()
+                        await session.commit()
+                        await ctx.reply(f"Tag `{tag_name}` deleted!")
+                        self.client.log.info(
+                            f"User {ctx.author} deleted a tag named {tag_name}"
+                        )
+                    except Exception as e:
+                        self.client.log.error(e)
+                        await session.rollback()
+                        await ctx.reply(
+                            "An error occurred while deleting the tag. 👎",
+                            ephemeral=True,
+                        )
+                else:
+                    await ctx.reply(f"Tag `{tag_name}` not found.", ephemeral=True)
 
 
 async def setup(client: commands.Bot):

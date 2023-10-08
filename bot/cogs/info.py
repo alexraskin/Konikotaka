@@ -46,8 +46,9 @@ class Info(commands.Cog, name="Info"):
         embed.set_thumbnail(url=self.client.logo_url)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(name="user", aliases=["member"])
     @commands.guild_only()
+    @app_commands.guild_only()
     async def user(self, ctx: commands.Context, *, user: Member = None):
         """Get user information"""
         user = user or ctx.author
@@ -63,6 +64,7 @@ class Info(commands.Cog, name="Info"):
             )
 
         embed = Embed(colour=user.top_role.colour.value)
+        embed.tile = f"About user {user.name}#{user.discriminator}"
         embed.set_thumbnail(url=user.avatar)
 
         embed.add_field(name="Full name", value=user)
@@ -77,9 +79,9 @@ class Info(commands.Cog, name="Info"):
         )
         embed.add_field(name="Roles", value=show_roles, inline=False)
 
-        await ctx.send(content=f"ℹ About **{user.id}**", embed=embed)
+        await ctx.send(embed=embed)
 
-    @commands.command(name="serverinfo", aliases=["guildinfo"])
+    @commands.hybrid_command(name="serverinfo", aliases=["guildinfo"])
     @commands.guild_only()
     async def serverinfo(self, ctx: commands.Context):
         """Check info about current server"""
@@ -106,9 +108,10 @@ class Info(commands.Cog, name="Info"):
                 content=f"ℹ information about **{ctx.guild.name}**", embed=embed
             )
 
-    @commands.command(aliases=["joindate", "joined"])
+    @commands.hybrid_command(aliases=["joined"])
     @commands.guild_only()
-    async def joinedat(self, ctx: commands.Context, *, user: Member = None):
+    @app_commands.guild_only()
+    async def joinedate(self, ctx: commands.Context, *, user: Member = None):
         """Check when a user joined the current server"""
         user = user or ctx.author
         await ctx.send(
@@ -119,6 +122,37 @@ class Info(commands.Cog, name="Info"):
                 ]
             )
         )
+
+    @commands.hybrid_command()
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def mods(self, ctx: commands.Context):
+        """Check which mods are online on current guild"""
+        message = ""
+        all_status = {
+            "online": {"users": [], "emoji": "🟢"},
+            "idle": {"users": [], "emoji": "🟡"},
+            "dnd": {"users": [], "emoji": "🔴"},
+            "offline": {"users": [], "emoji": "⚫"},
+        }
+
+        for user in ctx.guild.members:
+            user_perm = ctx.channel.permissions_for(user)
+            if user_perm.kick_members or user_perm.ban_members:
+                if not user.bot:
+                    all_status[str(user.status)]["users"].append(f"**{user}**")
+
+        for g in all_status:
+            if all_status[g]["users"]:
+                message += (
+                    f"{all_status[g]['emoji']} {', '.join(all_status[g]['users'])}\n"
+                )
+        embed = Embed()
+        embed.colour = Colour.blurple()
+        embed.title = f"Mods in {ctx.guild.name}"
+        embed.description = message
+        embed.set_footer(text=f"Requested by {ctx.author}")
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(
         name="ping", help="Returns the latency of the bot.", with_app_command=True

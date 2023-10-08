@@ -421,67 +421,67 @@ class Fun(commands.Cog, name="Fun"):
             member: Member = ctx.author
         async with self.client.async_session() as session:
             async with session.begin():
-              query = await session.execute(
-                  select(DiscordUser).where(DiscordUser.discord_id == str(member.id))
-              )
-              user = query.scalar_one_or_none()
-              if user is None:
-                  new_user = DiscordUser(
-                      discord_id=str(member.id),
-                      username=member.name,
-                      joined=member.joined_at,
-                      kira_percentage=result,
-                      guild_id=str(
-                          member.guild.id,
-                      ),
-                  )
-                  session.add(new_user)
-                  await session.flush()
-                  await session.commit()
-                  embed = Embed(
-                      title="✍️️️ Kira",
-                      description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                      timestamp=ctx.message.created_at,
-                  )
-                  embed.colour = Colour.blurple()
-                  embed.set_footer(
-                      text="Try tagging someone else to see if they are Kira"
-                  )
-                  embed.set_thumbnail(
-                      url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
-                  )
-                  return await ctx.send(embed=embed)
+                query = await session.execute(
+                    select(DiscordUser).where(DiscordUser.discord_id == str(member.id))
+                )
+                user = query.scalar_one_or_none()
+                if user is None:
+                    new_user = DiscordUser(
+                        discord_id=str(member.id),
+                        username=member.name,
+                        joined=member.joined_at,
+                        kira_percentage=result,
+                        guild_id=str(
+                            member.guild.id,
+                        ),
+                    )
+                    session.add(new_user)
+                    await session.flush()
+                    await session.commit()
+                    embed = Embed(
+                        title="✍️️️ Kira",
+                        description=f"There is a **{result}%** chance that {member.mention} is Kira",
+                        timestamp=ctx.message.created_at,
+                    )
+                    embed.colour = Colour.blurple()
+                    embed.set_footer(
+                        text="Try tagging someone else to see if they are Kira"
+                    )
+                    embed.set_thumbnail(
+                        url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                    )
+                    return await ctx.send(embed=embed)
 
-              if user.kira_percentage == 0 or user.kira_percentage is None:
-                  user.kira_percentage = result
-                  await session.flush()
-                  await session.commit()
-                  embed = Embed(
-                      title="✍️️️ Kira",
-                      description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                      timestamp=ctx.message.created_at,
-                  )
-                  embed.colour = Colour.blurple()
-                  embed.set_footer(
-                      text="Try tagging someone else to see if they are Kira"
-                  )
-                  embed.set_thumbnail(
-                      url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
-                  )
-              else:
-                  embed = Embed(
-                      title="✍️️️ Kira",
-                      description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
-                      timestamp=ctx.message.created_at,
-                  )
-                  embed.colour = Colour.blurple()
-                  embed.set_footer(
-                      text="Try tagging someone else to see if they are Kira"
-                  )
-                  embed.set_thumbnail(
-                      url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
-                  )
-                  await ctx.send(embed=embed)
+                if user.kira_percentage == 0 or user.kira_percentage is None:
+                    user.kira_percentage = result
+                    await session.flush()
+                    await session.commit()
+                    embed = Embed(
+                        title="✍️️️ Kira",
+                        description=f"There is a **{result}%** chance that {member.mention} is Kira",
+                        timestamp=ctx.message.created_at,
+                    )
+                    embed.colour = Colour.blurple()
+                    embed.set_footer(
+                        text="Try tagging someone else to see if they are Kira"
+                    )
+                    embed.set_thumbnail(
+                        url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                    )
+                else:
+                    embed = Embed(
+                        title="✍️️️ Kira",
+                        description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
+                        timestamp=ctx.message.created_at,
+                    )
+                    embed.colour = Colour.blurple()
+                    embed.set_footer(
+                        text="Try tagging someone else to see if they are Kira"
+                    )
+                    embed.set_thumbnail(
+                        url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                    )
+                    await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="xkcd", description="Get a Todays XKCD comic")
     @commands.guild_only()

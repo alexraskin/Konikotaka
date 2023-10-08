@@ -31,31 +31,31 @@ class WebServer(commands.Cog, name="WebServer"):
         )
         async with self.client.async_session() as session:
             async with session.begin():
-              try:
-                  session.add(ping)
-                  await session.flush()
-                  await session.commit()
-              except Exception as e:
-                  self.client.log.error(e)
-                  await session.rollback()
+                try:
+                    session.add(ping)
+                    await session.flush()
+                    await session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
 
     async def get_ping_history(self) -> list:
         async with self.client.async_session() as session:
             async with session.begin():
-              query: select = select(Ping).order_by(Ping.id.desc()).limit(25)
-              try:
-                  result = await session.execute(query)
-              except Exception as e:
-                  self.client.log.error(e)
-                  return []
-              data = result.scalars().all()
-              for k, v in enumerate(data):
-                  data[k] = {
-                      "ping_ws": v.ping_ws,
-                      "ping_rest": v.ping_rest,
-                      "date": v.date.strftime("%Y-%m-%d %H:%M:%S"),
-                  }
-              return data
+                query: select = select(Ping).order_by(Ping.id.desc()).limit(25)
+                try:
+                    result = await session.execute(query)
+                except Exception as e:
+                    self.client.log.error(e)
+                    return []
+                data = result.scalars().all()
+                for k, v in enumerate(data):
+                    data[k] = {
+                        "ping_ws": v.ping_ws,
+                        "ping_rest": v.ping_rest,
+                        "date": v.date.strftime("%Y-%m-%d %H:%M:%S"),
+                    }
+                return data
 
     async def get_discord_status(self) -> dict:
         discord_status = await self.client.session.get(
