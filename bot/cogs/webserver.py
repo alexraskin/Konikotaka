@@ -19,7 +19,7 @@ class WebServer(commands.Cog, name="WebServer"):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.client.log.info("Webserver is running!")
+        self.client.log.info("Webserver is started!")
         self.update_latency.start()
 
     @tasks.loop(minutes=1)
