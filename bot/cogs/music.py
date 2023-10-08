@@ -15,7 +15,7 @@ class Music(commands.Cog, name="Music"):
     @commands.Cog.listener()
     async def on_wavelink_node_ready(self, node: wavelink.Node) -> None:
         self.client.log.info(f"Node {node.id} is ready!")
-    
+
     @commands.hybrid_group(
         name="music", description="Music commands", with_app_command=True
     )
@@ -23,7 +23,6 @@ class Music(commands.Cog, name="Music"):
         """Music commands"""
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
-        
 
     @music.command(
         name="play", description="Search a song on Youtube, or queue a song!"
@@ -40,15 +39,11 @@ class Music(commands.Cog, name="Music"):
         """
 
         if search is None:
-            await ctx.reply(
-                "Please provide a search query.", ephemeral=True
-            )
+            await ctx.reply("Please provide a search query.", ephemeral=True)
             return
 
         if volume > 100 or volume < 0:
-            await ctx.reply(
-                "Volume must be between 0 and 100", ephemeral=True
-            )
+            await ctx.reply("Volume must be between 0 and 100", ephemeral=True)
             return
 
         if await self.check_author(ctx) is False:
@@ -90,9 +85,7 @@ class Music(commands.Cog, name="Music"):
                 embed.set_image(url=track.thumb)
                 await ctx.send(embed=embed)
             else:
-                await ctx.send(
-                    f"Queued Playlist {tracks.title}"
-                )
+                await ctx.send(f"Queued Playlist {tracks.title}")
 
         else:
             await ctx.send("No results found", ephemeral=True)
@@ -164,15 +157,11 @@ class Music(commands.Cog, name="Music"):
         if await self.check_author(ctx) is False:
             return
         if volume > 100 or volume < 0:
-            await ctx.send(
-                "Volume must be between 0 and 100", ephemeral=True
-            )
+            await ctx.send("Volume must be between 0 and 100", ephemeral=True)
             return
         player: wavelink.Player = ctx.voice_client
         if volume is None:
-            await ctx.send(
-                f"Current volume {player.volume}"
-            )
+            await ctx.send(f"Current volume {player.volume}")
             return
         await player.set_volume(volume)
         await ctx.send(content=f"Set volume to {volume}. 🔊")
@@ -203,18 +192,14 @@ class Music(commands.Cog, name="Music"):
             await ctx.send("Queue is empty")
             return
         if index > len(player.queue):
-            await ctx.send(
-                "Index out of range", ephemeral=True
-            )
+            await ctx.send("Index out of range", ephemeral=True)
             return
         del player.queue[index - 1]
         await ctx.send("Removed! ✅")
 
     async def check_author(self, ctx: commands.Context) -> bool:
         if ctx.author.voice is None:
-            await ctx.reply(
-                "Join a voice channel first..", ephemeral=True
-            )
+            await ctx.reply("Join a voice channel first..", ephemeral=True)
             return False
         return True
 

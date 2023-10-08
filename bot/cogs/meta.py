@@ -130,6 +130,23 @@ class Meta(commands.Cog, name="Meta"):
                     self.client.log.error(e)
                     await session.rollback()
 
+    @commands.Cog.listener()
+    async def on_member_update(self, before: Member, after: Member) -> None:
+        if before.guild.id != self.client.cosmo_guild:
+            return
+        async with self.client.async_session() as session:
+            async with session.begin():
+                try:
+                    user = await session.query(DiscordUser, before.id)
+                    if user is None:
+                        return
+                    user.username = after.name
+                    await session.flush()
+                    await session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Meta(client))

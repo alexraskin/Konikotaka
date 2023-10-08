@@ -16,7 +16,6 @@ from discord import (
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
-from models.users import DiscordUser
 
 
 class General(commands.Cog, name="General"):
@@ -103,22 +102,6 @@ class General(commands.Cog, name="General"):
     @property
     def display_emoji(self) -> PartialEmoji:
         return PartialEmoji(name="cosmo")
-
-    @commands.Cog.listener()
-    async def on_member_update(self, before: Member, after: Member) -> None:
-        if before.guild.id != self.client.cosmo_guild:
-            return
-        async with self.client.async_session() as session:
-            try:
-                user = await session.query(DiscordUser, before.id)
-                if user is None:
-                    return
-                user.username = after.name
-                await session.flush()
-                await session.commit()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
