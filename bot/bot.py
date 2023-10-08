@@ -40,7 +40,7 @@ class RoboTwizy(Bot):
         self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
         self.logo_url: str = "https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"
         self.engine: create_async_engine = create_async_engine(
-            os.getenv("POSTGRES_URL"), echo=False, future=True
+            os.getenv("POSTGRES_URL"), echo=False, future=True, connect_args={"server_settings": {"application_name": "RoboTwizy"}}
         )
 
     async def start(self, *args, **kwargs) -> None:
