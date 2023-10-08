@@ -65,7 +65,7 @@ class Info(commands.Cog, name="Info"):
             )
 
         embed = Embed(colour=user.top_role.colour.value)
-        embed.tile = f"About user {user.name}#{user.discriminator}"
+        embed.title = f"About user {user.name}#{user.discriminator}"
         embed.set_thumbnail(url=user.avatar)
 
         embed.add_field(name="Full name", value=user)
@@ -147,9 +147,8 @@ class Info(commands.Cog, name="Info"):
                 message += (
                     f"{all_status[g]['emoji']} {', '.join(all_status[g]['users'])}\n"
                 )
-        embed = Embed()
+        embed = Embed(title=f"Mods in {ctx.guild.name}")
         embed.colour = Colour.blurple()
-        embed.title = f"Mods in {ctx.guild.name}"
         embed.description = message
         embed.set_footer(text=f"Requested by {ctx.author}")
         await ctx.send(embed=embed)
