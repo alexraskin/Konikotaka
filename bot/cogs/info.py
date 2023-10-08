@@ -90,6 +90,7 @@ class Info(commands.Cog, name="Info"):
 
             embed = Embed()
             embed.colour = Colour.blurple()
+            embed.title = f"Information about **{ctx.guild.name}**"
 
             if ctx.guild.icon:
                 embed.set_thumbnail(url=ctx.guild.icon)
@@ -104,9 +105,7 @@ class Info(commands.Cog, name="Info"):
             embed.add_field(
                 name="Created", value=default.date(ctx.guild.created_at, ago=True)
             )
-            await ctx.send(
-                content=f"ℹ information about **{ctx.guild.name}**", embed=embed
-            )
+            await ctx.send(embed=embed)
 
     @commands.hybrid_command(aliases=["joined"])
     @commands.guild_only()
