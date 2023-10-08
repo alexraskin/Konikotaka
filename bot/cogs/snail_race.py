@@ -71,25 +71,26 @@ class SnailRace(commands.Cog, name="Snail Racing"):
             points=1,
         )
         async with self.client.async_session() as session:
-            query = await session.execute(
-                select(Races).filter(Races.discord_id == str(winner.id))
-            )
-            racer = query.scalar_one_or_none()
-            if racer:
-                racer.wins += 1
-                racer.points += 1
-                session.add(racer)
-            else:
-                session.add(updated_racer)
-            try:
-                await session.flush()
-                await session.commit()
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
-                self.client.log.error(
-                    f"An error occurred while updating the leaderboard.\n{e}"
-                )
+            async with session.begin():
+              query = await session.execute(
+                  select(Races).filter(Races.discord_id == str(winner.id))
+              )
+              racer = query.scalar_one_or_none()
+              if racer:
+                  racer.wins += 1
+                  racer.points += 1
+                  session.add(racer)
+              else:
+                  session.add(updated_racer)
+              try:
+                  await session.flush()
+                  await session.commit()
+              except Exception as e:
+                  self.client.log.error(e)
+                  await session.rollback()
+                  self.client.log.error(
+                      f"An error occurred while updating the leaderboard.\n{e}"
+                  )
 
     async def simulate_race(self, interaction: Interaction) -> None:
         global snail_positions
@@ -170,22 +171,23 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     @app_commands.guild_only()
     async def leaderboard(self, interaction: Interaction) -> None:
         async with self.client.async_session() as session:
-            query = await session.execute(
-                select(Races).order_by(Races.points.desc()).limit(3)
-            )
-            racers = query.scalars().all()
-            leaderboard = ""
-            for racer in racers:
-                racer_info = self.client.get_user(int(str(racer.discord_id).strip()))
-                leaderboard += f"{racer_info.mention}: {racer.points} points 🏅\n"
+            async with session.begin():
+              query = await session.execute(
+                  select(Races).order_by(Races.points.desc()).limit(3)
+              )
+              racers = query.scalars().all()
+              leaderboard = ""
+              for racer in racers:
+                  racer_info = self.client.get_user(int(str(racer.discord_id).strip()))
+                  leaderboard += f"{racer_info.mention}: {racer.points} points 🏅\n"
 
-            embed = discord.Embed(
-                title="Snail Racing Leaderboard 🏆",
-                description=leaderboard,
-                timestamp=interaction.created_at,
-            )
-            embed.colour = Colour.blurple()
-            await interaction.response.send_message(embed=embed)
+              embed = discord.Embed(
+                  title="Snail Racing Leaderboard 🏆",
+                  description=leaderboard,
+                  timestamp=interaction.created_at,
+              )
+              embed.colour = Colour.blurple()
+              await interaction.response.send_message(embed=embed)
 
 
 async def setup(client: commands.Bot) -> None:

@@ -5,10 +5,10 @@ import random
 from io import BytesIO
 from typing import Union
 
-from discord import File, Member, User, Guild, Embed, Colour
+from discord import Colour, Embed, File, Guild, Member, User
+from discord.abc import GuildChannel
 from discord.ext import commands
 from models.users import DiscordUser
-from discord.abc import GuildChannel
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -68,13 +68,14 @@ class Meta(commands.Cog, name="Meta"):
                 guild_id=str(member.guild.id),
             )
             async with self.client.async_session() as session:
-                try:
-                    session.add(user)
-                    await session.flush()
-                    await session.commit()
-                except Exception as e:
-                    self.client.log.error(e)
-                    await session.rollback()
+                async with session.begin():
+                  try:
+                      session.add(user)
+                      await session.flush()
+                      await session.commit()
+                  except Exception as e:
+                      self.client.log.error(e)
+                      await session.rollback()
 
             discord_avatar = await self.client.session.get(member.avatar.url)
             discord_avatar = Image.open(BytesIO(await discord_avatar.read()))
@@ -108,23 +109,50 @@ class Meta(commands.Cog, name="Meta"):
         if guild.id != self.client.cosmo_guild:
             return
         async with self.client.async_session() as session:
-            try:
-                user = await session.query(DiscordUser, str(user.id))
-                if user is None:
-                    return
-                await session.delete(user)
-                await session.flush()
-                await session.commit()
-                embed = Embed(
-                    title="User Banned 🚨",
+            async with session.begin():
+              try:
+                  user = await session.query(DiscordUser, str(user.id))
+                  if user is None:
+                      return
+                  await session.delete(user)
+                  await session.flush()
+                  await session.commit()
+                  embed = Embed(
+                      title="User Banned 🚨",
+                  )
+                  embed.colour = Colour.blurple()
+                  embed.add_field(name="User:", value=user.mention, inline=False)
+                  channel: GuildChannel = self.client.get_channel(self.general_channel)
+                  await channel.send(embed=embed)
+              except Exception as e:
+                  self.client.log.error(e)
+                  await session.rollback()
+
+    @commands.command()
+    @commands.guild_only()
+    async def mods(self, ctx: commands.Context):
+        """Check which mods are online on current guild"""
+        message = ""
+        all_status = {
+            "online": {"users": [], "emoji": "🟢"},
+            "idle": {"users": [], "emoji": "🟡"},
+            "dnd": {"users": [], "emoji": "🔴"},
+            "offline": {"users": [], "emoji": "⚫"},
+        }
+
+        for user in ctx.guild.members:
+            user_perm = ctx.channel.permissions_for(user)
+            if user_perm.kick_members or user_perm.ban_members:
+                if not user.bot:
+                    all_status[str(user.status)]["users"].append(f"**{user}**")
+
+        for g in all_status:
+            if all_status[g]["users"]:
+                message += (
+                    f"{all_status[g]['emoji']} {', '.join(all_status[g]['users'])}\n"
                 )
-                embed.colour = Colour.blurple()
-                embed.add_field(name="User:", value=user.mention, inline=False)
-                channel: GuildChannel = self.client.get_channel(self.general_channel)
-                await channel.send(embed=embed)
-            except Exception as e:
-                self.client.log.error(e)
-                await session.rollback()
+
+        await ctx.send(f"Mods in **{ctx.guild.name}**\n{message}")
 
 
 async def setup(client: commands.Bot) -> None:

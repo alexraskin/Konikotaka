@@ -4,8 +4,9 @@ import os
 import platform
 
 import pkg_resources
-from discord import Colour, Embed, app_commands
+from discord import Colour, Embed, Member, app_commands
 from discord.ext import commands
+from .utils import default
 
 
 class Info(commands.Cog, name="Info"):
@@ -45,6 +46,80 @@ class Info(commands.Cog, name="Info"):
         embed.set_thumbnail(url=self.client.logo_url)
         await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.guild_only()
+    async def user(self, ctx: commands.Context, *, user: Member = None):
+        """Get user information"""
+        user = user or ctx.author
+
+        show_roles = "None"
+        if len(user.roles) > 1:
+            show_roles = ", ".join(
+                [
+                    f"<@&{x.id}>"
+                    for x in sorted(user.roles, key=lambda x: x.position, reverse=True)
+                    if x.id != ctx.guild.default_role.id
+                ]
+            )
+
+        embed = Embed(colour=user.top_role.colour.value)
+        embed.set_thumbnail(url=user.avatar)
+
+        embed.add_field(name="Full name", value=user)
+        embed.add_field(
+            name="Nickname", value=user.nick if hasattr(user, "nick") else "None"
+        )
+        embed.add_field(
+            name="Account created", value=default.date(user.created_at, ago=True)
+        )
+        embed.add_field(
+            name="Joined this server", value=default.date(user.joined_at, ago=True)
+        )
+        embed.add_field(name="Roles", value=show_roles, inline=False)
+
+        await ctx.send(content=f"ℹ About **{user.id}**", embed=embed)
+
+    @commands.command(name="serverinfo", aliases=["guildinfo"])
+    @commands.guild_only()
+    async def serverinfo(self, ctx: commands.Context):
+        """Check info about current server"""
+        if ctx.invoked_subcommand is None:
+            find_bots = sum(1 for member in ctx.guild.members if member.bot)
+
+            embed = Embed()
+            embed.colour = Colour.blurple()
+
+            if ctx.guild.icon:
+                embed.set_thumbnail(url=ctx.guild.icon)
+            if ctx.guild.banner:
+                embed.set_image(url=ctx.guild.banner.with_format("png").with_size(1024))
+
+            embed.add_field(name="Server Name", value=ctx.guild.name)
+            embed.add_field(name="Server ID", value=ctx.guild.id)
+            embed.add_field(name="Members", value=ctx.guild.member_count)
+            embed.add_field(name="Bots", value=find_bots)
+            embed.add_field(name="Owner", value=ctx.guild.owner)
+            embed.add_field(
+                name="Created", value=default.date(ctx.guild.created_at, ago=True)
+            )
+            await ctx.send(
+                content=f"ℹ information about **{ctx.guild.name}**", embed=embed
+            )
+
+    @commands.command(aliases=["joindate", "joined"])
+    @commands.guild_only()
+    async def joinedat(self, ctx: commands.Context, *, user: Member = None):
+        """Check when a user joined the current server"""
+        user = user or ctx.author
+        await ctx.send(
+            "\n".join(
+                [
+                    f"**{user}** joined **{ctx.guild.name}**",
+                    f"{default.date(user.joined_at, ago=True)}",
+                ]
+            )
+        )
+
     @commands.hybrid_command(
         name="ping", help="Returns the latency of the bot.", with_app_command=True
     )
@@ -65,9 +140,9 @@ class Info(commands.Cog, name="Info"):
         embed = Embed(
             title="Bot Uptime 🕒",
             description=f"Uptime: {self.client.get_uptime} 🕒",
-            color=0x42F56C,
             timestamp=ctx.message.created_at,
         )
+        embed.colour = Colour.blurple()
         embed.set_thumbnail(url=self.client.logo_url)
         await ctx.send(embed=embed)
 

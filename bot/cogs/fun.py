@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-import os
 import asyncio
+import os
 import random
 import urllib.parse
-from typing import Literal, Optional, Union
-from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+from typing import Literal, Optional, Union
 
 import upsidedown
-from discord import Colour, Embed, Member, Message, app_commands, File
+from discord import Colour, Embed, File, Member, Message, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
+from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy.future import select
 
 from .utils.map_cords import map_cords
@@ -420,67 +420,68 @@ class Fun(commands.Cog, name="Fun"):
         if member is None:
             member: Member = ctx.author
         async with self.client.async_session() as session:
-            query = await session.execute(
-                select(DiscordUser).where(DiscordUser.discord_id == str(member.id))
-            )
-            user = query.scalar_one_or_none()
-            if user is None:
-                new_user = DiscordUser(
-                    discord_id=str(member.id),
-                    username=member.name,
-                    joined=member.joined_at,
-                    kira_percentage=result,
-                    guild_id=str(
-                        member.guild.id,
-                    ),
-                )
-                session.add(new_user)
-                await session.flush()
-                await session.commit()
-                embed = Embed(
-                    title="✍️️️ Kira",
-                    description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                    timestamp=ctx.message.created_at,
-                )
-                embed.colour = Colour.blurple()
-                embed.set_footer(
-                    text="Try tagging someone else to see if they are Kira"
-                )
-                embed.set_thumbnail(
-                    url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
-                )
-                return await ctx.send(embed=embed)
+            async with session.begin():
+              query = await session.execute(
+                  select(DiscordUser).where(DiscordUser.discord_id == str(member.id))
+              )
+              user = query.scalar_one_or_none()
+              if user is None:
+                  new_user = DiscordUser(
+                      discord_id=str(member.id),
+                      username=member.name,
+                      joined=member.joined_at,
+                      kira_percentage=result,
+                      guild_id=str(
+                          member.guild.id,
+                      ),
+                  )
+                  session.add(new_user)
+                  await session.flush()
+                  await session.commit()
+                  embed = Embed(
+                      title="✍️️️ Kira",
+                      description=f"There is a **{result}%** chance that {member.mention} is Kira",
+                      timestamp=ctx.message.created_at,
+                  )
+                  embed.colour = Colour.blurple()
+                  embed.set_footer(
+                      text="Try tagging someone else to see if they are Kira"
+                  )
+                  embed.set_thumbnail(
+                      url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                  )
+                  return await ctx.send(embed=embed)
 
-            if user.kira_percentage == 0 or user.kira_percentage is None:
-                user.kira_percentage = result
-                await session.flush()
-                await session.commit()
-                embed = Embed(
-                    title="✍️️️ Kira",
-                    description=f"There is a **{result}%** chance that {member.mention} is Kira",
-                    timestamp=ctx.message.created_at,
-                )
-                embed.colour = Colour.blurple()
-                embed.set_footer(
-                    text="Try tagging someone else to see if they are Kira"
-                )
-                embed.set_thumbnail(
-                    url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
-                )
-            else:
-                embed = Embed(
-                    title="✍️️️ Kira",
-                    description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
-                    timestamp=ctx.message.created_at,
-                )
-                embed.colour = Colour.blurple()
-                embed.set_footer(
-                    text="Try tagging someone else to see if they are Kira"
-                )
-                embed.set_thumbnail(
-                    url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
-                )
-                await ctx.send(embed=embed)
+              if user.kira_percentage == 0 or user.kira_percentage is None:
+                  user.kira_percentage = result
+                  await session.flush()
+                  await session.commit()
+                  embed = Embed(
+                      title="✍️️️ Kira",
+                      description=f"There is a **{result}%** chance that {member.mention} is Kira",
+                      timestamp=ctx.message.created_at,
+                  )
+                  embed.colour = Colour.blurple()
+                  embed.set_footer(
+                      text="Try tagging someone else to see if they are Kira"
+                  )
+                  embed.set_thumbnail(
+                      url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                  )
+              else:
+                  embed = Embed(
+                      title="✍️️️ Kira",
+                      description=f"There is a **{user.kira_percentage}%** chance that {member.mention} is Kira",
+                      timestamp=ctx.message.created_at,
+                  )
+                  embed.colour = Colour.blurple()
+                  embed.set_footer(
+                      text="Try tagging someone else to see if they are Kira"
+                  )
+                  embed.set_thumbnail(
+                      url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
+                  )
+                  await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="xkcd", description="Get a Todays XKCD comic")
     @commands.guild_only()
@@ -617,6 +618,45 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_footer(text=f"{ctx.author}")
         await ctx.send(embed=embed, file=File(f"{file_path}/files/map.png"))
         os.remove(f"{file_path}/files/map.png")
+
+    @commands.hybrid_command(name="pfp", description="Get a random profile picture")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def pfp(self, ctx: commands.Context, member: Member = None):
+        """
+        Get a random profile picture
+        """
+        if member is None:
+            member: Member = ctx.author
+        embed = Embed(
+            title="🖼️ Profile Picture",
+            description=f"{member.mention}'s profile picture",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_image(url=member.avatar_url)
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(aliases=["roul"])
+    async def roulette(self, ctx: commands.Context, picked_colour: str = None):
+        """Colours roulette"""
+        colour_table = ["blue", "red", "green", "yellow"]
+        if not picked_colour:
+            pretty_colours = ", ".join(colour_table)
+            return await ctx.send(f"Please pick a colour from: {pretty_colours}")
+
+        picked_colour = picked_colour.lower()
+        if picked_colour not in colour_table:
+            return await ctx.send("Please give correct color")
+
+        chosen_color = random.choice(colour_table)
+        msg = await ctx.send("Spinning 🔵🔴🟢🟡")
+        await asyncio.sleep(2)
+        result = f"Result: {chosen_color.upper()}"
+
+        if chosen_color == picked_colour:
+            return await msg.edit(content=f"> {result}\nCongrats, you won 🎉!")
+        await msg.edit(content=f"> {result}\nBetter luck next time")
 
 
 async def setup(client: commands.Bot) -> None:
