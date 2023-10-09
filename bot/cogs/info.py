@@ -65,7 +65,7 @@ class Info(commands.Cog, name="Info"):
             )
 
         embed = Embed(colour=user.top_role.colour.value)
-        embed.title = f"About user {user.name}#{user.discriminator}"
+        embed.title = f"{user.name}#{user.discriminator}"
         embed.set_thumbnail(url=user.avatar)
 
         embed.add_field(name="Full name", value=user)
@@ -91,7 +91,7 @@ class Info(commands.Cog, name="Info"):
 
             embed = Embed()
             embed.colour = Colour.blurple()
-            embed.title = f"Information about **{ctx.guild.name}**"
+            embed.title = f"{ctx.guild.name}"
 
             if ctx.guild.icon:
                 embed.set_thumbnail(url=ctx.guild.icon)
