@@ -14,7 +14,6 @@ from discord.ext import tasks
 from discord.ext.commands import Bot, NoEntryPointError, when_mentioned_or
 from dotenv import load_dotenv
 from models.db import Base
-from models.ping import Ping
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 

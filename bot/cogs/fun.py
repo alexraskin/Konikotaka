@@ -32,7 +32,7 @@ class Fun(commands.Cog, name="Fun"):
         Get a random photo of Cosmo the Cat from the twizy.dev API
         """
         async with self.client.session.get(
-            "https://api.twizy.dev/cats/cosmo"
+            "https://api.twizy.dev/v1/cosmo"
         ) as response:
             if response.status == 200:
                 photo = await response.json()
@@ -52,7 +52,7 @@ class Fun(commands.Cog, name="Fun"):
         Get a random photo of Pat and Ash's cats from the twizy.dev API
         """
         async with self.client.session.get(
-            "https://api.twizy.dev/cats/bczs"
+            "https://api.twizy.dev/v1/bczs"
         ) as response:
             if response.status == 200:
                 photo = await response.json()
