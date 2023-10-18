@@ -43,7 +43,7 @@ class Polls(commands.Cog):
 
         try:
             await ctx.message.delete()
-        except:
+        except Exception:
             pass
 
         body = "\n".join(f"{key}: {c}" for key, c in choices)

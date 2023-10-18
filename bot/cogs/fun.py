@@ -505,7 +505,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random xkcd comic
         """
-        response = await self.client.session.get(f"https://xkcd.com/info.0.json")
+        response = await self.client.session.get("https://xkcd.com/info.0.json")
         if response.status == 200:
             comic = await response.json()
             embed = Embed(
@@ -515,7 +515,7 @@ class Fun(commands.Cog, name="Fun"):
             )
             embed.colour = Colour.blurple()
             embed.set_image(url=comic["img"])
-            embed.set_footer(text=f"Provided by xkcd.com")
+            embed.set_footer(text="Provided by xkcd.com")
             await ctx.send(embed=embed)
         else:
             await ctx.send("Error getting xkcd comic!")

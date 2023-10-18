@@ -141,7 +141,7 @@ class Mod(commands.Cog, name="Mod"):
             await channel.set_permissions(ctx.guild.default_role, send_messages=False)
             embed = Embed(
                 title="Lockdown Notice 🔒",
-                description=f"This channel is currently under lockdown.",
+                description="This channel is currently under lockdown.",
                 color=0x00FF00,
                 timestamp=ctx.message.created_at,
             )
@@ -182,7 +182,7 @@ class Mod(commands.Cog, name="Mod"):
             )
             embed = Embed(
                 title="Lockdown Ended 🔓",
-                description=f"The lockdown has been lifted.",
+                description="The lockdown has been lifted.",
                 color=0x00FF00,
                 timestamp=ctx.message.created_at,
             )

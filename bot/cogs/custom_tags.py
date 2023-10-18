@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 import discord
-from discord import Embed, PartialEmoji, TextStyle, app_commands
+from discord import Embed, PartialEmoji, TextStyle, app_commands, Colour
 from discord.ext import commands
 from discord.interactions import Interaction
 from models.tags import CustomTags
@@ -422,7 +422,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                             "There are too many tags to list.", ephemeral=True
                         )
                     await ctx.reply(
-                        content=f"Here are all the tags:\n"
+                        content="Here are all the tags:\n"
                         + "\n".join([f"`{tag.name}`" for tag in tags])
                     )
                 else:
@@ -450,7 +450,7 @@ class Tags(commands.Cog, name="Custom Tags"):
                             "There are too many tags to list.", ephemeral=True
                         )
                     await ctx.reply(
-                        content=f"Here are all the tags:\n"
+                        content="Here are all the tags:\n"
                         + "\n".join([f"`{tag.name}`" for tag in tags])
                     )
                 else:

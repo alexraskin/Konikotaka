@@ -5,7 +5,7 @@ import random
 from typing import Dict, List, Optional
 
 import discord
-from discord import Interaction, Member, app_commands
+from discord import Interaction, Member, app_commands, Colour
 from discord.ext import commands
 from models.races import Races
 from sqlalchemy.future import select
@@ -28,7 +28,7 @@ class RaceButton(discord.ui.View):
 
         if interaction.user.id not in shuffled_participants:
             await interaction.followup.send(
-                f"You've entered into the race!", ephemeral=True
+                "You've entered into the race!", ephemeral=True
             )
             shuffled_participants.append(interaction.user.id)
         else:

@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 import wavelink
-from discord import app_commands
+from discord import app_commands, Colour
 from discord.ext import commands
 
 
@@ -98,7 +98,7 @@ class Music(commands.Cog, name="Music"):
         if await self.check_author(ctx) is False:
             return
         player: wavelink.Player = ctx.guild.voice_client
-        if player.queue.is_empty != True:
+        if player.queue.is_empty is not True:
             player.queue.clear()
         await player.disconnect()
         await ctx.reply("Stopped! ⏹️")
