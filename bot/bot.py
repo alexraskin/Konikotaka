@@ -37,7 +37,7 @@ class RoboTwizy(Bot):
         self.version: str = "1.0.6"
         self.lavalink_uri: str = os.getenv("LAVALINK_URI")
         self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
-        self.logo_url: str = "https://i.gyazo.com/ff166661faa0c601256ed4061ff15d2e.jpg"
+        self.logo_url: str = "https://i.gyazo.com/702abd99879359948dfb4e1742a99815.png"
         self.engine: create_async_engine = create_async_engine(
             os.getenv("POSTGRES_URL"),
             echo=False,
@@ -121,7 +121,7 @@ client: RoboTwizy = RoboTwizy(
     command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
     intents=discord.Intents.all(),
     max_messages=10000,
-    description="Hello, I am RoboTwizy!",
+    description="Hello! I am a bot written by Twizy to provide some nice utilities.",
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )
 
