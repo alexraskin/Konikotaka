@@ -37,7 +37,7 @@ class RoboTwizy(Bot):
         self.version: str = "1.0.6"
         self.lavalink_uri: str = os.getenv("LAVALINK_URI")
         self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
-        self.logo_url: str = "https://i.gyazo.com/702abd99879359948dfb4e1742a99815.png"
+        self.logo_url: str = "https://i.gyazo.com/73c8975fc66fa5bfe7a740b6666f7e70.png"
         self.engine: create_async_engine = create_async_engine(
             os.getenv("POSTGRES_URL"),
             echo=False,

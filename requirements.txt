@@ -31,6 +31,6 @@ SQLAlchemy==2.0.20
 tqdm==4.66.1
 typing_extensions==4.7.1
 upsidedown==0.4
-urllib3==2.0.6
+urllib3==2.0.7
 wavelink==2.6.4
 yarl==1.8.2
