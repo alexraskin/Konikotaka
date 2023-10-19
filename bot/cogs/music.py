@@ -114,9 +114,7 @@ class Music(commands.Cog, name="Music"):
         if not player.is_playing():
             await ctx.reply("Nothing is playing")
             return
-        embed = discord.Embed(
-            title="Now Playing ▶️", description=player.current.title
-        )
+        embed = discord.Embed(title="Now Playing ▶️", description=player.current.title)
         embed.colour = Colour.blurple()
         embed.set_image(url=player.current.thumbnail)
         await ctx.send(embed=embed)

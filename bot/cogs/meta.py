@@ -58,6 +58,21 @@ class Meta(commands.Cog, name="Meta"):
         day = random.randint(1, 28)
         return f"{month}.{day}.{year}"
 
+    async def create_image(self, member: Union[Member, User]) -> str:
+        discord_avatar = await self.client.session.get(member.avatar.url)
+        discord_avatar = Image.open(BytesIO(await discord_avatar.read()))
+        discord_avatar = discord_avatar.resize((150, 200))
+        draw = ImageDraw.Draw(self.image)
+        self.image.paste(self.visa_image, (0, 0))
+        draw.text((115, 525), str(member.name), fill=(0, 0, 0), font=self.user_font)
+        draw.text((400, 590), self.random_birthday(), fill=(0, 0, 0), font=self.font)
+        draw.text((400, 632), self.sex, fill=(0, 0, 0), font=self.font)
+        draw.text((400, 674), self.iss, fill=(0, 0, 0), font=self.font)
+        draw.text((400, 713), self.random_expiration(), fill=(0, 0, 0), font=self.font)
+        draw.text((75, 880), str(self.rand_number), fill=(1, 20, 20), font=self.font)
+        self.image.paste(discord_avatar, (100, 589))
+        self.image.save(f"{self.file_path}/files/{member.id}.jpg")
+
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
         if member.guild.id == self.client.cosmo_guild:
@@ -77,25 +92,7 @@ class Meta(commands.Cog, name="Meta"):
                         self.client.log.error(e)
                         await session.rollback()
 
-            discord_avatar = await self.client.session.get(member.avatar.url)
-            discord_avatar = Image.open(BytesIO(await discord_avatar.read()))
-            discord_avatar = discord_avatar.resize((150, 200))
-            draw = ImageDraw.Draw(self.image)
-            self.image.paste(self.visa_image, (0, 0))
-            draw.text((115, 525), str(member.name), fill=(0, 0, 0), font=self.user_font)
-            draw.text(
-                (400, 590), self.random_birthday(), fill=(0, 0, 0), font=self.font
-            )
-            draw.text((400, 632), self.sex, fill=(0, 0, 0), font=self.font)
-            draw.text((400, 674), self.iss, fill=(0, 0, 0), font=self.font)
-            draw.text(
-                (400, 713), self.random_expiration(), fill=(0, 0, 0), font=self.font
-            )
-            draw.text(
-                (75, 880), str(self.rand_number), fill=(1, 20, 20), font=self.font
-            )
-            self.image.paste(discord_avatar, (100, 589))
-            self.image.save(f"{self.file_path}/files/{member.id}.jpg")
+            await self.create_image(member)
             channel = await self.client.fetch_channel(
                 self.client.guilds[0].system_channel.id
             )

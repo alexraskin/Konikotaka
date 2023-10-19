@@ -45,7 +45,7 @@ class Info(commands.Cog, name="Info"):
             text=f"Made with discord.py v{version}",
             icon_url="http://i.imgur.com/5BFecvA.png",
         )
-        embed.set_thumbnail(url=self.client.logo_url)
+        embed.set_thumbnail(url=self.client.user.display_avatar.url)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="user", aliases=["member"])
@@ -73,12 +73,8 @@ class Info(commands.Cog, name="Info"):
         embed.add_field(
             name="Nickname", value=user.nick if hasattr(user, "nick") else "None"
         )
-        embed.add_field(
-            name="Account created", value=date(user.created_at, ago=True)
-        )
-        embed.add_field(
-            name="Joined this server", value=date(user.joined_at, ago=True)
-        )
+        embed.add_field(name="Account created", value=date(user.created_at, ago=True))
+        embed.add_field(name="Joined this server", value=date(user.joined_at, ago=True))
         embed.add_field(name="Roles", value=show_roles, inline=False)
 
         await ctx.send(embed=embed)
@@ -104,9 +100,7 @@ class Info(commands.Cog, name="Info"):
             embed.add_field(name="Members", value=ctx.guild.member_count)
             embed.add_field(name="Bots", value=find_bots)
             embed.add_field(name="Owner", value=ctx.guild.owner)
-            embed.add_field(
-                name="Created", value=date(ctx.guild.created_at, ago=True)
-            )
+            embed.add_field(name="Created", value=date(ctx.guild.created_at, ago=True))
             await ctx.send(embed=embed)
 
     @commands.hybrid_command(aliases=["joined"])

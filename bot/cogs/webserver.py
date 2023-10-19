@@ -95,6 +95,7 @@ class WebServer(commands.Cog, name="WebServer"):
                     "botName": self.client.user.name,
                     "discriminator": self.client.user.discriminator,
                     "botId": self.client.user.id,
+                    "botAvatar": self.client.user.avatar.url,
                 },
                 "ram": f"{self.client.memory_usage}MB",
                 "git_revision": self.client.git_revision,
