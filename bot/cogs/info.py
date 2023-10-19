@@ -7,7 +7,7 @@ import pkg_resources
 from discord import Colour, Embed, Member, app_commands
 from discord.ext import commands
 
-from .utils import default
+from .utils.utils import date
 
 
 class Info(commands.Cog, name="Info"):
@@ -74,10 +74,10 @@ class Info(commands.Cog, name="Info"):
             name="Nickname", value=user.nick if hasattr(user, "nick") else "None"
         )
         embed.add_field(
-            name="Account created", value=default.date(user.created_at, ago=True)
+            name="Account created", value=date(user.created_at, ago=True)
         )
         embed.add_field(
-            name="Joined this server", value=default.date(user.joined_at, ago=True)
+            name="Joined this server", value=date(user.joined_at, ago=True)
         )
         embed.add_field(name="Roles", value=show_roles, inline=False)
 
@@ -105,7 +105,7 @@ class Info(commands.Cog, name="Info"):
             embed.add_field(name="Bots", value=find_bots)
             embed.add_field(name="Owner", value=ctx.guild.owner)
             embed.add_field(
-                name="Created", value=default.date(ctx.guild.created_at, ago=True)
+                name="Created", value=date(ctx.guild.created_at, ago=True)
             )
             await ctx.send(embed=embed)
 
@@ -119,7 +119,7 @@ class Info(commands.Cog, name="Info"):
             "\n".join(
                 [
                     f"**{user}** joined **{ctx.guild.name}**",
-                    f"{default.date(user.joined_at, ago=True)}",
+                    f"{date(user.joined_at, ago=True)}",
                 ]
             )
         )

@@ -1,3 +1,4 @@
+import time
 from datetime import datetime as dt
 
 
@@ -21,3 +22,17 @@ def get_year_round() -> str:
     year_start = dt(now.year, 1, 1)
     year_percent = (now - year_start) / (year_end - year_start) * 100
     return year_percent
+
+
+def date(target, clock: bool = True, ago: bool = False, only_ago: bool = False) -> str:
+    """Converts a timestamp to a Discord timestamp format"""
+    if isinstance(target, int) or isinstance(target, float):
+        target = dt.utcfromtimestamp(target)
+
+    unix = int(time.mktime(target.timetuple()))
+    timestamp = f"<t:{unix}:{'f' if clock else 'D'}>"
+    if ago:
+        timestamp += f" (<t:{unix}:R>)"
+    if only_ago:
+        timestamp = f"<t:{unix}:R>"
+    return timestamp
