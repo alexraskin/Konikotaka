@@ -113,22 +113,6 @@ class General(commands.Cog, name="General"):
         if message.author == self.client.user:
             return
 
-        if message.content.__contains__("?servericon"):
-            await message.channel.send(
-                "https://media.discordapp.net/attachments/1064936966136795257/1151551567493865613/alexraskin.jpg?width=589&height=589"
-            )
-            return
-
-        if message.content.__contains__("?snadcaught"):
-            await message.channel.send(
-                "<@!253223272328462338> https://i.imgur.com/N6bI2DQ.png"
-            )
-            return
-
-        if message.content.__contains__("?twizy"):
-            await message.channel.send("https://twizy.dev/")
-            return
-
         if isinstance(message.channel, DMChannel):
             self.client.log.info(f"User {message.author} sent a DM.")
             if message.content.startswith("https://discord.gg/"):

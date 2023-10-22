@@ -19,6 +19,8 @@ class Music(commands.Cog, name="Music"):
     @commands.hybrid_group(
         name="music", description="Music commands", with_app_command=True
     )
+    @commands.guild_only()
+    @app_commands.guild_only()
     async def music(self, ctx: commands.Context) -> None:
         """Music commands"""
         if ctx.invoked_subcommand is None:

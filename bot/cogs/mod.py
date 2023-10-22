@@ -12,6 +12,7 @@ class Mod(commands.Cog, name="Mod"):
         self.client: commands.Bot = client
 
     @app_commands.command(name="amimod", description="Check if you are a mod")
+    @app_commands.guild_only()
     async def _amimod(self, interaction: Interaction) -> None:
         if (
             interaction.user.guild_permissions.administrator
@@ -47,6 +48,7 @@ class Mod(commands.Cog, name="Mod"):
         )
 
     @app_commands.command(name="kick", description="Kick a user")
+    @app_commands.guild_only()
     @app_commands.describe(member="The member to kick")
     @app_commands.describe(reason="The reason for the kick")
     @app_commands.checks.has_permissions(kick_members=True)
@@ -57,6 +59,7 @@ class Mod(commands.Cog, name="Mod"):
         await interaction.response.send_message(f"Kicked {member.name}", ephemeral=True)
 
     @app_commands.command(name="timeout", description="Timeout a user")
+    @app_commands.guild_only()
     @app_commands.describe(member="The member to timeout")
     @app_commands.describe(reason="The reason for the timeout")
     @app_commands.describe(duration="The duration of the timeout")
@@ -71,6 +74,7 @@ class Mod(commands.Cog, name="Mod"):
         )
 
     @app_commands.command(name="unban", description="Unban a user")
+    @app_commands.guild_only()
     @app_commands.describe(member="The member to unban")
     @app_commands.describe(reason="The reason for the unban")
     @app_commands.checks.has_permissions(ban_members=True)
@@ -83,6 +87,7 @@ class Mod(commands.Cog, name="Mod"):
         )
 
     @app_commands.command(name="purge")
+    @app_commands.guild_only()
     @app_commands.describe(amount="The amount of messages to purge.")
     @app_commands.describe(reason="The reason for purging the messages.")
     @app_commands.checks.has_permissions(manage_messages=True)

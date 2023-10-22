@@ -69,6 +69,7 @@ class Admin(commands.Cog, name="Admin"):
         await sync_message.delete(delay=5)
 
     @app_commands.command(name="add_emoji", description="Add an emoji to the server.")
+    @app_commands.guild_only()
     @app_commands.describe(name="The name of the emoji.")
     @app_commands.describe(url="The URL of the emoji.")
     @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
