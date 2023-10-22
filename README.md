@@ -1,6 +1,6 @@
 # Konikotaka
 
-<a href="https://i.gyazo.com/ece146e4af1c006d0b89c26cef212009.png"><img src="https://i.gyazo.com/ece146e4af1c006d0b89c26cef212009.png" alt="Konikotaka" width="200"/></a>
+<a href="https://i.gyazo.com/c36def619eb3fe22b2fa6777c150113e.png"><img src="https://i.gyazo.com/c36def619eb3fe22b2fa6777c150113e.png" alt="Konikotaka" width="200"/></a>
 
 _Profile Picture [Konikotaka](https://youtu.be/Qr2LQILdXD0)_
 
