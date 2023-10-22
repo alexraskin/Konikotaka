@@ -6,9 +6,9 @@ _Profile Picture [Konikotaka](https://youtu.be/Qr2LQILdXD0)_
 
 ## Description
 
-Konikotaka is a Discord Bot that I created for my personal server. It's a fun project that I use to learn new technologies and concepts.
+Konikotaka is a Discord Bot that I created for my personal server. It's a fun project that I use to learn new technologies and concepts. I would prefer if you don't run an instance of my bot. Just call the join command with an invite URL to have it on your server.
 
-![Badge](https://api.checklyhq.com/v1/badges/checks/96e08efd-4a4a-41af-b2d2-2baf2c3eed3c?style=flat&theme=default)
+Nevertheless, the installation steps are as follows:
 
 ## Installation
 
