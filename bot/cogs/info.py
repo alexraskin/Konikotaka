@@ -21,8 +21,14 @@ class Info(commands.Cog, name="Info"):
     @app_commands.guild_only()
     async def get_info(self, ctx: commands.Context) -> None:
         version = pkg_resources.get_distribution("discord.py").version
+
+        description = str(
+            "My personal bot, provides some useful commands and some fun commands. "
+            "The name Konikotaka comes from the TV Show - [The Office](https://youtu.be/v4xsDHFPSnc?si=fB5FxmolV7sYvzsg)"
+          )
+
         embed = Embed(
-            description=self.client.description,
+            description=description,
             timestamp=ctx.message.created_at,
         )
         embed.title = "Konikotaka"
