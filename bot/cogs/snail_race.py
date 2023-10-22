@@ -69,11 +69,12 @@ class SnailRace(commands.Cog, name="Snail Racing"):
             discord_id=str(winner.id),
             wins=1,
             points=1,
+            location_id=winner.guild.id,
         )
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
-                    select(Races).filter(Races.discord_id == str(winner.id))
+                    select(Races).filter(Races.discord_id == str(winner.id) and Races.location_id == winner.guild.id)
                 )
                 racer = query.scalar_one_or_none()
                 if racer:
