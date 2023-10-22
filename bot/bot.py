@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("Discord")
 
 
-class RoboTwizy(Bot):
+class Konikotaka(Bot):
     bot_app_info: discord.AppInfo
 
     def __init__(self, *args, **options) -> None:
@@ -42,7 +42,7 @@ class RoboTwizy(Bot):
             os.getenv("POSTGRES_URL"),
             echo=False,
             future=True,
-            connect_args={"server_settings": {"application_name": "RoboTwizy"}},
+            connect_args={"server_settings": {"application_name": "Konikotaka"}},
         )
 
     async def start(self, *args, **kwargs) -> None:
@@ -113,11 +113,11 @@ class RoboTwizy(Bot):
         latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
         if latest_revision is None:
             return None
-        url = f"<https://github.com/alexraskin/RoboTwizy/commit/{(short := latest_revision[:7])}>"
+        url = f"<https://github.com/alexraskin/Konikotaka/commit/{(short := latest_revision[:7])}>"
         return f"[{short}]({url})"
 
 
-client: RoboTwizy = RoboTwizy(
+client: Konikotaka = Konikotaka(
     command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
     intents=discord.Intents.all(),
     max_messages=10000,

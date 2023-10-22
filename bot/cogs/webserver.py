@@ -21,6 +21,11 @@ class WebServer(commands.Cog, name="WebServer"):
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is started!")
         self.update_latency.start()
+    
+    @commands.Cog.listener()
+    async def on_disconnect(self) -> None:
+        self.client.log.info("Webserver is stopped!")
+        self.__unload()
 
     @tasks.loop(minutes=1)
     async def update_latency(self):

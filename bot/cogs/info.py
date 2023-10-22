@@ -25,7 +25,7 @@ class Info(commands.Cog, name="Info"):
             description=self.client.description,
             timestamp=ctx.message.created_at,
         )
-        embed.title = "RoboTwizy"
+        embed.title = "Konikotaka"
         embed.url = "https://status.twizy.dev/"
         embed.colour = Colour.blurple()
         embed.set_author(
