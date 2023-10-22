@@ -13,6 +13,7 @@ from .utils.utils import date
 class Info(commands.Cog, name="Info"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
+        self.invite_url = "https://discord.com/api/oauth2/authorize?client_id=482960108117295105&permissions=10415295163479&scope=bot"
 
     @commands.hybrid_command(
         name="info", help="Get info about the bot", with_app_command=True
@@ -32,7 +33,7 @@ class Info(commands.Cog, name="Info"):
             timestamp=ctx.message.created_at,
         )
         embed.title = "Konikotaka"
-        embed.url = "https://status.twizy.dev/"
+        embed.url = self.invite_url
         embed.colour = Colour.blurple()
         embed.set_author(
             name=str(self.client.owner), icon_url=self.client.owner.display_avatar.url
@@ -53,6 +54,11 @@ class Info(commands.Cog, name="Info"):
         )
         embed.set_thumbnail(url=self.client.user.display_avatar.url)
         await ctx.send(embed=embed)
+
+    @commands.hybrid_command("invite", with_app_command=True)
+    async def invite(self, ctx: commands.Context) -> None:
+        """Invite me to your server!"""
+        await ctx.send(self.invite_url)
 
     @commands.hybrid_command(name="user", aliases=["member"])
     @commands.guild_only()
