@@ -27,6 +27,7 @@ class Mod(commands.Cog, name="Mod"):
             )
 
     @app_commands.command(name="ban", description="Ban a user")
+    @app_commands.guild_only()
     @app_commands.describe(member="The member to ban")
     @app_commands.describe(reason="The reason for the ban")
     @app_commands.checks.has_permissions(ban_members=True)
@@ -35,6 +36,7 @@ class Mod(commands.Cog, name="Mod"):
         await interaction.response.send_message(f"Banned {member.name}", ephemeral=True)
 
     @app_commands.command(name="softban", description="Softban a user")
+    @app_commands.guild_only()
     @app_commands.describe(member="The member to softban")
     @app_commands.describe(reason="The reason for the softban")
     @app_commands.checks.has_permissions(ban_members=True)
