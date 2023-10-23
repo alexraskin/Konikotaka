@@ -13,6 +13,7 @@ from .utils.utils import date
 class Info(commands.Cog, name="Info"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
+        self.client_id: int = os.getenv("CLIENT_ID")
 
     @commands.hybrid_command(
         name="info", help="Get info about the bot", with_app_command=True
@@ -74,7 +75,7 @@ class Info(commands.Cog, name="Info"):
         perms.attach_files = True
         perms.add_reactions = True
         perms.use_application_commands = True
-        await ctx.send(f'<{oauth_url(self.bot.client_id, permissions=perms)}>')
+        await ctx.send(f'<{oauth_url(self.client_id, permissions=perms)}>')
 
     @commands.hybrid_command(name="user", aliases=["member"])
     @commands.guild_only()
