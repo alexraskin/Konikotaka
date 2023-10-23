@@ -44,14 +44,14 @@ class Meta(commands.Cog, name="Meta"):
             ]
         )
 
-    def random_birthday(self):
+    def random_birthday(self) -> str:
         """Generates a random birthday."""
         year = random.randint(1900, 2023)
         month = random.randint(1, 12)
         day = random.randint(1, 28)
         return f"{month}.{day}.{year}"
 
-    def random_expiration(self):
+    def random_expiration(self) -> str:
         """Generates a random expiration date."""
         year = random.randint(1900, 2023)
         month = random.randint(1, 12)
@@ -93,9 +93,7 @@ class Meta(commands.Cog, name="Meta"):
                         await session.rollback()
 
             await self.create_image(member)
-            channel = await self.client.fetch_channel(
-                self.client.guilds[0].system_channel.id
-            )
+            channel = await self.client.fetch_channel(member.guild.system_channel.id)
             await channel.send(
                 file=File(f"{self.file_path}/files/{member.id}.jpg"),
             )
