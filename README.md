@@ -4,7 +4,7 @@ Konikotaka is a Discord Bot that I created for my personal server. It's a fun pr
 
 <a href="https://i.gyazo.com/c36def619eb3fe22b2fa6777c150113e.png"><img src="https://i.gyazo.com/c36def619eb3fe22b2fa6777c150113e.png" alt="Konikotaka" width="200"/></a>
 
-_Profile Picture [Konikotaka](https://youtu.be/Qr2LQILdXD0)_
+_Name and Photo [Konikotaka](https://youtu.be/Qr2LQILdXD0)_
 
 ## Running
 
