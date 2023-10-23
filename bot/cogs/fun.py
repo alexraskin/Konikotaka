@@ -519,6 +519,8 @@ class Fun(commands.Cog, name="Fun"):
             await ctx.send("Error getting xkcd comic!")
 
     @commands.hybrid_command(name="year", description="Show the year progress")
+    @commands.guild_only()
+    @app_commands.guild_only()
     async def year(self, ctx: commands.Context):
         embed: Embed = Embed(timestamp=ctx.message.created_at)
         embed.colour = Colour.blurple()
@@ -532,6 +534,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command("f", description="Press F to pay respects")
+    @commands.guild_only()
     async def f(self, ctx: commands.Context):
         """
         Press F to pay respects
@@ -639,6 +642,8 @@ class Fun(commands.Cog, name="Fun"):
         os.remove(f"{file_path}/files/map.png")
 
     @commands.hybrid_command(aliases=["roul"])
+    @commands.guild_only()
+    @app_commands.guild_only()
     async def roulette(self, ctx: commands.Context, picked_colour: str = None):
         """Colours roulette"""
         colour_table = ["blue", "red", "green", "yellow"]
@@ -658,6 +663,21 @@ class Fun(commands.Cog, name="Fun"):
         if chosen_color == picked_colour:
             return await msg.edit(content=f"> {result}\nCongrats, you won 🎉!")
         await msg.edit(content=f"> {result}\nBetter luck next time")
+
+    @commands.hybrid_command(name="theoffice", description="🏢 Get a random Quote from The Office")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def the_office(self, ctx: commands.Context) -> Message:
+        """
+        Get a random Quote from The Office
+        """
+        async with self.client.session.get(
+            "https://officeapi.akashrajpurohit.com/quote/random"
+        ) as response:
+            if response.status == 200:
+                quote = await response.json()
+                message = f'"{quote["quote"]}" - {quote["character"]}'
+                await ctx.send(message)
 
 
 async def setup(client: commands.Bot) -> None:
