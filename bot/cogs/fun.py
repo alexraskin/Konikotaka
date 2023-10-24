@@ -672,12 +672,18 @@ class Fun(commands.Cog, name="Fun"):
         Get a random Quote from The Office
         """
         async with self.client.session.get(
-            "https://officeapi.akashrajpurohit.com/quote/random"
+            "https://theoffice.konikotaka.dev/quote/random"
         ) as response:
             if response.status == 200:
                 quote = await response.json()
-                message = f'"{quote["quote"]}" - {quote["character"]}'
-                await ctx.send(message)
+                embed = Embed(
+                    description=f'"{quote["quote"]}" - {quote["character"]}',
+                    timestamp=ctx.message.created_at,
+                )
+                embed.colour = Colour.blurple()
+                embed.set_image(url=quote["character_avatar_url"])
+                embed.set_footer(text="theoffice.konikotaka.dev")
+                await ctx.send(embed=embed)
 
 
 async def setup(client: commands.Bot) -> None:
