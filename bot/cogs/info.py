@@ -25,7 +25,7 @@ class Info(commands.Cog, name="Info"):
 
         description = str(
             "My personal bot, provides some useful and fun commands. "
-            "The name **Konikotaka** comes from the [The Office](https://cdn.theoffice.foo/Dwight-Schrutes-Perfect-Girl-Speech-Anime.mp4)"
+            "The name **Konikotaka** comes from the [The Office](https://api.konikotaka.dev/video)"
         )
 
         embed = Embed(
