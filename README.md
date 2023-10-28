@@ -4,7 +4,7 @@ Konikotaka is a Discord Bot that I created for my personal server. It's a fun pr
 
 <a href="https://i.gyazo.com/12ccb49e7c6b2e31a207ad63e38e7f36.png"><img src="https://i.gyazo.com/12ccb49e7c6b2e31a207ad63e38e7f36.png" alt="Konikotaka" width="200"/></a>
 
-_Name and Photo [Konikotaka](https://cdn.theoffice.foo/Dwight-Schrutes-Perfect-Girl-Speech-Anime.mp4)_
+_Name and Photo [Konikotaka](https://api.konikotaka.dev/video)_
 
 ## Running
 
