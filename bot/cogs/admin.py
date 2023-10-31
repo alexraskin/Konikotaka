@@ -95,6 +95,7 @@ class Admin(commands.Cog, name="Admin"):
             return
 
     @commands.command(name="git", aliases=["gr"], hidden=True)
+    @commands.guild_only()
     async def git_revision(self, ctx: commands.Context):
         """
         Get the current git revision.
