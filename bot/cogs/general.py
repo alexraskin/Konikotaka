@@ -4,6 +4,7 @@ import os
 import random
 from typing import Union
 
+import validators
 from discord import (
     DMChannel,
     Embed,
@@ -102,6 +103,26 @@ class General(commands.Cog, name="General"):
     @property
     def display_emoji(self) -> PartialEmoji:
         return PartialEmoji(name="cosmo")
+    
+    @commands.hybrid_command("shorten_url", description="Shorten a URL")
+    @app_commands.guild_only()
+    @commands.guild_only()
+    async def shorten_url(self, ctx: commands.Context, url: str) -> None:
+        api_url = "https://edgesnip.dev/"
+        validate_url = validators.url(url)
+        if validate_url:
+            data = {
+                "url": url
+            }
+            short_url = await self.client.session.post(url=api_url, json=data)
+            if short_url.status == 200:
+                short_url = await short_url.json()
+                await ctx.send(f"Shortened URL: {short_url['url']}")
+            else:
+                await ctx.send("Error shortening URL")
+        else:
+            await ctx.send("Invalid URL")
+
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
