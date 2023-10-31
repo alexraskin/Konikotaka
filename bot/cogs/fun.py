@@ -639,29 +639,6 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed, file=File(f"{file_path}/files/map.png"))
         os.remove(f"{file_path}/files/map.png")
 
-    @commands.hybrid_command(aliases=["roul"])
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def roulette(self, ctx: commands.Context, picked_colour: str = None):
-        """Colours roulette"""
-        colour_table = ["blue", "red", "green", "yellow"]
-        if not picked_colour:
-            pretty_colours = ", ".join(colour_table)
-            return await ctx.send(f"Please pick a colour from: {pretty_colours}")
-
-        picked_colour = picked_colour.lower()
-        if picked_colour not in colour_table:
-            return await ctx.send("Please give correct color")
-
-        chosen_color = random.choice(colour_table)
-        msg = await ctx.send("Spinning 🔵🔴🟢🟡")
-        await asyncio.sleep(2)
-        result = f"Result: {chosen_color.upper()}"
-
-        if chosen_color == picked_colour:
-            return await msg.edit(content=f"> {result}\nCongrats, you won 🎉!")
-        await msg.edit(content=f"> {result}\nBetter luck next time")
-
     @commands.hybrid_command(
         name="theoffice", description="🏢 Get a random Quote from The Office"
     )
