@@ -103,7 +103,7 @@ class General(commands.Cog, name="General"):
     @property
     def display_emoji(self) -> PartialEmoji:
         return PartialEmoji(name="cosmo")
-    
+
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
     @app_commands.guild_only()
     @commands.guild_only()
@@ -111,9 +111,7 @@ class General(commands.Cog, name="General"):
         api_url = "https://edgesnip.dev/"
         validate_url = validators.url(url)
         if validate_url:
-            data = {
-                "url": url
-            }
+            data = {"url": url}
             short_url = await self.client.session.post(url=api_url, json=data)
             if short_url.status == 200:
                 short_url = await short_url.json()
@@ -122,7 +120,6 @@ class General(commands.Cog, name="General"):
                 await ctx.send("Error shortening URL")
         else:
             await ctx.send("Invalid URL")
-
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):

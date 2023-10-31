@@ -31,9 +31,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random photo of Cosmo the Cat from the twizy.dev API
         """
-        async with self.client.session.get(
-            "https://api.twizy.sh/v1/cosmo"
-        ) as response:
+        async with self.client.session.get("https://api.twizy.sh/v1/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
@@ -664,7 +662,9 @@ class Fun(commands.Cog, name="Fun"):
             return await msg.edit(content=f"> {result}\nCongrats, you won 🎉!")
         await msg.edit(content=f"> {result}\nBetter luck next time")
 
-    @commands.hybrid_command(name="theoffice", description="🏢 Get a random Quote from The Office")
+    @commands.hybrid_command(
+        name="theoffice", description="🏢 Get a random Quote from The Office"
+    )
     @commands.guild_only()
     @app_commands.guild_only()
     async def the_office(self, ctx: commands.Context) -> Message:

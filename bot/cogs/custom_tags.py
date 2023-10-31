@@ -249,7 +249,13 @@ class Tags(commands.Cog, name="Custom Tags"):
                     if tags:
                         await ctx.reply(
                             content=f"Tag `{tag_name}` not found. Did you mean one of these?\n"
-                            + "\n".join([f"{tag.name}" for tag in tags if tag.location_id == ctx.guild.id])
+                            + "\n".join(
+                                [
+                                    f"{tag.name}"
+                                    for tag in tags
+                                    if tag.location_id == ctx.guild.id
+                                ]
+                            )
                         )
                     else:
                         await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
@@ -416,7 +422,13 @@ class Tags(commands.Cog, name="Custom Tags"):
                 if tags:
                     await ctx.reply(
                         content=f"Tag `{tag_name}` not found. Did you mean one of these?\n"
-                        + "\n".join([f"`{tag.name}`" for tag in tags if tag.location_id == ctx.guild.id])
+                        + "\n".join(
+                            [
+                                f"`{tag.name}`"
+                                for tag in tags
+                                if tag.location_id == ctx.guild.id
+                            ]
+                        )
                     )
                 else:
                     await ctx.reply(f"Tag `{tag_name}` not found", ephemeral=True)
@@ -441,7 +453,13 @@ class Tags(commands.Cog, name="Custom Tags"):
                         )
                     await ctx.reply(
                         content="Here are all the tags:\n"
-                        + "\n".join([f"`{tag.name}`" for tag in tags if tag.location_id == ctx.guild.id])
+                        + "\n".join(
+                            [
+                                f"`{tag.name}`"
+                                for tag in tags
+                                if tag.location_id == ctx.guild.id
+                            ]
+                        )
                     )
                 else:
                     await ctx.reply("There are no tags.", ephemeral=True)
@@ -472,7 +490,13 @@ class Tags(commands.Cog, name="Custom Tags"):
                         )
                     await ctx.reply(
                         content="Here are all the tags:\n"
-                        + "\n".join([f"`{tag.name}`" for tag in tags if tag.location_id == ctx.guild.id])
+                        + "\n".join(
+                            [
+                                f"`{tag.name}`"
+                                for tag in tags
+                                if tag.location_id == ctx.guild.id
+                            ]
+                        )
                     )
                 else:
                     await ctx.reply("There are no tags.", ephemeral=True)

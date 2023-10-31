@@ -75,7 +75,7 @@ class Info(commands.Cog, name="Info"):
         perms.attach_files = True
         perms.add_reactions = True
         perms.use_application_commands = True
-        await ctx.send(f'<{oauth_url(self.client_id, permissions=perms)}>')
+        await ctx.send(f"<{oauth_url(self.client_id, permissions=perms)}>")
 
     @commands.hybrid_command(name="user", aliases=["member"])
     @commands.guild_only()
