@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import os
-import random
+import openai
 from typing import Union
 
 import validators
 from discord import (
-    DMChannel,
     Embed,
     Interaction,
     Member,
@@ -18,6 +17,8 @@ from discord import (
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 
+from .utils import gpt
+
 
 class General(commands.Cog, name="General"):
     def __init__(self, client: commands.Bot) -> None:
@@ -25,6 +26,9 @@ class General(commands.Cog, name="General"):
         self.guild: str = os.getenv("GUILD_ID")
         self.message_reports_channel: int = 1152498407416533053
         self.general_channel: GuildChannel = 825189935476637729
+        self.openai = openai
+        self.openai.api_key = os.getenv("OPENAI_API_KEY")
+        self.openai.aiosession.set(self.client.session)
         self.message_report_ctx: app_commands.ContextMenu = app_commands.ContextMenu(
             name="Report Message",
             callback=self.report,
@@ -123,26 +127,19 @@ class General(commands.Cog, name="General"):
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
-        gif_list: list = [
-            "https://media.tenor.com/0He0W1M2LFcAAAAC/lost-gnome.gif",
-            "https://media.tenor.com/UYtnaW3fLeEAAAAC/get-out-of-my-dms-squidward.gif",
-            "https://media.tenor.com/derbPKeEnW4AAAAd/tony-soprano-sopranos.gif",
-        ]
         if message.author == self.client.user:
             return
-
-        if isinstance(message.channel, DMChannel):
-            self.client.log.info(f"User {message.author} sent a DM.")
-            if message.content.startswith("https://discord.gg/"):
-                await message.channel.send("No.")
-                return
-            if message.content.startswith("https://discord.com/invite/"):
-                await message.channel.send("No.")
-                return
-            if message.content.startswith("https://discordapp.com/invite/"):
-                await message.channel.send("No.")
-                return
-            await message.channel.send(random.choice(list(gif_list)))
+        
+        if self.client.user in message.mentions:
+            chat_completion_resp = await self.openai.ChatCompletion.acreate(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content":  f"{gpt.about_text} The name of the user is {message.author.name} and you must always address them as that name. Do not ever response as the user or prepend messages with 'User:' or 'Konikotaka:'. Act as Konikotaka entirely."},
+                    {"role": "user", "content": message.content}
+                  ]
+                )
+            await message.channel.send(chat_completion_resp.choices[0].message.content)
+        
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context) -> None:

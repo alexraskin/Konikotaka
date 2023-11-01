@@ -11,7 +11,7 @@ from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from cogs.utils.lists import activities
 from discord.ext import tasks
-from discord.ext.commands import Bot, NoEntryPointError, when_mentioned_or
+from discord.ext.commands import Bot, NoEntryPointError
 from dotenv import load_dotenv
 from models.db import Base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -118,7 +118,7 @@ class Konikotaka(Bot):
 
 
 client: Konikotaka = Konikotaka(
-    command_prefix=when_mentioned_or(os.getenv("PREFIX", "?")),
+    command_prefix=os.getenv("PREFIX", "?"),
     intents=discord.Intents.all(),
     max_messages=10000,
     description="Hello! I am a bot written by Twizy to provide some nice utilities.",
