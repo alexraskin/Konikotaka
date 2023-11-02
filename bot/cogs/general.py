@@ -127,31 +127,34 @@ class General(commands.Cog, name="General"):
     async def on_message(self, message: Message):
         if message.author == self.client.user:
             return
-        
+
         if self.client.user in message.mentions:
-          headers = {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + self.cloudflare_token,
-          }
-          payload = {"messages": [
-                  {
-                      "role": "system",
-                      "content": gpt.about_text + f"when you answer someone, answer them by {message.author.name}"
-                  },
-                  {
-                      "role": "user",
-                      "content": message.content.strip(f"<@!{self.client.user.id}>")
-                  }
-              ]}
-          await message.channel.typing()
-          response = await self.client.session.post(url=self.cloudflare_url, headers=headers, json=payload)
-          if response.status == 200:
-            json_response = await response.json()
-            await message.channel.send(json_response['result']['response'])
-          else:
-            await message.channel.send("An error occurred, this has been logged.")
-              
-        
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + self.cloudflare_token,
+            }
+            payload = {
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": gpt.about_text
+                        + f"when you answer someone, answer them by {message.author.name}",
+                    },
+                    {
+                        "role": "user",
+                        "content": message.content.strip(f"<@!{self.client.user.id}>"),
+                    },
+                ]
+            }
+            await message.channel.typing()
+            response = await self.client.session.post(
+                url=self.cloudflare_url, headers=headers, json=payload
+            )
+            if response.status == 200:
+                json_response = await response.json()
+                await message.channel.send(json_response["result"]["response"])
+            else:
+                await message.channel.send("An error occurred, this has been logged.")
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context) -> None:
