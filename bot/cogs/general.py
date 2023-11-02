@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import openai
 from typing import Union
 
 import validators
@@ -26,9 +25,8 @@ class General(commands.Cog, name="General"):
         self.guild: str = os.getenv("GUILD_ID")
         self.message_reports_channel: int = 1152498407416533053
         self.general_channel: GuildChannel = 825189935476637729
-        self.openai = openai
-        self.openai.api_key = os.getenv("OPENAI_API_KEY")
-        self.openai.aiosession.set(self.client.session)
+        self.cloudflare_token: str = os.getenv("CLOUDFLARE_TOKEN")
+        self.cloudflare_url: str = os.getenv("CLOUDFLARE_URL")
         self.message_report_ctx: app_commands.ContextMenu = app_commands.ContextMenu(
             name="Report Message",
             callback=self.report,
@@ -131,14 +129,28 @@ class General(commands.Cog, name="General"):
             return
         
         if self.client.user in message.mentions:
-            chat_completion_resp = await self.openai.ChatCompletion.acreate(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content":  f"{gpt.about_text} The name of the user is {message.author.name} and you must always address them as that name. Do not ever response as the user or prepend messages with 'User:' or 'Konikotaka:'. Act as Konikotaka entirely."},
-                    {"role": "user", "content": message.content}
-                  ]
-                )
-            await message.channel.send(chat_completion_resp.choices[0].message.content)
+          headers = {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + self.cloudflare_token,
+          }
+          payload = {"messages": [
+                  {
+                      "role": "system",
+                      "content": gpt.about_text + f"when you answer someone, answer them by {message.author.name}"
+                  },
+                  {
+                      "role": "user",
+                      "content": message.content.strip(f"<@!{self.client.user.id}>")
+                  }
+              ]}
+          await message.channel.typing()
+          response = await self.client.session.post(url=self.cloudflare_url, headers=headers, json=payload)
+          if response.status == 200:
+            json_response = await response.json()
+            await message.channel.send(json_response['result']['response'])
+          else:
+            await message.channel.send("An error occurred, this has been logged.")
+              
         
 
     @commands.Cog.listener()
