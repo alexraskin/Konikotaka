@@ -4,6 +4,7 @@ import os
 from typing import Union
 
 import validators
+from openai import AsyncOpenAI
 from discord import (
     Embed,
     Interaction,
@@ -25,8 +26,8 @@ class General(commands.Cog, name="General"):
         self.guild: str = os.getenv("GUILD_ID")
         self.message_reports_channel: int = 1152498407416533053
         self.general_channel: GuildChannel = 825189935476637729
-        self.cloudflare_token: str = os.getenv("CLOUDFLARE_TOKEN")
-        self.cloudflare_url: str = os.getenv("CLOUDFLARE_URL")
+        self.openai_token: str = os.getenv("OPENAI_TOKEN")
+        self.openai_gateway_url: str = os.getenv("CLOUDFLARE_AI_GATEWAY_URL")
         self.message_report_ctx: app_commands.ContextMenu = app_commands.ContextMenu(
             name="Report Message",
             callback=self.report,
@@ -129,32 +130,22 @@ class General(commands.Cog, name="General"):
             return
 
         if self.client.user in message.mentions:
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + self.cloudflare_token,
-            }
-            payload = {
-                "messages": [
+            client = AsyncOpenAI(api_key=self.openai_token, base_url=self.openai_gateway_url)
+            chat_completion = await client.chat.completions.create(
+                messages = [
                     {
                         "role": "system",
-                        "content": gpt.about_text
-                        + f"when you answer someone, answer them by {message.author.name}",
+                        "content": gpt.about_text + f"when you answer someone, answer them by {message.author.nick}"
                     },
                     {
                         "role": "user",
                         "content": message.content.strip(f"<@!{self.client.user.id}>"),
                     },
-                ]
-            }
-            await message.channel.typing()
-            response = await self.client.session.post(
-                url=self.cloudflare_url, headers=headers, json=payload
+                ], model="gpt-4-1106-preview"
             )
-            if response.status == 200:
-                json_response = await response.json()
-                await message.channel.send(json_response["result"]["response"])
-            else:
-                await message.channel.send("An error occurred, this has been logged.")
+            await message.channel.typing()
+            await message.channel.send(chat_completion.choices[0].message.content)
+
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context) -> None:
