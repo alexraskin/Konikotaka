@@ -10,7 +10,7 @@ activities = [
     "?cat",
     "?bczs",
     "with Bartholomeow",
-    "Annoying Seaira",
     "/waifu",
     "?year",
+    "@Konikotaka"
 ]
