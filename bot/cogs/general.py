@@ -130,22 +130,25 @@ class General(commands.Cog, name="General"):
             return
 
         if self.client.user in message.mentions:
-            client = AsyncOpenAI(api_key=self.openai_token, base_url=self.openai_gateway_url)
+            client = AsyncOpenAI(
+                api_key=self.openai_token, base_url=self.openai_gateway_url
+            )
             chat_completion = await client.chat.completions.create(
-                messages = [
+                messages=[
                     {
                         "role": "system",
-                        "content": gpt.about_text + f"when you answer someone, answer them by {message.author.nick}"
+                        "content": gpt.about_text
+                        + f"when you answer someone, answer them by {message.author.nick}",
                     },
                     {
                         "role": "user",
                         "content": message.content.strip(f"<@!{self.client.user.id}>"),
                     },
-                ], model="gpt-4-1106-preview"
+                ],
+                model="gpt-4-1106-preview",
             )
             await message.channel.typing()
             await message.channel.send(chat_completion.choices[0].message.content)
-
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context) -> None:
