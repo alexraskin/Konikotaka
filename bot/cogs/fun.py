@@ -659,7 +659,7 @@ class Fun(commands.Cog, name="Fun"):
                 )
                 embed.colour = Colour.blurple()
                 embed.set_image(url=quote["character_avatar_url"])
-                embed.set_footer(text="theoffice.konikotaka.dev")
+                embed.set_footer(text="https://theoffice.foo/")
                 await ctx.send(embed=embed)
 
 
