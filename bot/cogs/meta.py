@@ -92,12 +92,13 @@ class Meta(commands.Cog, name="Meta"):
                         self.client.log.error(e)
                         await session.rollback()
 
-            await self.create_image(member)
-            channel = await self.client.fetch_channel(member.guild.system_channel.id)
-            await channel.send(
-                file=File(f"{self.file_path}/files/{member.id}.jpg"),
-            )
-            os.remove(f"{self.file_path}/files/{member.id}.jpg")
+        await self.create_image(member)
+        channel = await self.client.fetch_channel(member.guild.system_channel.id)
+        await channel.send(
+            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",
+            file=File(f"{self.file_path}/files/{member.id}.jpg"),
+        )
+        os.remove(f"{self.file_path}/files/{member.id}.jpg")
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: Guild, user: Member) -> None:
