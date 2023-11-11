@@ -649,7 +649,7 @@ class Fun(commands.Cog, name="Fun"):
         Get a random Quote from The Office
         """
         async with self.client.session.get(
-            "https://theoffice.konikotaka.dev/quote/random"
+            "https://theoffice.foo/quote/random"
         ) as response:
             if response.status == 200:
                 quote = await response.json()
