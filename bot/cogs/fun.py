@@ -29,12 +29,16 @@ class Fun(commands.Cog, name="Fun"):
     @app_commands.guild_only()
     async def cosmo_photo(self, ctx: commands.Context) -> None:
         """
-        Get a random photo of Cosmo the Cat from the twizy.dev API
+        Get a random photo of my cat Cosmo!
         """
         async with self.client.session.get("https://api.twizy.sh/v1/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send(photo["photoUrl"])
+                embed = Embed()
+                embed.title = "🐈 Cosmo"
+                embed.url = "https://cosmo.alexraskin.com"
+                embed.colour = Colour.blurple()
+                embed.set_image(url=photo["photoUrl"])
             else:
                 await ctx.send("Error getting photo of Cosmo!")
 
