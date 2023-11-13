@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import random
 from datetime import datetime
-from typing import Optional, Union
+from typing import Union
 
 import discord
 from discord import Embed, PartialEmoji, TextStyle, app_commands, Colour
@@ -200,7 +200,7 @@ class Tags(commands.Cog, name="Custom Tags"):
 
     async def lookup_similar_tags(
         self, ctx: commands.Context, tag_name: str
-    ) -> Optional[list[CustomTags]]:
+    ) -> Union[list[CustomTags], None]:
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(

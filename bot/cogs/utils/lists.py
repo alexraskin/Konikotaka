@@ -1,4 +1,4 @@
-activities = [
+activities: list = [
     "with Cosmo",
     "?cosmo",
     "RuneLite",
@@ -12,5 +12,5 @@ activities = [
     "with Bartholomeow",
     "/waifu",
     "?year",
-    "@Konikotaka"
+    "@Konikotaka",
 ]

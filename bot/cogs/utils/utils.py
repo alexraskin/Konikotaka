@@ -6,7 +6,7 @@ def get_time_string() -> str:
     return dt.utcnow().__str__()
 
 
-def progress_bar(percent):
+def progress_bar(percent) -> str:
     bar_filled = "▓"
     bar_empty = "░"
     length = 15

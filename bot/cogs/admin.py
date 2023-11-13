@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Union
 
 from discord import Embed, HTTPException, Interaction, app_commands, Colour
 from discord.ext import commands
@@ -12,7 +12,6 @@ class Admin(commands.Cog, name="Admin"):
 
     @commands.command(name="reload", hidden=True)
     @commands.is_owner()
-    @commands.guild_only()
     async def reload(
         self, ctx: commands.Context, extension: Optional[str] = None
     ) -> None:
@@ -52,7 +51,7 @@ class Admin(commands.Cog, name="Admin"):
             await ctx.send(embed=embed)
 
     @commands.command(name="sync", hidden=True)
-    @commands.has_permissions(administrator=True)
+    @commands.is_owner()
     async def sync(self, ctx: commands.Context) -> None:
         """
         Sync app commands with Discord.
@@ -68,29 +67,36 @@ class Admin(commands.Cog, name="Admin"):
         sync_message = await message.edit(content="Synced successfully! ✅")
         await sync_message.delete(delay=5)
 
-    @app_commands.command(name="add_emoji", description="Add an emoji to the server.")
-    @app_commands.guild_only()
-    @app_commands.describe(name="The name of the emoji.")
-    @app_commands.describe(url="The URL of the emoji.")
+    @commands.command(name="add_emoji", description="Add an emoji to the server.")
     @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
-    async def add_emoji(self, interaction: Interaction, name: str, url: str) -> None:
+    async def add_emoji(
+        self, ctx: commands.Context, emoji: str, name: str = None
+    ) -> None:
         """
         Adds an emoji to the server.
         """
+        if name is None:
+            name = emoji.name
+        guild = ctx.guild
         try:
-            await interaction.response.defer()
-            await interaction.guild.create_custom_emoji(name=name, image=url)
-            embed = Embed(
-                title="Emoji Added ✅",
-                description=f"Added the emoji `:{name}:` successfully.",
-                timestamp=interaction.message.created_at,
-            )
-            embed.colour = Colour.blurple()
-            await interaction.followup.send(embed=embed)
+            res = await self.client.get(emoji.url)
+            if res.status == 200:
+                image_data = await res.read()
+                new_emoji = await guild.create_custom_emoji(name=name, image=image_data)
+                embed = Embed()
+                embed.title = "Emoji Added"
+                embed.description = f"Added {new_emoji} to the server."
+                embed.colour = Colour.blurple()
+                embed.set_thumbnail(url=new_emoji.url)
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send(
+                    "The emoji image could not be downloaded.", ephemeral=True
+                )
+                return
         except Exception as e:
-            self.client.log.error(f"Error: {e}")
-            await interaction.response.send_message(
-                "An error occurred while adding the emoji.", ephemeral=True
+            await ctx.send(
+                f"An error occurred while adding the emoji: {e}", ephemeral=True
             )
             return
 
@@ -100,9 +106,7 @@ class Admin(commands.Cog, name="Admin"):
         """
         Get the current git revision.
         """
-        await ctx.send(
-            f"Git Revision: {self.client.git_revision} _(Show more data at once)_"
-        )
+        await ctx.send(f"Git Revision: {self.client.git_revision}")
 
 
 async def setup(client: commands.Bot):

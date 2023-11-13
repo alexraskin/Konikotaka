@@ -1,4 +1,4 @@
-map_cords = {
+map_cords: dict = {
     "SHADY STILTS": (943, 517),
     "SLAPPY SHORES": (1537, 957),
     "KENJUTSU CROSSING": (1467, 1771),
