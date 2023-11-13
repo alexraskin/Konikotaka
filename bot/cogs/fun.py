@@ -666,20 +666,21 @@ class Fun(commands.Cog, name="Fun"):
                 embed.set_footer(text="https://theoffice.foo/")
                 await ctx.send(embed=embed)
 
-    @commands.hybrid_command("officeclip", description="Get a random clip from The Office")
+    @commands.hybrid_command(
+        "officeclip", description="Get a random clip from The Office"
+    )
     @commands.guild_only()
     @app_commands.guild_only()
     async def officeclip(self, ctx: commands.Context) -> Message:
         """
         Get a random clip from The Office
         """
-        async with self.client.session.get(
-            "https://theoffice.foo/extras"
-        ) as response:
+        async with self.client.session.get("https://theoffice.foo/extras") as response:
             if response.status == 200:
                 data = await response.json()
                 random_clip = random.choice(data)
                 await ctx.send(random_clip["video_url"])
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Fun(client))
