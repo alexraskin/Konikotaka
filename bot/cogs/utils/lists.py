@@ -13,4 +13,10 @@ activities: list = [
     "/waifu",
     "?year",
     "@Konikotaka",
+    "with the API",
+    "/weather",
+    "Call of Duty: Modern Warfare",
+    "Sea of Thieves",
+    "Minecraft",
+    "GenSHIN Impact",
 ]
