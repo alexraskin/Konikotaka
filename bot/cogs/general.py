@@ -130,6 +130,10 @@ class General(commands.Cog, name="General"):
             return
 
         if self.client.user in message.mentions:
+            if message.author.nick is None:
+                name = message.author.name
+            else:
+                name = message.author.nick
             client = AsyncOpenAI(
                 api_key=self.openai_token, base_url=self.openai_gateway_url
             )
@@ -138,7 +142,7 @@ class General(commands.Cog, name="General"):
                     {
                         "role": "system",
                         "content": gpt.about_text
-                        + f"when you answer someone, answer them by {message.author.nick}",
+                        + f"when you answer someone, answer them by {name}",
                     },
                     {
                         "role": "user",
