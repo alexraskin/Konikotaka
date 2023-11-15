@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from typing import Union
+from io import BytesIO
 
 import validators
 from openai import AsyncOpenAI
@@ -13,6 +14,7 @@ from discord import (
     PartialEmoji,
     User,
     app_commands,
+    File,
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
@@ -106,6 +108,28 @@ class General(commands.Cog, name="General"):
     @property
     def display_emoji(self) -> PartialEmoji:
         return PartialEmoji(name="cosmo")
+
+    @app_commands.command(
+        name="imagine", description="Generate an image using StabilityAI"
+    )
+    @app_commands.guild_only()
+    async def imagine(self, interaction: Interaction, prompt: str) -> None:
+        url = "https://image-gen.twizy.workers.dev/"
+        data = {"prompt": prompt}
+        await interaction.response.defer()
+        image_data = await self.client.session.post(url=url, json=data)
+        message = await interaction.followup.send(
+            "Generating image, please wait...",
+        )
+        if image_data.status == 200:
+            image = await image_data.read()
+            with BytesIO(image) as image_binary:
+                image_file = File(fp=image_binary, filename="image.png")
+            await message.delete()
+            await interaction.followup.send("Image generated!", file=image_file)
+        else:
+            await message.delete()
+            await interaction.followup.send("Error generating image")
 
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
     @app_commands.guild_only()
