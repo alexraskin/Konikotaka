@@ -132,6 +132,7 @@ class General(commands.Cog, name="General"):
                 download_url = f"https://i.konikotaka.dev/{ray_id}.png"
             await interaction.followup.send(f"Image generated!", file=image_file, view=Download(download_url))
         else:
+            self.client.log.error(f"Error generating image: {image_data.status}")
             await interaction.followup.send("Error generating image")
 
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
