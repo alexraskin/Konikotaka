@@ -128,11 +128,11 @@ class General(commands.Cog, name="General"):
         if image_data.status == 200:
             image = await image_data.read()
             with BytesIO(image) as image_binary:
-                image_file = File(fp=image_binary, filename="image.png")
                 ray_id = image_data.headers["CF-RAY"].split("-")[0]
+                image_file = File(fp=image_binary, filename=f"{ray_id}.png")
                 download_url = f"https://i.konikotaka.dev/{ray_id}.png"
             await interaction.followup.send(
-                f"Image generated!", file=image_file, view=Download(download_url)
+                "Image generated!", file=image_file, view=Download(download_url)
             )
         else:
             self.client.log.error(f"Error generating image: {image_data.status}")
