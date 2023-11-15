@@ -118,17 +118,12 @@ class General(commands.Cog, name="General"):
         data = {"prompt": prompt}
         await interaction.response.defer()
         image_data = await self.client.session.post(url=url, json=data)
-        message = await interaction.followup.send(
-            "Generating image, please wait...",
-        )
         if image_data.status == 200:
             image = await image_data.read()
             with BytesIO(image) as image_binary:
                 image_file = File(fp=image_binary, filename="image.png")
-            await message.delete()
             await interaction.followup.send("Image generated!", file=image_file)
         else:
-            await message.delete()
             await interaction.followup.send("Error generating image")
 
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
