@@ -15,11 +15,17 @@ from discord import (
     User,
     app_commands,
     File,
+    ui
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
 
 from .utils import gpt
+
+class Download(ui.View):
+    def __init__(self, url: str):
+        super().__init__()
+        self.add_item(ui.Button(label='Download your image here!', url=url))
 
 
 class General(commands.Cog, name="General"):
@@ -122,7 +128,9 @@ class General(commands.Cog, name="General"):
             image = await image_data.read()
             with BytesIO(image) as image_binary:
                 image_file = File(fp=image_binary, filename="image.png")
-            await interaction.followup.send("Image generated!", file=image_file)
+                ray_id = image_data.headers["CF-RAY"].split('-')[0]
+                download_url = f"https://i.konikotaka.dev/{ray_id}.png"
+            await interaction.followup.send(f"Image generated!", file=image_file, view=Download(download_url))
         else:
             await interaction.followup.send("Error generating image")
 
