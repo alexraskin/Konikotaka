@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from typing import Union
 from io import BytesIO
-import asyncio
 
 import validators
 from openai import AsyncOpenAI
@@ -127,7 +126,7 @@ class General(commands.Cog, name="General"):
         data: dict = {"prompt": prompt}
 
         await interaction.edit_original_response(
-            content=f"Generating image <a:utility6:1174820977708904559>"
+            content="Generating image <a:utility6:1174820977708904559>"
         )
 
         image_data = await self.client.session.post(url=url, json=data)
