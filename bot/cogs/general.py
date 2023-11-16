@@ -16,7 +16,7 @@ from discord import (
     User,
     app_commands,
     File,
-    ui
+    ui,
 )
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
@@ -124,24 +124,27 @@ class General(commands.Cog, name="General"):
     async def imagine(self, interaction: Interaction, prompt: str) -> None:
         await interaction.response.defer()
         url = "https://image-gen.twizy.workers.dev/"
-        
+
         data = {"prompt": prompt}
         spinner_frames = ["-", "\\", "|", "/"]
         frame_index = 0
-        await interaction.edit_original_response(content=f"Generating image {spinner_frames[frame_index]}")
+        await interaction.edit_original_response(
+            content=f"Generating image {spinner_frames[frame_index]}"
+        )
 
         async def update_spinner():
-          nonlocal frame_index
-          while True:
-              await asyncio.sleep(0.2)
-              frame_index = (frame_index + 1) % len(spinner_frames)
-              await interaction.edit_original_response(content=f"Generating image {spinner_frames[frame_index]}")
+            nonlocal frame_index
+            while True:
+                await asyncio.sleep(0.2)
+                frame_index = (frame_index + 1) % len(spinner_frames)
+                await interaction.edit_original_response(
+                    content=f"Generating image {spinner_frames[frame_index]}"
+                )
 
         spinner_task = asyncio.create_task(update_spinner())
         image_data = await self.client.session.post(url=url, json=data)
 
         if image_data.status == 200:
-            
             self.client.log.info(f"Image generated: {image_data.status}")
             image = await image_data.read()
 
@@ -151,12 +154,16 @@ class General(commands.Cog, name="General"):
             spinner_task.cancel()
             content = f"Image generated - Prompt: **{prompt}**"
             await interaction.edit_original_response(
-                content=content, attachments=[image_file], view=Download(url=f"https://i.konikotaka.dev/{ray_id}.png")
+                content=content,
+                attachments=[image_file],
+                view=Download(url=f"https://i.konikotaka.dev/{ray_id}.png"),
             )
 
         else:
             spinner_task.cancel()
-            self.client.log.error(content=f"Error generating image: {image_data.status}")
+            self.client.log.error(
+                content=f"Error generating image: {image_data.status}"
+            )
             await interaction.edit_original_response("Error generating image")
 
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
