@@ -135,7 +135,7 @@ class General(commands.Cog, name="General"):
         async def update_spinner():
             nonlocal frame_index
             while True:
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(0.1)
                 frame_index = (frame_index + 1) % len(spinner_frames)
                 await interaction.edit_original_response(
                     content=f"Generating image {spinner_frames[frame_index]}"
