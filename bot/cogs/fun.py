@@ -36,7 +36,9 @@ class Fun(commands.Cog, name="Fun"):
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
             else:
-                self.client.log.error(f"An error occurred getting photo of Cosmo: {response.status}")
+                self.client.log.error(
+                    f"An error occurred getting photo of Cosmo: {response.status}"
+                )
                 await ctx.send("Error getting photo of Cosmo!")
 
     @commands.hybrid_command(
@@ -56,7 +58,9 @@ class Fun(commands.Cog, name="Fun"):
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
             else:
-                self.client.log.error(f"An error occurred getting photo of Pat and Ash's cats: {response.status}")
+                self.client.log.error(
+                    f"An error occurred getting photo of Pat and Ash's cats: {response.status}"
+                )
                 await ctx.send("Error getting photo of Pat and Ash's cats!")
 
     @commands.hybrid_command(
