@@ -19,4 +19,5 @@ activities: list = [
     "Sea of Thieves",
     "Minecraft",
     "GenSHIN Impact",
+    "/imagine",
 ]
