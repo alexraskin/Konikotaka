@@ -34,12 +34,9 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get("https://api.twizy.sh/v1/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
-                embed = Embed()
-                embed.title = "🐈 Cosmo"
-                embed.url = "https://cosmo.alexraskin.com"
-                embed.colour = Colour.blurple()
-                embed.set_image(url=photo["photoUrl"])
+                await ctx.send(photo["photoUrl"])
             else:
+                self.client.log.error(f"An error occurred getting photo of Cosmo: {response.status}")
                 await ctx.send("Error getting photo of Cosmo!")
 
     @commands.hybrid_command(
@@ -53,11 +50,13 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random photo of Pat and Ash's cats from the twizy.dev API
         """
-        async with self.client.session.get("https://api.twizy.dev/v1/bczs") as response:
+        self.client.log.info("Getting photo of Pat and Ash's cats")
+        async with self.client.session.get("https://api.twizy.sh/v1/bczs") as response:
             if response.status == 200:
                 photo = await response.json()
                 await ctx.send(photo["photoUrl"])
             else:
+                self.client.log.error(f"An error occurred getting photo of Pat and Ash's cats: {response.status}")
                 await ctx.send("Error getting photo of Pat and Ash's cats!")
 
     @commands.hybrid_command(
