@@ -12,6 +12,7 @@ from discord.ext import commands, tasks
 from openai import AsyncOpenAI
 
 from .utils import gpt
+from .utils.lists import ai_ban_words
 
 
 class Download(ui.View):
@@ -113,8 +114,15 @@ class General(commands.Cog, name="General"):
     @app_commands.guild_only()
     async def imagine(self, interaction: Interaction, prompt: str) -> None:
         await interaction.response.defer()
+
+        if any(word in prompt for word in ai_ban_words):
+            await interaction.edit_original_response(
+                "Your prompt contains a banned word. Please try again."
+            )
+            return
+
         await interaction.edit_original_response(
-            content="Generating image <a:utility6:1174820977708904559>"
+            content=f"**{prompt}** - {interaction.user.mention} <a:utility6:1174820977708904559>"
         )
 
         url: str = "https://image-gen.twizy.workers.dev/"
@@ -128,12 +136,17 @@ class General(commands.Cog, name="General"):
 
             image: bytes = await image_data.read()
             ray_id: str = image_data.headers["CF-RAY"].split("-")[0]
-
-            with BytesIO(image) as image_binary:
-                image_file: File = File(fp=image_binary, filename=f"{ray_id}.png")
+            try:
+              with BytesIO(image) as image_binary:
+                  image_file: File = File(fp=image_binary, filename=f"{ray_id}.png")
+            
+            except Exception as e:
+              self.client.log.error(f"Error generating image: {e}")
+              await interaction.edit_original_response(f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}")
+              return
 
             await interaction.edit_original_response(
-                content=f"Image generated - Prompt: **{prompt}**",
+                content=f"**{prompt}** - {interaction.user.mention}",
                 attachments=[image_file],
                 view=Download(url=f"https://i.konikotaka.dev/{ray_id}.png"),
             )
@@ -142,7 +155,7 @@ class General(commands.Cog, name="General"):
             self.client.log.error(
                 content=f"Error generating image: {image_data.status}"
             )
-            await interaction.edit_original_response("Error generating image")
+            await interaction.edit_original_response(f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}")
 
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
     @app_commands.guild_only()
