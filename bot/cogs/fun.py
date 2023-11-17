@@ -8,7 +8,7 @@ from io import BytesIO
 from typing import Literal, Optional, Union
 
 import upsidedown
-from discord import Colour, Embed, File, Member, Message, app_commands, ui
+from discord import Colour, Embed, File, Member, Message, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
 from PIL import Image, ImageDraw, ImageFont
@@ -16,13 +16,6 @@ from sqlalchemy.future import select
 
 from .utils.map_cords import map_cords
 from .utils.utils import get_year_round, progress_bar
-
-
-class OnlineLink(ui.View):
-    def __init__(self, url: str):
-        super().__init__()
-
-        self.add_item(ui.Button(label="View Online!", url=url))
 
 
 class Fun(commands.Cog, name="Fun"):
@@ -41,8 +34,7 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get("https://api.twizy.sh/v1/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
-                url = photo["photoUrl"]
-                await ctx.send(content=url, view=OnlineLink(url=url))
+                await ctx.send(content=photo["photoUrl"])
             else:
                 self.client.log.error(
                     f"An error occurred getting photo of Cosmo: {response.status}"
@@ -64,8 +56,7 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get("https://api.twizy.sh/v1/bczs") as response:
             if response.status == 200:
                 photo = await response.json()
-                url = photo["photoUrl"]
-                await ctx.send(content=url, view=OnlineLink(url=url))
+                await ctx.send(content=photo["photoUrl"])
             else:
                 self.client.log.error(
                     f"An error occurred getting photo of Pat and Ash's cats: {response.status}"
