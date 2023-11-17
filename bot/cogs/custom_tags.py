@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Union
 
 import discord
-from discord import Embed, PartialEmoji, TextStyle, app_commands, Colour
+from discord import Colour, Embed, PartialEmoji, TextStyle, app_commands
 from discord.ext import commands
 from discord.interactions import Interaction
 from models.tags import CustomTags

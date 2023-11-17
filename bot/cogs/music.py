@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 import wavelink
-from discord import app_commands, Colour
+from discord import Colour, app_commands
 from discord.ext import commands
 
 

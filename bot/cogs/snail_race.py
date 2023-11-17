@@ -5,7 +5,7 @@ import random
 from typing import Dict, List, Optional
 
 import discord
-from discord import Interaction, Member, app_commands, Colour
+from discord import Colour, Interaction, Member, app_commands
 from discord.ext import commands
 from models.races import Races
 from sqlalchemy.future import select

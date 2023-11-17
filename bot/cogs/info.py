@@ -4,9 +4,10 @@ import os
 import platform
 
 import pkg_resources
-from discord import Colour, Embed, Member, app_commands, Permissions
+from discord import Colour, Embed, Member, Permissions, app_commands
 from discord.ext import commands
 from discord.utils import oauth_url
+
 from .utils.utils import date
 
 

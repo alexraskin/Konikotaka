@@ -1,24 +1,15 @@
 from __future__ import annotations
 
 import os
-from typing import Union
 from io import BytesIO
+from typing import Union
 
 import validators
-from openai import AsyncOpenAI
-from discord import (
-    Embed,
-    Interaction,
-    Member,
-    Message,
-    PartialEmoji,
-    User,
-    app_commands,
-    File,
-    ui,
-)
+from discord import (Embed, File, Interaction, Member, Message, PartialEmoji,
+                     User, app_commands, ui)
 from discord.abc import GuildChannel
 from discord.ext import commands, tasks
+from openai import AsyncOpenAI
 
 from .utils import gpt
 
