@@ -153,7 +153,7 @@ class General(commands.Cog, name="General"):
 
         else:
             self.client.log.error(
-                content=f"Error generating image: {image_data.status}"
+                f"Error generating image: {image_data.status}"
             )
             await interaction.edit_original_response(f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}")
 
