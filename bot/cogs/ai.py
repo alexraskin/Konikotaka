@@ -75,9 +75,8 @@ class Ai(commands.Cog, name="Ai"):
 
         start_time = time.time()
         image_data = await self.client.session.post(
-            url="https://mecha-muse.twizy.workers.dev/",
-            json={"prompt": prompt}
-            )
+            url="https://mecha-muse.twizy.workers.dev/", json={"prompt": prompt}
+        )
 
         if image_data.status == 200:
             self.client.log.info(
