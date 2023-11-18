@@ -80,33 +80,29 @@ class WebServer(commands.Cog, name="WebServer"):
         end_time: time = time.time()
         latency: int = round((end_time - start_time) * 1000)
         return latency
-    
+
     async def get_all_commands(self) -> list:
         commands: list = []
         for command in self.client.commands:
             if command.hidden is False:
-              commands.append({
-                  "name": command.name,
-                  "description": command.help
-              })
+                commands.append({"name": command.name, "description": command.help})
         return commands
 
     async def index_handler(self, request: web.Request) -> web.json_response:
-        return web.json_response({
-            "last_fetch": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-            "@me": {
-                "botStatus": 200,
-                "upTime": str(self.client.get_uptime)
-            },
-            "gitRevision": self.client.git_revision,
-            "ram": f"{self.client.memory_usage}MB",
-            "ping": {
+        return web.json_response(
+            {
+                "last_fetch": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+                "@me": {"botStatus": 200, "upTime": str(self.client.get_uptime)},
+                "gitRevision": self.client.git_revision,
+                "ram": f"{self.client.memory_usage}MB",
+                "ping": {
                     "type": "ms",
                     "bot": self.client.get_bot_latency,
                     "rest": await self.get_api_latency(),
                 },
-            "botCommands": await self.get_all_commands()
-            })
+                "botCommands": await self.get_all_commands(),
+            }
+        )
 
     async def stats_handler(self, request: web.Request) -> web.json_response:
         if request.headers.get("X-API-KEY") != self.api_key:
