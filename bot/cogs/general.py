@@ -125,7 +125,7 @@ class General(commands.Cog, name="General"):
             content=f"**{prompt}** - {interaction.user.mention} <a:utility6:1174820977708904559>"
         )
 
-        url: str = "https://image-gen.twizy.workers.dev/"
+        url: str = "https://mecha-muse.twizy.workers.dev/"
         data: dict = {"prompt": prompt}
         image_data = await self.client.session.post(url=url, json=data)
 
