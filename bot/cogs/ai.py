@@ -64,6 +64,7 @@ class Ai(commands.Cog, name="Ai"):
         name="imagine", description="Generate an image using StabilityAI"
     )
     @app_commands.guild_only()
+    @app_commands.describe(prompt="The prompt to generate an image from")
     async def imagine(self, interaction: Interaction, prompt: str) -> None:
         if any(word in prompt for word in ai_ban_words):
             await interaction.response.send_message(
@@ -120,6 +121,7 @@ class Ai(commands.Cog, name="Ai"):
         name="describe", description="Describe an image using MicrosoftAI"
     )
     @app_commands.guild_only()
+    @app_commands.describe(photo="The photo to describe")
     async def describe(self, interaction: Interaction, photo: Attachment) -> None:
         await interaction.response.defer()
         url = f"{os.getenv('CLOUDFLARE_AI_URL')}/@cf/microsoft/resnet-50"
