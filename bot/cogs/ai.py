@@ -68,19 +68,16 @@ class Ai(commands.Cog, name="Ai"):
     async def imagine(self, interaction: Interaction, prompt: str) -> None:
         await interaction.response.defer()
         if any(word in prompt for word in ai_ban_words):
-            await interaction.response.send_message(
+            await interaction.edit_original_response(
                 "Your prompt contains a banned word. Please try again."
             )
             return
 
-        await interaction.edit_original_response(
-            content=f"**{prompt}** - {interaction.user.mention} <a:utility6:1174820977708904559>"
-        )
-
-        url: str = "https://mecha-muse.twizy.workers.dev/"
-        data: dict = {"prompt": prompt}
         start_time = time.time()
-        image_data = await self.client.session.post(url=url, json=data)
+        image_data = await self.client.session.post(
+            url="https://mecha-muse.twizy.workers.dev/",
+            json={"prompt": prompt}
+            )
 
         if image_data.status == 200:
             self.client.log.info(
@@ -115,7 +112,7 @@ class Ai(commands.Cog, name="Ai"):
         else:
             self.client.log.error(f"Error generating image: {image_data.status}")
             await interaction.edit_original_response(
-                f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
+                content=f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
             )
 
     @app_commands.command(

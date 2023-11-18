@@ -67,7 +67,9 @@ class Admin(commands.Cog, name="Admin"):
         sync_message = await message.edit(content="Synced successfully! ✅")
         await sync_message.delete(delay=5)
 
-    @commands.hybrid_command(name="add_emoji", description="Add an emoji to the server.")
+    @commands.hybrid_command(
+        name="add_emoji", description="Add an emoji to the server."
+    )
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(emoji="The emoji to add")
