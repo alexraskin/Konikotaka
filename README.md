@@ -12,7 +12,7 @@ I would prefer if you don't run an instance of my bot. Just call the invite comm
 
 Nevertheless, the installation steps are as follows:
 
-Create an `.env` file in the root directory with the following variables:
+Create an `.env` file in the root directory with the following variables: 
 
 ```bash
 DISCORD_TOKEN=
