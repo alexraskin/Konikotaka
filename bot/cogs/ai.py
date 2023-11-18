@@ -66,13 +66,14 @@ class Ai(commands.Cog, name="Ai"):
     @app_commands.guild_only()
     @app_commands.describe(prompt="The prompt to generate an image from")
     async def imagine(self, interaction: Interaction, prompt: str) -> None:
+        await interaction.response.defer()
         if any(word in prompt for word in ai_ban_words):
             await interaction.response.send_message(
                 "Your prompt contains a banned word. Please try again."
             )
             return
 
-        await interaction.response.send_message(
+        await interaction.edit_original_response(
             content=f"**{prompt}** - {interaction.user.mention} <a:utility6:1174820977708904559>"
         )
 

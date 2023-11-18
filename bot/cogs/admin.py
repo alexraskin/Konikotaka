@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from discord import Colour, Embed, HTTPException, app_commands
+from discord import Colour, Embed, HTTPException, app_commands, Emoji
 from discord.ext import commands
 
 
@@ -67,10 +67,14 @@ class Admin(commands.Cog, name="Admin"):
         sync_message = await message.edit(content="Synced successfully! ✅")
         await sync_message.delete(delay=5)
 
-    @commands.command(name="add_emoji", description="Add an emoji to the server.")
+    @commands.hybrid_command(name="add_emoji", description="Add an emoji to the server.")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    @app_commands.describe(emoji="The emoji to add")
+    @app_commands.describe(name="The name of the emoji")
     @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
     async def add_emoji(
-        self, ctx: commands.Context, emoji: str, name: str = None
+        self, ctx: commands.Context, emoji: Emoji, name: str = None
     ) -> None:
         """
         Adds an emoji to the server.
