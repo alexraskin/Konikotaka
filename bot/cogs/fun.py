@@ -31,7 +31,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random photo of my cat Cosmo!
         """
-        async with self.client.session.get("https://api.twizy.sh/v1/cosmo") as response:
+        async with self.client.session.get("https://api.cat.network/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
                 await ctx.send(content=photo["photoUrl"])
