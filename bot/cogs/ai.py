@@ -74,9 +74,16 @@ class Ai(commands.Cog, name="Ai"):
             return
 
         start_time = time.time()
-        image_data = await self.client.session.post(
-            url="https://mecha-muse.twizy.workers.dev/", json={"prompt": prompt}
-        )
+        try:
+          image_data = await self.client.session.post(
+              url="https://mecha-muse.twizy.workers.dev/", json={"prompt": prompt}
+          )
+        except Exception as e:
+            self.client.log.error(f"Error generating image: {e}")
+            await interaction.edit_original_response(
+                f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
+            )
+            return
 
         if image_data.status == 200:
             self.client.log.info(
@@ -137,9 +144,16 @@ class Ai(commands.Cog, name="Ai"):
             )
             return
         start_time = time.time()
-        response = await self.client.session.post(
-            url=url, headers=headers, data=image_binary
-        )
+        try:
+          response = await self.client.session.post(
+              url=url, headers=headers, data=image_binary
+          )
+        except Exception as e:
+            self.client.log.error(f"Error describing image: {e}")
+            await interaction.edit_original_response(
+                content="An error occurred while describing your image, please try again"
+            )
+            return
         if response.status == 200:
             data = await response.json()
             image_description = data["result"]
