@@ -75,9 +75,9 @@ class Ai(commands.Cog, name="Ai"):
 
         start_time = time.time()
         try:
-          image_data = await self.client.session.post(
-              url="https://mecha-muse.twizy.workers.dev/", json={"prompt": prompt}
-          )
+            image_data = await self.client.session.post(
+                url="https://mecha-muse.twizy.workers.dev/", json={"prompt": prompt}
+            )
         except Exception as e:
             self.client.log.error(f"Error generating image: {e}")
             await interaction.edit_original_response(
@@ -145,9 +145,9 @@ class Ai(commands.Cog, name="Ai"):
             return
         start_time = time.time()
         try:
-          response = await self.client.session.post(
-              url=url, headers=headers, data=image_binary
-          )
+            response = await self.client.session.post(
+                url=url, headers=headers, data=image_binary
+            )
         except Exception as e:
             self.client.log.error(f"Error describing image: {e}")
             await interaction.edit_original_response(
