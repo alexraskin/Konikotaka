@@ -37,7 +37,6 @@ class Konikotaka(Bot):
         self.version: str = "1.0.6"
         self.lavalink_uri: str = os.getenv("LAVALINK_URI")
         self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
-        self.logo_url: str = "https://i.gyazo.com/12ccb49e7c6b2e31a207ad63e38e7f36.png"
         self.engine: create_async_engine = create_async_engine(
             os.getenv("POSTGRES_URL"),
             echo=False,
@@ -121,12 +120,12 @@ client: Konikotaka = Konikotaka(
     command_prefix=os.getenv("PREFIX", "?"),
     intents=discord.Intents.all(),
     max_messages=10000,
-    description="Hello! I am a bot written by Twizy to provide some nice utilities.",
+    description="Hello! I am a bot written by Twizycat to provide some nice utilities.",
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )
 
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=30)
 async def change_activity() -> None:
     await client.change_presence(activity=discord.Game(name=random.choice(activities)))
 
