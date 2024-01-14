@@ -67,7 +67,7 @@ class General(commands.Cog, name="General"):
             value=f"{interaction.user.mention} ({interaction.user})",
             inline=False,
         )
-        embed.set_thumbnail(url=self.client.logo_url)
+        embed.set_thumbnail(url=self.client.user.avatar.url)
         await interaction.followup.send(embed=embed, ephemeral=True)
 
     async def report(self, interaction: Interaction, message: Message) -> None:
@@ -94,7 +94,7 @@ class General(commands.Cog, name="General"):
             value=f"[Click here]({message.jump_url})",
             inline=False,
         )
-        embed.set_thumbnail(url=self.client.logo_url)
+        embed.set_thumbnail(url=self.client.user.avatar.url)
         await channel.send(embed=embed)
         await interaction.followup.send("Message reported", ephemeral=True)
 

@@ -95,6 +95,7 @@ class WebServer(commands.Cog, name="WebServer"):
                 "@me": {"botStatus": 200, "upTime": str(self.client.get_uptime)},
                 "gitRevision": self.client.git_revision,
                 "ram": f"{self.client.memory_usage}MB",
+                "cpu": f"{self.client.cpu_usage}%",
                 "ping": {
                     "type": "ms",
                     "bot": self.client.get_bot_latency,

@@ -32,7 +32,7 @@ class Admin(commands.Cog, name="Admin"):
                     return
             embed = Embed(
                 title="Cog Reload 🔃",
-                description="I have reloaded all the cogs successfully ✅",
+                description="Reloaded all the cogs successfully ✅",
                 timestamp=ctx.message.created_at,
             )
             embed.colour = Colour.blurple()
@@ -43,7 +43,7 @@ class Admin(commands.Cog, name="Admin"):
             await self.client.load_extension(f"cogs.{extension}")
             embed = Embed(
                 title="Cog Reload 🔃",
-                description=f"I have reloaded the **{str(extension).upper()}** cog successfully ✅",
+                description=f"Reloaded **{str(extension).upper()}** cog successfully ✅",
                 timestamp=ctx.message.created_at,
             )
             embed.colour = Colour.blurple()

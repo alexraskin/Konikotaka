@@ -20,6 +20,9 @@ activities: list = [
     "Minecraft",
     "GenSHIN Impact",
     "/imagine",
+    "Team Fight Tactics",
+    "League of Legends",
+    "Fortnite",
 ]
 
 ai_ban_words: list = [

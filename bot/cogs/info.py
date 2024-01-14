@@ -197,11 +197,11 @@ class Info(commands.Cog, name="Info"):
     async def uptime(self, ctx: commands.Context) -> None:
         embed = Embed(
             title="Bot Uptime 🕒",
-            description=f"Uptime: {self.client.get_uptime} 🕒",
+            description=f"{self.client.get_uptime}",
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
-        embed.set_thumbnail(url=self.client.logo_url)
+        embed.set_thumbnail(url=self.client.user.avatar.url)
         await ctx.send(embed=embed)
 
 
