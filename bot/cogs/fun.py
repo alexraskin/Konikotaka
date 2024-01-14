@@ -683,7 +683,7 @@ class Fun(commands.Cog, name="Fun"):
                 data = await response.json()
                 random_clip = random.choice(data)
                 await ctx.send(random_clip["video_url"])
-    
+
     @commands.hybrid_command(name="anime", description="Get a random anime quote")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -691,7 +691,9 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random anime quote
         """
-        async with self.client.session.get("https://animechan.xyz/api/random") as response:
+        async with self.client.session.get(
+            "https://animechan.xyz/api/random"
+        ) as response:
             if response.status == 200:
                 quote = await response.json()
                 embed = Embed(
