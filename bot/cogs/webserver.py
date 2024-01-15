@@ -49,11 +49,13 @@ class WebServer(commands.Cog, name="WebServer"):
                 "botCommands": await self.get_all_commands(),
             }
         )
-    
+
     async def leaderboard_handler(self, request: web.Request) -> web.json_response:
         async with self.client.async_session() as session:
             async with session.begin():
-                query = await session.execute(select(DiscordUser).order_by(DiscordUser.level.desc()))
+                query = await session.execute(
+                    select(DiscordUser).order_by(DiscordUser.level.desc())
+                )
                 users = query.scalars().all()
                 leaderboard = []
                 for user in users:

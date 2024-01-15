@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import time
+
 # from io import BytesIO
 
 from discord import (
@@ -18,6 +19,7 @@ from discord.ext import commands
 from openai import AsyncOpenAI
 
 from .utils import gpt
+
 # from .utils.lists import ai_ban_words
 
 
