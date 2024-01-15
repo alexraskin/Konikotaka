@@ -81,6 +81,8 @@ class Meta(commands.Cog, name="Meta"):
                 username=member.name,
                 joined=member.joined_at,
                 guild_id=str(member.guild.id),
+                xp=0,
+                level=0,
             )
             async with self.client.async_session() as session:
                 async with session.begin():

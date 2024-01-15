@@ -94,13 +94,13 @@ class Konikotaka(Bot):
         )
 
     @property
-    def memory_usage(self):
+    def memory_usage(self) -> int:
         process = psutil.Process(self.pid)
         memory_info = process.memory_info()
         return round(memory_info.rss / (1024**2))
 
     @property
-    def cpu_usage(self):
+    def cpu_usage(self) -> float:
         return psutil.cpu_percent(interval=1)
 
     @property
@@ -108,7 +108,7 @@ class Konikotaka(Bot):
         return self.bot_app_info.owner
 
     @property
-    def git_revision(self):
+    def git_revision(self) -> str:
         latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
         if latest_revision is None:
             return None

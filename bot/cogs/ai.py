@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import os
 import time
-from io import BytesIO
+# from io import BytesIO
 
 from discord import (
     Embed,
-    File,
+    # File,
     Interaction,
     Message,
     app_commands,
@@ -18,7 +18,7 @@ from discord.ext import commands
 from openai import AsyncOpenAI
 
 from .utils import gpt
-from .utils.lists import ai_ban_words
+# from .utils.lists import ai_ban_words
 
 
 class Download(ui.View):
