@@ -18,6 +18,10 @@ class Levels(commands.Cog, name="Levels"):
     async def on_message(self, message: Message) -> None:
         if message.author == self.client.user:
             return
+        if message.author.bot:
+            return
+        if message.webhook_id:
+            return
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
