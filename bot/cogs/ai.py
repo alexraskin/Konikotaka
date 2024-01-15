@@ -64,7 +64,7 @@ class Ai(commands.Cog, name="Ai"):
         name="imagine", description="Generate an image using StabilityAI"
     )
     @app_commands.guild_only()
-    @app_commands.describe(prompt="The prompt to generate an image from")
+    # @app_commands.describe(prompt="The prompt to generate an image from")
     async def imagine(self, interaction: Interaction) -> None:
         await interaction.response.send_message(
             "This command is currently disabled due to stability issues with the Cloudflare AI API. Please try again later."
