@@ -18,6 +18,8 @@ class Levels(commands.Cog, name="Levels"):
     async def on_message(self, message: Message) -> None:
         if message.author == self.client.user:
             return
+        if message.guild.id != self.client.cosmo_guild:
+            return
         if message.author.bot:
             return
         if message.webhook_id:
