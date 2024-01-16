@@ -11,11 +11,17 @@ class Levels(commands.Cog, name="Levels"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
-    def get_xp_needed(self, level):
+    def get_xp_needed(self, level) -> int:
+        """
+        Returns the amount of xp needed to level up.
+        """
         return 100 * level
 
     @commands.Cog.listener()
     async def on_message(self, message: Message) -> None:
+        """
+        Gives xp to users when they send a message.
+        """
         if message.author == self.client.user:
             return
         if message.guild.id != self.client.cosmo_guild:
@@ -58,6 +64,9 @@ class Levels(commands.Cog, name="Levels"):
 
     @app_commands.command(name="rank")
     async def rank(self, interaction: Interaction, user: User = None) -> None:
+        """
+        Sends a user's rank
+        """
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(

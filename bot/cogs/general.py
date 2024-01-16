@@ -7,16 +7,13 @@ from discord import (
     PartialEmoji,
     app_commands,
 )
-from discord.abc import GuildChannel
+
 from discord.ext import commands, tasks
 
 
 class General(commands.Cog, name="General"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
-        self.guild: str = os.getenv("GUILD_ID")
-        self.message_reports_channel: int = 1152498407416533053
-        self.general_channel: GuildChannel = 825189935476637729
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:

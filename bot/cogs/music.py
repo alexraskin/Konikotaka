@@ -182,7 +182,7 @@ class Music(commands.Cog, name="Music"):
             embed.description += f"{i}) {track.title}\n"
         await ctx.send(embed=embed)
 
-    @app_commands.command(name="remove", description="Remove a song from queue")
+    @music.command(name="remove", description="Remove a song from queue")
     @app_commands.guild_only()
     async def remove(self, ctx: commands.Context, index: int) -> None:
         """Remove a song from queue"""
