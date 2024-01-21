@@ -4,8 +4,16 @@ import os
 import time
 from io import BytesIO
 
-from discord import (Attachment, Colour, Embed, File, Interaction, Message,
-                     app_commands, ui)
+from discord import (
+    Attachment,
+    Colour,
+    Embed,
+    File,
+    Interaction,
+    Message,
+    app_commands,
+    ui,
+)
 from discord.ext import commands
 from openai import AsyncOpenAI
 
