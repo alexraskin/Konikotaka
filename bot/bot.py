@@ -120,7 +120,9 @@ client: Konikotaka = Konikotaka(
     command_prefix=os.getenv("PREFIX", "?"),
     intents=discord.Intents.all(),
     max_messages=10000,
-    description="Hello! I am a bot written by Twizycat to provide some nice utilities.",
+    description=str(
+        "Hello! I am Konikotaka, a Discord bot written in Python. I am a general purpose bot with a variety of commands."
+    ),
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )
 
