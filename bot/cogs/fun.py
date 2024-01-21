@@ -8,7 +8,8 @@ from io import BytesIO
 from typing import Literal, Optional, Union
 
 import upsidedown
-from discord import Colour, Embed, File, Member, Message, app_commands
+from async_foaas import Fuck
+from discord import Colour, Embed, File, Member, Message, User, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
 from PIL import Image, ImageDraw, ImageFont
@@ -21,6 +22,7 @@ from .utils.utils import get_year_round, progress_bar
 class Fun(commands.Cog, name="Fun"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
+        self.fuck = Fuck()
 
     @commands.hybrid_command(
         name="cosmo", help="Get a random Photo of Cosmo the Cat", with_app_command=True
@@ -40,6 +42,13 @@ class Fun(commands.Cog, name="Fun"):
                     f"An error occurred getting photo of Cosmo: {response.status}"
                 )
                 await ctx.send("Error getting photo of Cosmo!")
+
+    @commands.hybrid_command(name="fuckoff", help="Tell Someone to Fuck Off")
+    @commands.guild_only()
+    @app_commands.guild_only()
+    async def fuck_off(self, ctx: commands.Context, user: Union[Member, User]):
+        _fuck = await self.fuck.random(name=user.mention, from_=ctx.author.name).json
+        await ctx.send(_fuck["message"])
 
     @commands.hybrid_command(
         name="bczs",
