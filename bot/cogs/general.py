@@ -3,11 +3,7 @@ from __future__ import annotations
 import os
 
 import validators
-from discord import (
-    PartialEmoji,
-    app_commands,
-)
-
+from discord import PartialEmoji, app_commands
 from discord.ext import commands, tasks
 
 

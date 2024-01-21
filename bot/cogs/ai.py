@@ -2,19 +2,10 @@ from __future__ import annotations
 
 import os
 import time
-
 from io import BytesIO
 
-from discord import (
-    Embed,
-    File,
-    Interaction,
-    Message,
-    app_commands,
-    ui,
-    Attachment,
-    Colour,
-)
+from discord import (Attachment, Colour, Embed, File, Interaction, Message,
+                     app_commands, ui)
 from discord.ext import commands
 from openai import AsyncOpenAI
 

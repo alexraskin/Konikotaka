@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+from discord import Colour, Embed, Interaction, Message, User, app_commands
 from discord.ext import commands
-from discord import Message, app_commands, Interaction, User, Embed, Colour
-from sqlalchemy.future import select
-
 from models.users import DiscordUser
+from sqlalchemy.future import select
 
 
 class Levels(commands.Cog, name="Levels"):
