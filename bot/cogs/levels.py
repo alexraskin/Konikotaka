@@ -5,6 +5,8 @@ from discord.ext import commands
 from models.users import DiscordUser
 from sqlalchemy.future import select
 
+from typing import Optional
+
 
 class Levels(commands.Cog, name="Levels"):
     def __init__(self, client: commands.Bot) -> None:
@@ -62,7 +64,7 @@ class Levels(commands.Cog, name="Levels"):
                     await session.flush()
 
     @app_commands.command(name="rank")
-    async def rank(self, interaction: Interaction, user: User = None) -> None:
+    async def rank(self, interaction: Interaction, user: Optional[User] = None) -> None:
         """
         Sends a user's rank
         """

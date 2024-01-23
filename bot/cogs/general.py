@@ -18,10 +18,10 @@ class General(commands.Cog, name="General"):
     @tasks.loop(hours=1)
     async def health_check(self) -> None:
         check = await self.client.session.get(os.getenv("HEALTHCHECK_URL"))
-        if check.status == 200:
-            self.client.log.info("Health check successful.")
-        else:
+        if check.status != 200:
             self.client.log.error("Health check failed.")
+        else:
+            self.client.log.info("Health check successful.")
 
     @property
     def display_emoji(self) -> PartialEmoji:

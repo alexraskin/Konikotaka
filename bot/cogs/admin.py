@@ -108,12 +108,12 @@ class Admin(commands.Cog, name="Admin"):
 
     @commands.command(name="git", aliases=["gr"], hidden=True)
     @commands.guild_only()
-    async def git_revision(self, ctx: commands.Context):
+    async def git_revision(self, ctx: commands.Context) -> None:
         """
         Get the current git revision.
         """
         await ctx.send(f"Git Revision: {self.client.git_revision}")
 
 
-async def setup(client: commands.Bot):
+async def setup(client: commands.Bot) -> None:
     await client.add_cog(Admin(client))

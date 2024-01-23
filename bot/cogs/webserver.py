@@ -11,7 +11,7 @@ from sqlalchemy.future import select
 
 
 class WebServer(commands.Cog, name="WebServer"):
-    def __init__(self, client: commands.Bot):
+    def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
         self.api_key: str = os.getenv("X-API-KEY")
 
@@ -90,11 +90,11 @@ class WebServer(commands.Cog, name="WebServer"):
         await self.client.wait_until_ready()
         await self.site.start()
 
-    def __unload(self):
+    def __unload(self) -> None:
         asyncio.ensure_future(self.site.stop())
 
 
-async def setup(client: commands.Bot):
+async def setup(client: commands.Bot) -> None:
     server: WebServer = WebServer(client)
     client.loop.create_task(server.webserver())
     await client.add_cog(WebServer(client))

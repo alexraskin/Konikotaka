@@ -57,7 +57,7 @@ class Info(commands.Cog, name="Info"):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command("join", with_app_command=True)
-    async def join(self, ctx: commands.Context):
+    async def join(self, ctx: commands.Context) -> None:
         """Posts my invite to allow you to invite me"""
         perms = Permissions.none()
         perms.read_messages = True
@@ -81,7 +81,7 @@ class Info(commands.Cog, name="Info"):
     @commands.hybrid_command(name="user", aliases=["member"])
     @commands.guild_only()
     @app_commands.guild_only()
-    async def user(self, ctx: commands.Context, *, user: Member = None):
+    async def user(self, ctx: commands.Context, *, user: Member = None) -> None:
         """Get user information"""
         user = user or ctx.author
 
@@ -111,7 +111,7 @@ class Info(commands.Cog, name="Info"):
 
     @commands.hybrid_command(name="serverinfo", aliases=["guildinfo"])
     @commands.guild_only()
-    async def serverinfo(self, ctx: commands.Context):
+    async def serverinfo(self, ctx: commands.Context) -> None:
         """Check info about current server"""
         if ctx.invoked_subcommand is None:
             find_bots = sum(1 for member in ctx.guild.members if member.bot)
@@ -136,7 +136,7 @@ class Info(commands.Cog, name="Info"):
     @commands.hybrid_command(aliases=["joined"])
     @commands.guild_only()
     @app_commands.guild_only()
-    async def joinedate(self, ctx: commands.Context, *, user: Member = None):
+    async def joinedate(self, ctx: commands.Context, *, user: Member = None) -> None:
         """Check when a user joined the current server"""
         user = user or ctx.author
         await ctx.send(
@@ -151,7 +151,7 @@ class Info(commands.Cog, name="Info"):
     @commands.hybrid_command()
     @commands.guild_only()
     @app_commands.guild_only()
-    async def mods(self, ctx: commands.Context):
+    async def mods(self, ctx: commands.Context) -> None:
         """Check which mods are online on current guild"""
         message = ""
         all_status = {
@@ -205,5 +205,5 @@ class Info(commands.Cog, name="Info"):
         await ctx.send(embed=embed)
 
 
-async def setup(client: commands.Bot):
+async def setup(client: commands.Bot) -> None:
     await client.add_cog(Info(client))

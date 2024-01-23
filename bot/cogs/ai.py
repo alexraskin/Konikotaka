@@ -160,7 +160,7 @@ class Ai(commands.Cog, name="Ai"):
             data = await response.json()
             image_description = data["result"]
             embed = Embed()
-            embed.title = "Image Description"
+            embed.title = "Description for your image"
             embed.colour = Colour.blurple()
             description = ""
             for i in image_description:

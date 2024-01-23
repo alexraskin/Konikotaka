@@ -14,7 +14,7 @@ from sqlalchemy.future import select
 
 
 class TagName(commands.clean_content):
-    def __init__(self, *, lower: bool = False):
+    def __init__(self, *, lower: bool = False) -> None:
         self.lower: bool = lower
         super().__init__()
 
@@ -329,7 +329,7 @@ class Tags(commands.Cog, name="Custom Tags"):
     @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
-    async def edit(self, ctx: commands.Context):
+    async def edit(self, ctx: commands.Context) -> None:
         """
         Edit a tag
         """

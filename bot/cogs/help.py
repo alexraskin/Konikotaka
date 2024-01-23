@@ -13,7 +13,7 @@ class myHelpCommand(HelpCommand):
         self.paginator = None
         self.spacer: str = " "
 
-    async def send_pages(self, header=False, footer=False):
+    async def send_pages(self, header=False, footer=False) -> None:
         destination = self.get_destination()
         embed = Embed(color=0x2ECC71, timestamp=self.context.message.created_at)
         if header:

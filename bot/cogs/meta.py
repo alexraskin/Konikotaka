@@ -15,10 +15,10 @@ from PIL import Image, ImageDraw, ImageFont
 class Meta(commands.Cog, name="Meta"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
-        self.sex = random.choice(["M", "F", "Never"])
-        self.random_number = random.randint(10**9, (10**10) - 1)
-        self.file_path = os.path.dirname(os.path.abspath(__file__))
-        self.rand_number = (
+        self.sex: str = random.choice(["M", "F", "Never"])
+        self.random_number: int = random.randint(10**9, (10**10) - 1)
+        self.file_path: str = os.path.dirname(os.path.abspath(__file__))
+        self.rand_number: int = (
             f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"
         )
         self.visa_image = Image.open(f"{self.file_path}/files/visa.jpg")

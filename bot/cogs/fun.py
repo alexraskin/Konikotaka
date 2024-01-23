@@ -1,28 +1,24 @@
 from __future__ import annotations
 
 import asyncio
-import os
 import random
 import urllib.parse
-from io import BytesIO
 from typing import Literal, Optional, Union
 
 import upsidedown
 from async_foaas import Fuck
-from discord import Colour, Embed, File, Member, Message, User, app_commands
+from discord import Colour, Embed, Member, Message, User, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
-from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy.future import select
 
-from .utils.map_cords import map_cords
 from .utils.utils import get_year_round, progress_bar
 
 
 class Fun(commands.Cog, name="Fun"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
-        self.fuck = Fuck()
+        self.fuck: Fuck = Fuck()
 
     @commands.hybrid_command(
         name="cosmo", help="Get a random Photo of Cosmo the Cat", with_app_command=True
@@ -36,12 +32,12 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get("https://api.cat.network/cosmo") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send(content=photo["photoUrl"])
+                await ctx.reply(content=photo["photoUrl"])
             else:
                 self.client.log.error(
                     f"An error occurred getting photo of Cosmo: {response.status}"
                 )
-                await ctx.send("Error getting photo of Cosmo!")
+                await ctx.reply("Error getting photo of Cosmo!", ephemeral=True)
 
     @commands.hybrid_command(name="fuckoff", help="Tell Someone to Fuck Off")
     @commands.guild_only()
@@ -65,12 +61,12 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get("https://api.cat.network/bczs") as response:
             if response.status == 200:
                 photo = await response.json()
-                await ctx.send(content=photo["photoUrl"])
+                await ctx.reply(content=photo["photoUrl"])
             else:
                 self.client.log.error(
                     f"An error occurred getting photo of Pat and Ash's cats: {response.status}"
                 )
-                await ctx.send("Error getting photo of Pat and Ash's cats!")
+                await ctx.reply("Error getting photo of Pat and Ash's cats!", ephemeral=True)
 
     @commands.hybrid_command(
         name="meme", help="Get a random meme!", with_app_command=True
@@ -83,9 +79,9 @@ class Fun(commands.Cog, name="Fun"):
         async with self.client.session.get("https://meme-api.com/gimme") as response:
             if response.status == 200:
                 meme = await response.json()
-                await ctx.send(meme["url"])
+                await ctx.reply(meme["url"])
             else:
-                await ctx.send("Error getting meme!")
+                await ctx.reply("Error getting meme!", ephemeral=True)
 
     @commands.hybrid_command(
         name="gcattalk", help="Be able to speak with G Cat", with_app_command=True
@@ -97,7 +93,7 @@ class Fun(commands.Cog, name="Fun"):
         Translate your message into G Cat's language
         """
         up_down = upsidedown.transform(message)
-        await ctx.send(up_down)
+        await ctx.reply(up_down)
 
     @commands.hybrid_command(name="waifu", aliases=["getwaifu"])
     @commands.guild_only()
@@ -115,9 +111,9 @@ class Fun(commands.Cog, name="Fun"):
         )
         if response.status == 200:
             waifu = await response.json()
-            await ctx.send(waifu["url"])
+            await ctx.reply(waifu["url"])
         else:
-            await ctx.send("Error getting waifu!")
+            await ctx.reply("Error getting waifu!", ephemeral=True)
 
     @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.command(name="cat", description="Get a random cat image")
@@ -128,10 +124,10 @@ class Fun(commands.Cog, name="Fun"):
         base_url = "https://cataas.com"
         response = await self.client.session.get(f"{base_url}/cat?json=true")
         if response.status != 200:
-            return await ctx.send("Error getting cat!")
+            return await ctx.reply("Error getting cat!", ephemeral=True)
         response = await response.json()
         url = response["url"]
-        await ctx.send(f"{base_url}{url}")
+        await ctx.reply(f"{base_url}{url}")
 
     @commands.hybrid_command(name="roll", description="Roll a dice with NdN")
     @commands.guild_only()
@@ -152,7 +148,7 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(name="8ball", description="Ask the magic 8ball a question")
     @commands.guild_only()
@@ -171,7 +167,7 @@ class Fun(commands.Cog, name="Fun"):
         embed.colour = Colour.blurple()
         embed.set_image(url=json_data["url"])
         embed.set_footer(text=f"{ctx.author}")
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(name="fact", description="Get a random fact")
     @commands.guild_only()
@@ -315,7 +311,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         data = await self.client.session.get("https://nekos.life/api/v2/cat")
         json_data = await data.json()
-        await ctx.send(json_data["cat"])
+        await ctx.reply(json_data["cat"])
 
     @commands.hybrid_command(name="coffee", description="Get a random coffee image")
     @commands.guild_only()
@@ -329,9 +325,7 @@ class Fun(commands.Cog, name="Fun"):
         ) as response:
             if response.status == 200:
                 coffee = await response.json()
-                await ctx.send(coffee["file"])
-            else:
-                await ctx.send("Error getting coffee!")
+                await ctx.reply(coffee["file"])
 
     @commands.hybrid_command(name="slots", description="Play the slots")
     @commands.guild_only()
@@ -374,7 +368,6 @@ class Fun(commands.Cog, name="Fun"):
         )
         embed.add_field(name="Result:", value=f"**{result}**", inline=False)
         await message.edit(embed=embed)
-        print("hello4")
 
     @commands.hybrid_command(name="coinflip", description="Flip a coin")
     @commands.guild_only()
@@ -390,7 +383,7 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(name="rps", description="Play rock paper scissors")
     @commands.guild_only()
@@ -432,7 +425,7 @@ class Fun(commands.Cog, name="Fun"):
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="kira", description="Likelihood of you or someone being Kira"
@@ -477,7 +470,7 @@ class Fun(commands.Cog, name="Fun"):
                     embed.set_thumbnail(
                         url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
                     )
-                    return await ctx.send(embed=embed)
+                    return await ctx.reply(embed=embed)
 
                 if user.kira_percentage == 0 or user.kira_percentage is None:
                     user.kira_percentage = result
@@ -508,7 +501,7 @@ class Fun(commands.Cog, name="Fun"):
                     embed.set_thumbnail(
                         url="https://i.gyazo.com/66470edafe907ac8499c925b5221693d.jpg"
                     )
-                    await ctx.send(embed=embed)
+                    await ctx.reply(embed=embed)
 
     @commands.hybrid_command(name="xkcd", description="Get a Todays XKCD comic")
     @commands.guild_only()
@@ -528,9 +521,9 @@ class Fun(commands.Cog, name="Fun"):
             embed.colour = Colour.blurple()
             embed.set_image(url=comic["img"])
             embed.set_footer(text="Provided by xkcd.com")
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
         else:
-            await ctx.send("Error getting xkcd comic!")
+            await ctx.reply("Error getting xkcd comic!", ephemeral=True)
 
     @commands.hybrid_command(name="year", description="Show the year progress")
     @commands.guild_only()
@@ -576,9 +569,7 @@ class Fun(commands.Cog, name="Fun"):
         ) as response:
             if response.status == 200:
                 quote = await response.text()
-                await ctx.send(quote)
-            else:
-                await ctx.send("Error getting quote!")
+                await ctx.reply(quote)
 
     @commands.hybrid_command(name="dog", description="Get a random dog image")
     @commands.guild_only()
@@ -600,7 +591,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a supreme image
         """
-        await ctx.send(
+        await ctx.reply(
             f"https://api.alexflipnote.dev/supreme?text={urllib.parse.quote(text)}"
         )
 
@@ -613,47 +604,9 @@ class Fun(commands.Cog, name="Fun"):
         """
         Make a did you mean image
         """
-        await ctx.send(
+        await ctx.reply(
             f"https://api.alexflipnote.dev/didyoumean?top={urllib.parse.quote(top)}&bottom={urllib.parse.quote(bottom)}"
         )
-
-    @commands.hybrid_command(
-        name="wherewedropping", description="Get a random location to drop in Fortnite"
-    )
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def where_we_dropping(self, ctx: commands.Context):
-        """
-        Get a random location to drop in Fortnite
-        """
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        data = await self.client.session.get("https://fortnite-api.com/images/map.png")
-        map = Image.open(BytesIO(await data.read()))
-        width, height = map.size
-        background_color = (255, 255, 255)
-        image = Image.new("RGB", (width, height), background_color)
-        image.paste(map, (0, 0))
-        draw = ImageDraw.Draw(image)
-        random_location = random.choice(list(map_cords.keys()))
-        draw.text(
-            map_cords[random_location],
-            random_location,
-            fill=(255, 255, 255),
-            font=ImageFont.truetype(
-                f"{file_path}/files/AROneSans.ttf",
-                size=60,
-            ),
-        )
-        image.save(f"{file_path}/files/map.png")
-        embed = Embed(
-            title="🗺️ Where We Droppin'?",
-            description=f"**{random_location}**",
-            timestamp=ctx.message.created_at,
-        )
-        embed.colour = Colour.blurple()
-        embed.set_footer(text=f"{ctx.author}")
-        await ctx.send(embed=embed, file=File(f"{file_path}/files/map.png"))
-        os.remove(f"{file_path}/files/map.png")
 
     @commands.hybrid_command(
         name="theoffice", description="🏢 Get a random Quote from The Office"
@@ -676,7 +629,7 @@ class Fun(commands.Cog, name="Fun"):
                 embed.colour = Colour.blurple()
                 embed.set_image(url=quote["character_avatar_url"])
                 embed.set_footer(text="https://theoffice.foo/")
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         "officeclip", description="Get a random clip from The Office"
@@ -691,7 +644,7 @@ class Fun(commands.Cog, name="Fun"):
             if response.status == 200:
                 data = await response.json()
                 random_clip = random.choice(data)
-                await ctx.send(random_clip["video_url"])
+                await ctx.reply(random_clip["video_url"])
 
     @commands.hybrid_command(name="anime", description="Get a random anime quote")
     @commands.guild_only()
@@ -711,7 +664,7 @@ class Fun(commands.Cog, name="Fun"):
                 )
                 embed.colour = Colour.blurple()
                 embed.set_footer(text="https://animechan.xyz/")
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed)
 
 
 async def setup(client: commands.Bot) -> None:

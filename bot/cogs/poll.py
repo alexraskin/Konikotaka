@@ -10,7 +10,7 @@ class Polls(commands.Cog):
     https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/poll.py
     """
 
-    def __init__(self, client: commands.Bot):
+    def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
 
     def to_emoji(self, c: int) -> str:
@@ -19,7 +19,7 @@ class Polls(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def quickpoll(self, ctx: commands.Context, *questions_and_choices: str):
+    async def quickpoll(self, ctx: commands.Context, *questions_and_choices: str) -> None:
         """Makes a poll quickly.
 
         The first argument is the question and the rest are the choices.
