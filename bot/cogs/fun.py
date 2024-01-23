@@ -11,11 +11,9 @@ import upsidedown
 from async_foaas import Fuck
 from discord import Colour, Embed, File, Member, Message, User, app_commands
 from discord.ext import commands
-from anekos import NekosLifeClient, SFWImageTags
 from models.users import DiscordUser
 from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy.future import select
-
 
 from .utils.map_cords import map_cords
 from .utils.utils import get_year_round, progress_bar
@@ -25,14 +23,6 @@ class Fun(commands.Cog, name="Fun"):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
         self.fuck = Fuck()
-        self.nekos_client = NekosLifeClient()
-
-    @commands.hybrid_command(name="meow", help="Get a random Meow image")
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def meow(self, ctx: commands.Context) ->Message:
-        img = await  self.nekos_client.image(SFWImageTags.MEOW)
-        await ctx.reply(img.url)
 
     @commands.hybrid_command(
         name="cosmo", help="Get a random Photo of Cosmo the Cat", with_app_command=True
@@ -56,7 +46,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="fuckoff", help="Tell Someone to Fuck Off")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def fuck_off(self, ctx: commands.Context, user: Union[Member, User]) -> Message:
+    async def fuck_off(self, ctx: commands.Context, user: Union[Member, User]):
         _fuck = await self.fuck.random(name=user.mention, from_=ctx.author.name).json
         await ctx.send(_fuck["message"])
 
@@ -129,6 +119,20 @@ class Fun(commands.Cog, name="Fun"):
         else:
             await ctx.send("Error getting waifu!")
 
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    @commands.command(name="cat", description="Get a random cat image")
+    async def cat(self, ctx: commands.Context) -> Message:
+        """
+        Get a random cat image from the catapi
+        """
+        base_url = "https://cataas.com"
+        response = await self.client.session.get(f"{base_url}/cat?json=true")
+        if response.status != 200:
+            return await ctx.send("Error getting cat!")
+        response = await response.json()
+        url = response["url"]
+        await ctx.send(f"{base_url}{url}")
+
     @commands.hybrid_command(name="roll", description="Roll a dice with NdN")
     @commands.guild_only()
     @app_commands.guild_only()
@@ -153,38 +157,39 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="8ball", description="Ask the magic 8ball a question")
     @commands.guild_only()
     @app_commands.guild_only()
-    @app_commands.describe(question="The question to ask the 8ball")
     async def eight_ball(self, ctx: commands.Context, *, question: str) -> Embed:
         """
         Ask the magic 8ball a question
         """
-        ball = await self.nekos_client.random_8ball(question)
-        await ctx.reply(ball.text)
-
-    @commands.hybrid_command(name="owoify", description="Owoify a string")
-    @commands.guild_only()
-    @app_commands.guild_only()
-    @app_commands.describe(text="The string to owoify")
-    async def _owo(self, ctx: commands.Context, *, text: str):
-      owo = await self.nekos_client.owoify(text)
-      await ctx.reply(owo.text)
-
-    @commands.hybrid_command(name="randomname", description="Get a random name")
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def random_name(self, ctx: commands.Context) -> Message:
-        name = await self.nekos_client.random_name()
-        await ctx.reply(name.text)
+        data = await self.client.session.get("https://nekos.life/api/v2/8ball")
+        json_data = await data.json()
+        embed = Embed(
+            title="🎱 Meowgical 8ball",
+            description=f"Question: {question}\n\nAnswer: {json_data['response']}",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_image(url=json_data["url"])
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="fact", description="Get a random fact")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def fact(self, ctx: commands.Context) -> Message:
+    async def fact(self, ctx: commands.Context) -> Embed:
         """
         Get a random fact
         """
-        data = await self.nekos_client.random_fact_text()
-        await ctx.reply(data.text)
+        data = await self.client.session.get("https://nekos.life/api/v2/fact")
+        json_data = await data.json()
+        embed = Embed(
+            title="📖 Fact",
+            description=f"{json_data['fact']}",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_footer(text=f"{ctx.author}")
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="reverse", description="Reverse a string")
     @commands.guild_only()
@@ -232,22 +237,38 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="hug", description="Hug someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def hug(self, ctx: commands.Context, member: Member) -> Message:
+    async def hug(self, ctx: commands.Context, member: Member) -> Embed:
         """
         Hug someone
         """
-        img = await self.nekos_client.image(SFWImageTags.HUG)
-        await ctx.reply(img.url)
-  
+        data = await self.client.session.get("https://nekos.life/api/v2/img/hug")
+        json_data = await data.json()
+        embed = Embed(
+            title="🫂 Hug",
+            description=f"{ctx.author.mention} hugged {member.mention} 😊",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_image(url=json_data["url"])
+        await ctx.send(embed=embed)
+
     @commands.hybrid_command(name="slap", description="Slap someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def slap(self, ctx: commands.Context, member: Member) -> Message:
+    async def slap(self, ctx: commands.Context, member: Member) -> Embed:
         """
         Slap someone
         """
-        img = await self.nekos_client.image(SFWImageTags.SLAP)
-        await ctx.reply(f'{ctx.author.mention} slapped {member.mention}!\n{img.url}')
+        data = await self.client.session.get("https://nekos.life/api/v2/img/slap")
+        json_data = await data.json()
+        embed = Embed(
+            title="👊 Slap",
+            description=f"{ctx.author.mention} slapped {member.mention} 😡",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_image(url=json_data["url"])
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="kiss", description="Kiss someone")
     @commands.guild_only()
@@ -256,24 +277,34 @@ class Fun(commands.Cog, name="Fun"):
         """
         Kiss someone
         """
-        if member == ctx.author or member is None:
-            await ctx.reply("Mention someone!")
-            return
-        img = await self.nekos_client.image(SFWImageTags.KISS)
-        await ctx.reply(img.url)
+        data = await self.client.session.get("https://nekos.life/api/v2/img/kiss")
+        json_data = await data.json()
+        embed = Embed(
+            title="💋 Kiss",
+            description=f"{ctx.author.mention} kissed {member.mention} 😘",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_image(url=json_data["url"])
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="pat", description="Pat someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def pat(self, ctx: commands.Context, member: Member) -> Message:
+    async def pat(self, ctx: commands.Context, member: Member) -> Embed:
         """
         Pat someone
         """
-        if member == ctx.author or member is None:
-            await ctx.reply("Mention someone!")
-            return
-        img = await self.nekos_client.image(SFWImageTags.PAT)
-        await ctx.reply(f"{ctx.author.mention} patted {member.mention}!\n{img.url}")
+        data = await self.client.session.get("https://nekos.life/api/v2/img/pat")
+        json_data = await data.json()
+        embed = Embed(
+            title="👋 Pat",
+            description=f"{ctx.author.mention} patted {member.mention} 😊",
+            timestamp=ctx.message.created_at,
+        )
+        embed.colour = Colour.blurple()
+        embed.set_image(url=json_data["url"])
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="textcat")
     @commands.guild_only()
@@ -282,7 +313,9 @@ class Fun(commands.Cog, name="Fun"):
         """
         Get a random text cat
         """
-        data = await self.nekos_client.random_cat_text()
+        data = await self.client.session.get("https://nekos.life/api/v2/cat")
+        json_data = await data.json()
+        await ctx.send(json_data["cat"])
 
     @commands.hybrid_command(name="coffee", description="Get a random coffee image")
     @commands.guild_only()
