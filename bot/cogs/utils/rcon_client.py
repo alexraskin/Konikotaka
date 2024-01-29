@@ -1,3 +1,5 @@
+# https://github.com/KOOKIIEStudios/PalCON-Discord
+
 from rcon import Console
 from typing import Optional, Union
 
