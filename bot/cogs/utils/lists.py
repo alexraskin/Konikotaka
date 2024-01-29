@@ -23,6 +23,7 @@ activities: list = [
     "Team Fight Tactics",
     "League of Legends",
     "Fortnite",
+    "Palworld",
 ]
 
 ai_ban_words: list = [
