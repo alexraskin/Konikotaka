@@ -78,7 +78,7 @@ class RconClient:
 
     def force_stop(self) -> Union[str, bool]:
         console = self.open()
-        res = console.command(f"DoExit")
+        res = console.command("DoExit")
         console.close()
         # TODO: Check if this is supposed to give a response (and alter accordingly)
         return res if res else False
