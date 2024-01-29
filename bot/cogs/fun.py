@@ -66,7 +66,9 @@ class Fun(commands.Cog, name="Fun"):
                 self.client.log.error(
                     f"An error occurred getting photo of Pat and Ash's cats: {response.status}"
                 )
-                await ctx.reply("Error getting photo of Pat and Ash's cats!", ephemeral=True)
+                await ctx.reply(
+                    "Error getting photo of Pat and Ash's cats!", ephemeral=True
+                )
 
     @commands.hybrid_command(
         name="meme", help="Get a random meme!", with_app_command=True

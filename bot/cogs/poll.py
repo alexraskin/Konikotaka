@@ -19,7 +19,9 @@ class Polls(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def quickpoll(self, ctx: commands.Context, *questions_and_choices: str) -> None:
+    async def quickpoll(
+        self, ctx: commands.Context, *questions_and_choices: str
+    ) -> None:
         """Makes a poll quickly.
 
         The first argument is the question and the rest are the choices.
