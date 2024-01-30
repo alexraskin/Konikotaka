@@ -10,7 +10,7 @@ class RconClient:
     ) -> None:
         self.host: str = host
         self.password: str = password
-        self.port: int = int(port)
+        self.port: int = port
         self.timeout: int = timeout
 
     def open(self) -> Console:
