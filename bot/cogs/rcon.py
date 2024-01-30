@@ -29,7 +29,7 @@ class Rcon(
     )
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_commands(self, interaction: Interaction) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -48,7 +48,7 @@ class Rcon(
     )
     @app_commands.checks.has_role(1201576683355000852)
     async def online(self, interaction: Interaction) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -74,7 +74,7 @@ class Rcon(
     @command(name="info", description="Get the server info")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_info(self, interaction: Interaction) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -90,7 +90,7 @@ class Rcon(
     @command(name="save", description="Save the palworld server")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_save(self, interaction: Interaction) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -108,7 +108,7 @@ class Rcon(
     @app_commands.describe(message="The message to broadcast")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_broadcast(self, interaction: Interaction, message: str) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -124,7 +124,7 @@ class Rcon(
     @app_commands.describe(steam_id="The steam id of the player to kick")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_kick(self, interaction: Interaction, steam_id: str) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -140,7 +140,7 @@ class Rcon(
     @app_commands.describe(steam_id="The steam id of the player to ban")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_ban(self, interaction: Interaction, steam_id: str) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -163,7 +163,7 @@ class Rcon(
     async def rcon_shutdown(
         self, interaction: Interaction, seconds: str, message: str
     ) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -180,7 +180,7 @@ class Rcon(
     @command(name="force_stop", description="Force stop the server")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_force_stop(self, interaction: Interaction) -> None:
-        if interaction.message.guild.id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.cosmo_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
