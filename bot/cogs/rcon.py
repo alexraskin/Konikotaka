@@ -5,7 +5,7 @@ import os
 from discord import app_commands, Interaction, Embed, Colour
 from discord.ext import commands
 from discord.ext.commands import GroupCog
-from discord.app_commands import Group, command
+from discord.app_commands import command
 
 from .utils.rcon_client import RconClient
 
