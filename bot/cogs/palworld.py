@@ -12,7 +12,7 @@ from discord.ext.commands import GroupCog
 from discord.app_commands import command
 
 
-class DynamicPages(menus.ListPageSource):
+class PalPages(menus.ListPageSource):
     def __init__(self, data, per_page):
         super().__init__(data, per_page=per_page)
 
@@ -28,7 +28,7 @@ class DynamicPages(menus.ListPageSource):
         return embed
 
 
-class MyMenu(menus.MenuPages):
+class PalMenu(menus.MenuPages):
     pass
 
 
@@ -72,8 +72,8 @@ class Palworld(GroupCog, name="pal"):
         data = await response.json()
 
         if response.status == 200:
-            pages = DynamicPages(data["content"], per_page=5)
-            menu = MyMenu(pages)
+            pages = PalPages(data["content"], per_page=5)
+            menu = PalMenu(pages)
             await menu.start(ctx)
         else:
             await ctx.send("No results found.")

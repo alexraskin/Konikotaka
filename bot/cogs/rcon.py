@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
+import asyncio
 
+import discord
 from discord import app_commands, Interaction, Embed, Colour
 from discord.ext import commands
 from discord.ext.commands import GroupCog
@@ -12,7 +14,7 @@ from .utils.rcon_client import RconClient
 
 class Rcon(
     GroupCog,
-    group_name="palworld",
+    group_name="palserver",
     group_description="Avaliable commands to interact with the Palworld Server",
 ):
     def __init__(self, client: commands.Bot) -> None:
@@ -72,7 +74,7 @@ class Rcon(
         embed.add_field(name="Players", value=list_of_players, inline=False)
         await interaction.response.send_message(embed=embed)
 
-    @command(name="info", description="Get the server info")
+    @command(name="info", description="Get information about the Palworld Server")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_info(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
@@ -103,7 +105,7 @@ class Rcon(
             return
         await interaction.response.send_message("Server saved successfully. 🎉")
 
-    @command(name="broadcast", description="Broadcast a message to the server")
+    @command(name="broadcast", description="Broadcast a message to the Palworld server")
     @app_commands.describe(message="The message to broadcast")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_broadcast(self, interaction: Interaction, message: str) -> None:
@@ -119,7 +121,7 @@ class Rcon(
             return
         await interaction.response.send_message("Message broadcasted successfully. 🎉")
 
-    @command(name="kick", description="Kick a player from the server")
+    @command(name="kick", description="Kick a player from the Palworld server")
     @app_commands.describe(steam_id="The steam id of the player to kick")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_kick(self, interaction: Interaction, steam_id: str) -> None:
@@ -133,9 +135,9 @@ class Rcon(
                 "There was an error kicking the player."
             )
             return
-        await interaction.response.send_message("Player kicked successfully.")
+        await interaction.response.send_message("Player kicked successfully. 🎉")
 
-    @command(name="ban", description="Ban a player from the server")
+    @command(name="ban", description="Ban a player from the Palworld server")
     @app_commands.describe(steam_id="The steam id of the player to ban")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_ban(self, interaction: Interaction, steam_id: str) -> None:
@@ -149,9 +151,9 @@ class Rcon(
                 "There was an error banning the player."
             )
             return
-        await interaction.response.send_message("Player banned successfully.")
+        await interaction.response.send_message("Player banned successfully. 🎉")
 
-    @command(name="shutdown", description="Shutdown the server")
+    @command(name="shutdown", description="Shutdown the Palworld server")
     @app_commands.describe(
         seconds="The number of seconds to wait before shutting down the server"
     )
@@ -166,6 +168,12 @@ class Rcon(
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
+        save = self.rcon_client.save()
+        if not save:
+            await interaction.response.send_message(
+                "There was an error saving the server."
+            )
+            return
         output = self.rcon_client.shutdown(seconds, message)
         if not output:
             await interaction.response.send_message(
@@ -176,21 +184,37 @@ class Rcon(
             "Server shutting down in {seconds} seconds. Please prepare to disconnect from the server. 🎉"
         )
 
-    @command(name="force_stop", description="Force stop the server")
+    @command(name="force_stop", description="Force stop the Palworld server")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_force_stop(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
+        
+        await interaction.response.send_message("Are you sure you want to force stop the server?")
 
-        output = self.rcon_client.force_stop()
-        if not output:
-            await interaction.response.send_message(
-                "There was an error force stopping the server."
-            )
-            return
-        await interaction.response.send_message("Server force stopped successfully.")
+        def check(interaction: Interaction, user: discord.User, channel: discord.TextChannel):
+            return interaction.user == user and interaction.channel == channel and str(interaction.emoji) in ["✅", "❌"]
+        
+        try:
+          reaction, user = await self.client.wait_for("reaction_add", check=check, timeout=30)
+        except asyncio.TimeoutError:
+          await interaction.followup.send("You took too long to respond.")
+          return
+        else:
+          if str(reaction.emoji) == "✅":
+            await interaction.followup.send("Server force stopping...")
+            output = self.rcon_client.force_stop()
+            if not output:
+                await interaction.followup.send(
+                    "There was an error force stopping the server."
+                )
+                return
+            else:
+                await interaction.followup.send("Server force stopped successfully. 🎉")
+          else:
+            await interaction.followup.send("Server force stop cancelled.")
 
 
 async def setup(client: commands.Bot) -> None:
