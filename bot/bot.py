@@ -9,7 +9,7 @@ import psutil
 import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
-from bot.cogs.utils.consts import activities
+from cogs.utils.consts import activities
 from discord.ext import tasks
 from discord.ext.commands import Bot, NoEntryPointError
 from dotenv import load_dotenv
