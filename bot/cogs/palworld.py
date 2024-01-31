@@ -18,13 +18,19 @@ class DynamicPages(menus.ListPageSource):
 
     async def format_page(self, menu, page):
         embed = discord.Embed(title="Palworld Pals", color=discord.Color.purple())
-        embed.set_thumbnail(url="https://i.gyazo.com/272047b9ab38dd7d5a1ad5513436fcdf.png")
+        embed.set_thumbnail(
+            url="https://i.gyazo.com/272047b9ab38dd7d5a1ad5513436fcdf.png"
+        )
         for item in page:
-            embed.add_field(name=item['name'], value=f"[Wiki]({item['wiki']})", inline=True)
+            embed.add_field(
+                name=item["name"], value=f"[Wiki]({item['wiki']})", inline=True
+            )
         return embed
+
 
 class MyMenu(menus.MenuPages):
     pass
+
 
 class Palworld(GroupCog, name="pal"):
     def __init__(self, client: commands.Bot):
@@ -40,7 +46,7 @@ class Palworld(GroupCog, name="pal"):
         ]
         url_params = "&".join(param_list)
         return url + ("?" + url_params if url_params else "")
-    
+
     @command(name="palworld")
     async def palworld(self, interaction: discord.Interaction) -> None:
         """Get the Palworld API information"""
