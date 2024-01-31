@@ -71,11 +71,13 @@ class Meta(commands.Cog, name="Meta"):
         draw.text((400, 713), self.random_expiration(), fill=(0, 0, 0), font=self.font)
         draw.text((75, 880), str(self.rand_number), fill=(1, 20, 20), font=self.font)
         self.image.paste(discord_avatar, (100, 589))
-        self.image.save(f"{self.file_path}/files/{member.id}.jpg")
+        file_path = f"{self.file_path}/files/{member.id}.jpg"
+        self.image.save(file_path)
+        return file_path
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id == self.client.cosmo_guild:
+        if member.guild.id == self.client.main_guild:
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
@@ -94,17 +96,17 @@ class Meta(commands.Cog, name="Meta"):
                         self.client.log.error(e)
                         await session.rollback()
 
-        await self.create_image(member)
+        image = await self.create_image(member)
         channel = await self.client.fetch_channel(member.guild.system_channel.id)
         await channel.send(
             content=f"Welcome {member.mention} to the {member.guild.name} discord server!",
-            file=File(f"{self.file_path}/files/{member.id}.jpg"),
+            file=File(image),
         )
-        os.remove(f"{self.file_path}/files/{member.id}.jpg")
+        os.remove(image)
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: Guild, user: Member) -> None:
-        if guild.id != self.client.cosmo_guild:
+        if guild.id != self.client.main_guild:
             return
         async with self.client.async_session() as session:
             async with session.begin():
@@ -130,7 +132,7 @@ class Meta(commands.Cog, name="Meta"):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member) -> None:
-        if before.guild.id != self.client.cosmo_guild:
+        if before.guild.id != self.client.main_guild:
             return
         async with self.client.async_session() as session:
             async with session.begin():

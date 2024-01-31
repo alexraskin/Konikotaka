@@ -24,12 +24,10 @@ class Rcon(
         )
         self.steam_profile = "https://steamcommunity.com/profiles/{steam_id}/"
 
-    @command(
-        name="commands", description="Get the list of Palworld Server commands"
-    )
+    @command(name="commands", description="Get the list of Palworld Server commands")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_commands(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -38,6 +36,9 @@ class Rcon(
         embed.add_field(name="Save", value="Save the server")
         embed.add_field(name="ShowPlayers", value="Get the list of players online")
         embed.add_field(name="Broadcast", value="Broadcast a message to the server")
+        embed.add_field(name="Kick", value="Kick a player from the server")
+        embed.add_field(name="Ban", value="Ban a player from the server")
+        embed.add_field(name="Shutdown", value="Shutdown the server")
 
         embed.set_footer(text="Note: Commands only available to admins")
         await interaction.response.send_message(embed=embed)
@@ -48,7 +49,7 @@ class Rcon(
     )
     @app_commands.checks.has_role(1201576683355000852)
     async def online(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -74,7 +75,7 @@ class Rcon(
     @command(name="info", description="Get the server info")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_info(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -90,7 +91,7 @@ class Rcon(
     @command(name="save", description="Save the palworld server")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_save(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -100,15 +101,13 @@ class Rcon(
                 "There was an error saving the server."
             )
             return
-        await interaction.response.send_message("Server saved successfully.")
+        await interaction.response.send_message("Server saved successfully. 🎉")
 
-    @command(
-        name="broadcast", description="Broadcast a message to the server"
-    )
+    @command(name="broadcast", description="Broadcast a message to the server")
     @app_commands.describe(message="The message to broadcast")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_broadcast(self, interaction: Interaction, message: str) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -118,13 +117,13 @@ class Rcon(
                 "There was an error broadcasting the message."
             )
             return
-        await interaction.response.send_message("Message broadcasted successfully.")
+        await interaction.response.send_message("Message broadcasted successfully. 🎉")
 
     @command(name="kick", description="Kick a player from the server")
     @app_commands.describe(steam_id="The steam id of the player to kick")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_kick(self, interaction: Interaction, steam_id: str) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -140,7 +139,7 @@ class Rcon(
     @app_commands.describe(steam_id="The steam id of the player to ban")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_ban(self, interaction: Interaction, steam_id: str) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -163,7 +162,7 @@ class Rcon(
     async def rcon_shutdown(
         self, interaction: Interaction, seconds: str, message: str
     ) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -174,13 +173,13 @@ class Rcon(
             )
             return
         await interaction.response.send_message(
-            "Server shutting down in {seconds} seconds."
+            "Server shutting down in {seconds} seconds. Please prepare to disconnect from the server. 🎉"
         )
 
     @command(name="force_stop", description="Force stop the server")
     @app_commands.checks.has_role(1201576683355000852)
     async def rcon_force_stop(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.cosmo_guild:
+        if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )

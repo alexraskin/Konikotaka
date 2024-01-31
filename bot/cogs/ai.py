@@ -18,7 +18,7 @@ from discord.ext import commands
 from openai import AsyncOpenAI
 
 from .utils import gpt
-from .utils.lists import ai_ban_words
+from .utils.consts import ai_ban_words
 
 
 class Download(ui.View):

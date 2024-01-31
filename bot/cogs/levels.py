@@ -25,7 +25,7 @@ class Levels(commands.Cog, name="Levels"):
         """
         if message.author == self.client.user:
             return
-        if message.guild.id != self.client.cosmo_guild:
+        if message.guild.id != self.client.main_guild:
             return
         if message.author.bot:
             return
@@ -64,6 +64,7 @@ class Levels(commands.Cog, name="Levels"):
                     await session.flush()
 
     @app_commands.command(name="rank")
+    @app_commands.describe(user="The user to get the rank of")
     async def rank(self, interaction: Interaction, user: Optional[User] = None) -> None:
         """
         Sends a user's rank

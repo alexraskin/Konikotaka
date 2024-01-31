@@ -9,7 +9,7 @@ import psutil
 import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
-from cogs.utils.lists import activities
+from bot.cogs.utils.consts import activities
 from discord.ext import tasks
 from discord.ext.commands import Bot, NoEntryPointError
 from dotenv import load_dotenv
@@ -32,7 +32,7 @@ class Konikotaka(Bot):
         self.session = None
         self.pid = os.getpid()
         self.start_time = time.time()
-        self.cosmo_guild: int = 1020830000104099860
+        self.main_guild: int = 1020830000104099860
         self.general_channel: int = 1145087802141315093
         self.version: str = "1.0.6"
         self.lavalink_uri: str = os.getenv("LAVALINK_URI")
