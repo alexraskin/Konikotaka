@@ -32,7 +32,7 @@ class PalMenu(menus.MenuPages):
     pass
 
 
-class Palworld(GroupCog, name="pal"):
+class Palworld(GroupCog, name="palworld"):
     def __init__(self, client: commands.Bot):
         self.client = client
         self.base_url: str = "https://palapi.world"
