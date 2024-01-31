@@ -6,13 +6,27 @@ Konikotaka is a Discord Bot that I created for my personal server. It's a fun pr
 
 _Name and Photo [Konikotaka](https://youtu.be/Qr2LQILdXD0?si=WwoM0emUIa_8dBfJ)_
 
-## Running
+## Features
+
+- [Music](https://github.com/lavalink-devs/Lavalink)
+- Moderation
+- Fun
+- Utility
+- Games
+- RCON (Palworld)
+- [Tomorrow.io Weather](https://www.tomorrow.io/)
+- [OpenAI](https://openai.com/)
+- [Cloudflare AI](https://ai.cloudflare.com/)
+- Anime Waifus (SFW)
+- Memes (SFW)
+
+## Running the Bot Locally
 
 I would prefer if you don't run an instance of my bot. Just call the invite command with an invite URL to have it on your server.
 
 Nevertheless, the installation steps are as follows:
 
-Create an `.env` file in the root directory with the following variables: 
+Create an `.env` file in the root directory with the following variables:
 
 ```bash
 DISCORD_TOKEN=
@@ -27,6 +41,15 @@ LAVALINK_URI=
 LAVALINK_PASSWORD=
 HEALTHCHECK_URL=
 X-API-KEY=
+CLIENT_ID=
+OPENAI_TOKEN=
+CLOUDFLARE_AI_GATEWAY_URL=
+CLOUDFLARE_AI_URL=
+CLOUDFLARE_AI_TOKEN=
+TOMORROW_API_KEY=
+RCON_HOST=
+RCON_PORT=
+RCON_PASSWORD=
 ```
 
 Run the bot:
