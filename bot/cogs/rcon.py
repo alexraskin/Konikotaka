@@ -191,30 +191,42 @@ class Rcon(
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
-        
-        await interaction.response.send_message("Are you sure you want to force stop the server?")
 
-        def check(interaction: Interaction, user: discord.User, channel: discord.TextChannel):
-            return interaction.user == user and interaction.channel == channel and str(interaction.emoji) in ["✅", "❌"]
-        
+        await interaction.response.send_message(
+            "Are you sure you want to force stop the server?"
+        )
+
+        def check(
+            interaction: Interaction, user: discord.User, channel: discord.TextChannel
+        ):
+            return (
+                interaction.user == user
+                and interaction.channel == channel
+                and str(interaction.emoji) in ["✅", "❌"]
+            )
+
         try:
-          reaction, user = await self.client.wait_for("reaction_add", check=check, timeout=30)
+            reaction, user = await self.client.wait_for(
+                "reaction_add", check=check, timeout=30
+            )
         except asyncio.TimeoutError:
-          await interaction.followup.send("You took too long to respond.")
-          return
+            await interaction.followup.send("You took too long to respond.")
+            return
         else:
-          if str(reaction.emoji) == "✅":
-            await interaction.followup.send("Server force stopping...")
-            output = self.rcon_client.force_stop()
-            if not output:
-                await interaction.followup.send(
-                    "There was an error force stopping the server."
-                )
-                return
+            if str(reaction.emoji) == "✅":
+                await interaction.followup.send("Server force stopping...")
+                output = self.rcon_client.force_stop()
+                if not output:
+                    await interaction.followup.send(
+                        "There was an error force stopping the server."
+                    )
+                    return
+                else:
+                    await interaction.followup.send(
+                        "Server force stopped successfully. 🎉"
+                    )
             else:
-                await interaction.followup.send("Server force stopped successfully. 🎉")
-          else:
-            await interaction.followup.send("Server force stop cancelled.")
+                await interaction.followup.send("Server force stop cancelled.")
 
 
 async def setup(client: commands.Bot) -> None:
