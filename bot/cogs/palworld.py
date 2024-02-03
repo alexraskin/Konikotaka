@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import random
 import urllib.parse
 
@@ -36,6 +37,7 @@ class Palworld(GroupCog, name="palworld"):
     def __init__(self, client: commands.Bot):
         self.client = client
         self.base_url: str = "https://palapi.world"
+        self.server_ip: str = os.getenv("PALWORLD_SERVER_IP")
 
     def build_url(self, **kwargs) -> str:
         url = self.base_url
@@ -61,6 +63,21 @@ class Palworld(GroupCog, name="palworld"):
         )
         embed.timestamp = interaction.created_at
         embed.set_footer(text="Powered by Palworld API")
+        await interaction.response.send_message(embed=embed)
+    
+    @command(name="connect")
+    async def connect(self, interaction: discord.Interaction) -> None:
+        """Palworld Server IP Address"""
+
+        if interaction.guild.id != self.client.main_guild:
+            return await interaction.response.send_message("This command is not available in this server.")
+
+        embed = discord.Embed()
+        embed.colour = discord.Colour.blurple()
+        embed.title = "Palworld Server IP Address"
+        embed.description = f"{self.server_ip} (This is not an invite code. You need to join using the multiplayer feature in the game.)"
+        embed.set_thumbnail(url="https://i.gyazo.com/272047b9ab38dd7d5a1ad5513436fcdf.png")
+        embed.timestamp = interaction.created_at
         await interaction.response.send_message(embed=embed)
 
     @command(name="allpals")
