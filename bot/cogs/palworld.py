@@ -77,7 +77,7 @@ class Palworld(GroupCog, name="palworld"):
         embed = discord.Embed()
         embed.colour = discord.Colour.blurple()
         embed.title = "Palworld Server IP Address"
-        embed.description = f"{self.server_ip} (This is not an invite code. You need to join using the multiplayer feature in the game.)"
+        embed.description = f"**{self.server_ip}** (This is not an invite code. You need to join using the multiplayer feature in the game.)"
         embed.set_thumbnail(
             url="https://i.gyazo.com/272047b9ab38dd7d5a1ad5513436fcdf.png"
         )
