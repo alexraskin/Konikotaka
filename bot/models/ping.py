@@ -5,6 +5,16 @@ from sqlalchemy import DATE, Column, Integer
 class Ping(Base):
     """
     Ping Model
+
+    Attributes:
+    - id: int
+        The primary key of the table
+    - ping_ws: int
+        The ping of the websocket
+    - ping_rest: int
+        The ping of the rest api
+    - date: str
+        The date the ping was recorded
     """
 
     __tablename__ = "ping"

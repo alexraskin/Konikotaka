@@ -5,6 +5,24 @@ from sqlalchemy import DATE, VARCHAR, Column, Integer
 class DiscordUser(Base):
     """
     Discord User Model
+
+    Attributes:
+    - id: int
+        The primary key of the table
+    - discord_id: str
+        The discord id of the user
+    - username: str
+        The username of the user
+    - joined: str
+        The date the user joined the guild
+    - guild_id: str
+        The guild id of the user
+    - kira_percentage: int
+        The kira percentage of the user
+    - level: int
+        The level of the user
+    - xp: int
+        The xp of the user
     """
 
     __tablename__ = "discord_users"

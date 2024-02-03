@@ -5,6 +5,22 @@ from sqlalchemy import BIGINT, VARCHAR, Column, Integer, String
 class CustomTags(Base):
     """
     Custom Tags Model
+
+    Attributes:
+    - id: int
+        The primary key of the table
+    - discord_id: str
+        The discord id of the user who added the tag
+    - name: str
+        The name of the tag
+    - location_id: int
+        The location id of the tag
+    - content: str
+        The content of the tag
+    - called: int
+        The number of times the tag has been called
+    - date_added: str
+        The date the tag was added
     """
 
     __tablename__ = "tags"
