@@ -27,7 +27,7 @@ class Rcon(
         self.steam_profile = "https://steamcommunity.com/profiles/{steam_id}/"
 
     @command(name="commands", description="Get the list of Palworld Server commands")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_commands(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -49,7 +49,7 @@ class Rcon(
         name="online",
         description="Get the list of players online in our Palworld Server",
     )
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def online(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -75,7 +75,7 @@ class Rcon(
         await interaction.response.send_message(embed=embed)
 
     @command(name="info", description="Get information about the Palworld Server")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_info(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -91,7 +91,7 @@ class Rcon(
         await interaction.response.send_message(embed=embed)
 
     @command(name="save", description="Save the palworld server")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_save(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -107,7 +107,7 @@ class Rcon(
 
     @command(name="broadcast", description="Broadcast a message to the Palworld server")
     @app_commands.describe(message="The message to broadcast")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_broadcast(self, interaction: Interaction, message: str) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -123,7 +123,7 @@ class Rcon(
 
     @command(name="kick", description="Kick a player from the Palworld server")
     @app_commands.describe(steam_id="The steam id of the player to kick")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_kick(self, interaction: Interaction, steam_id: str) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -139,7 +139,7 @@ class Rcon(
 
     @command(name="ban", description="Ban a player from the Palworld server")
     @app_commands.describe(steam_id="The steam id of the player to ban")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_ban(self, interaction: Interaction, steam_id: str) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
@@ -160,7 +160,7 @@ class Rcon(
     @app_commands.describe(
         message="The message to broadcast before shutting down the server"
     )
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_shutdown(
         self, interaction: Interaction, seconds: str, message: str
     ) -> None:
@@ -185,7 +185,7 @@ class Rcon(
         )
 
     @command(name="force_stop", description="Force stop the Palworld server")
-    @app_commands.checks.has_role(1201576683355000852)
+    @app_commands.checks.has_permissions(administrator=True)
     async def rcon_force_stop(self, interaction: Interaction) -> None:
         if interaction.guild_id != self.client.main_guild:
             return await interaction.response.send_message(
