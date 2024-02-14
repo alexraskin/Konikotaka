@@ -131,7 +131,8 @@ class SnailRace(commands.Cog, name="Snail Racing"):
         )
         embed.set_thumbnail(url=winner.display_avatar.url)
         await interaction.channel.send(embed=embed)
-        await self.update_leaderboard(winner)
+        if winner.name != self.client.user.name:
+            await self.update_leaderboard(winner)
 
     @app_commands.command(name="race", description="Start a Snail Race")
     @app_commands.guild_only()
