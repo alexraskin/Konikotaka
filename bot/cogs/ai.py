@@ -38,8 +38,8 @@ class Ai(commands.Cog, name="Ai"):
         if message.author == self.client.user:
             return
 
-        if self.client.user.mentioned_in(message):
-            name = message.author.nick if message.author.nick else message.author.name
+        if self.client.user.mentioned_in(message):  # type: ignore
+            name = message.author.nick if message.author.nick else message.author.name  # type: ignore
             client = AsyncOpenAI(
                 api_key=self.openai_token, base_url=self.openai_gateway_url
             )

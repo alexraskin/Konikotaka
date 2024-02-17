@@ -111,7 +111,7 @@ class Konikotaka(Bot):
     def git_revision(self) -> str:
         latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
         if latest_revision is None:
-            return None
+            return None  # type: ignore
         url = f"<https://github.com/alexraskin/Konikotaka/commit/{(short := latest_revision[:7])}>"
         return f"[{short}]({url})"
 
@@ -141,7 +141,7 @@ async def init_database() -> None:
 
 @client.event
 async def on_ready() -> None:
-    client.log.info(f"{client.user.name} has connected to Discord!")
+    client.log.info(f"{client.user.name} has connected to Discord!")  # type: ignore
     change_activity.start()
     init_database.start()
 

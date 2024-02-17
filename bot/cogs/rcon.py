@@ -29,7 +29,7 @@ class Rcon(
     @command(name="commands", description="Get the list of Palworld Server commands")
     @app_commands.checks.has_permissions(administrator=True)
     async def rcon_commands(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.main_guild:
+        if interaction.guild_id != self.client.main_guild:  # type: ignore
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -93,7 +93,7 @@ class Rcon(
     @command(name="save", description="Save the palworld server")
     @app_commands.checks.has_permissions(administrator=True)
     async def rcon_save(self, interaction: Interaction) -> None:
-        if interaction.guild_id != self.client.main_guild:
+        if interaction.guild_id != self.client.main_guild:  # type: ignore
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -109,7 +109,7 @@ class Rcon(
     @app_commands.describe(message="The message to broadcast")
     @app_commands.checks.has_permissions(administrator=True)
     async def rcon_broadcast(self, interaction: Interaction, message: str) -> None:
-        if interaction.guild_id != self.client.main_guild:
+        if interaction.guild_id != self.client.main_guild:  # type: ignores
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -125,7 +125,7 @@ class Rcon(
     @app_commands.describe(steam_id="The steam id of the player to kick")
     @app_commands.checks.has_permissions(administrator=True)
     async def rcon_kick(self, interaction: Interaction, steam_id: str) -> None:
-        if interaction.guild_id != self.client.main_guild:
+        if interaction.guild_id != self.client.main_guild:  # type: ignore
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )
@@ -141,7 +141,7 @@ class Rcon(
     @app_commands.describe(steam_id="The steam id of the player to ban")
     @app_commands.checks.has_permissions(administrator=True)
     async def rcon_ban(self, interaction: Interaction, steam_id: str) -> None:
-        if interaction.guild_id != self.client.main_guild:
+        if interaction.guild_id != self.client.main_guild:  # type: ignore
             return await interaction.response.send_message(
                 "This command is not available in this server."
             )

@@ -12,9 +12,7 @@ class Admin(commands.Cog, name="Admin"):
 
     @commands.command(name="reload", hidden=True)
     @commands.is_owner()
-    async def reload(
-        self, ctx: commands.Context, extension: Optional[str] = None
-    ) -> None:
+    async def reload(self, ctx: Context, extension: Optional[str] = None) -> None:
         """
         Reloads all the cogs or a specified cog.
         """
@@ -83,7 +81,7 @@ class Admin(commands.Cog, name="Admin"):
         """
         if name is None:
             name = emoji.name
-        guild = ctx.guild
+        guild: Guild = ctx.guild  # type: ignore
         try:
             res = await self.client.get(emoji.url)
             if res.status == 200:

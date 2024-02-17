@@ -77,12 +77,12 @@ class Meta(commands.Cog, name="Meta"):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id == self.client.main_guild:
+        if member.guild.id == self.client.main_guild:  # type: ignore
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
-                joined=member.joined_at,
-                guild_id=str(member.guild.id),
+                joined=member.joined_at,  # type: ignore
+                guild_id=str(member.guild.id),  # type: ignore
                 xp=0,
                 level=0,
             )
@@ -123,7 +123,7 @@ class Meta(commands.Cog, name="Meta"):
                     embed.colour = Colour.blurple()
                     embed.add_field(name="User:", value=user.mention, inline=False)
                     channel: GuildChannel = self.client.get_channel(
-                        self.general_channel
+                        self.general_channel  # type: ignore
                     )
                     await channel.send(embed=embed)
                 except Exception as e:
