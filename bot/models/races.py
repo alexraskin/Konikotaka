@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import BIGINT, VARCHAR, Column, Integer
+from sqlalchemy import BIGINT, VARCHAR, Column, Integer  # type: ignore
 
 
 class Races(Base):

@@ -1,16 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, Annotated
 
 import discord
-import wavelink
+import wavelink  # type: ignore
 from discord import Colour, app_commands
 from discord.ext import commands
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
+
 
 class Music(commands.Cog, name="Music"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     @commands.Cog.listener()
     async def on_wavelink_node_ready(self, node: wavelink.Node) -> None:
@@ -21,7 +25,7 @@ class Music(commands.Cog, name="Music"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def music(self, ctx: commands.Context) -> None:
+    async def music(self, ctx: Context) -> None:
         """Music commands"""
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
@@ -34,7 +38,7 @@ class Music(commands.Cog, name="Music"):
     @app_commands.describe(search="The search query to use.")
     @app_commands.describe(volume="The volume to play at.")
     async def play(
-        self, ctx: commands.Context, search: str, volume: Optional[int] = 30
+        self, ctx: Context, search: str, volume: Optional[int] = 30
     ) -> None:
         """
         Play a song from YouTube.
@@ -44,7 +48,7 @@ class Music(commands.Cog, name="Music"):
             await ctx.reply("Please provide a search query.", ephemeral=True)
             return
 
-        if volume > 100 or volume < 0:
+        if volume > 100 or volume < 0:  # type: ignore
             await ctx.reply("Volume must be between 0 and 100", ephemeral=True)
             return
 
@@ -54,8 +58,8 @@ class Music(commands.Cog, name="Music"):
         author_voice = ctx.author.voice
 
         player: wavelink.Player = (
-            ctx.guild.voice_client
-            or await author_voice.channel.connect(cls=wavelink.Player)
+            ctx.guild.voice_client  # type: ignore
+            or await author_voice.channel.connect(cls=wavelink.Player)  # type: ignore
         )
         player.autoplay = True
 
@@ -95,11 +99,11 @@ class Music(commands.Cog, name="Music"):
     @music.command(name="stop", description="Stop the current song")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def stop(self, ctx: commands.Context) -> None:
+    async def stop(self, ctx: Context) -> None:
         """Stop the current song"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client # type: ignore
         if player.queue.is_empty is not True:
             player.queue.clear()
         await player.disconnect()
@@ -108,11 +112,11 @@ class Music(commands.Cog, name="Music"):
     @music.command(name="playing", description="Show the current song")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def playing(self, ctx: commands.Context) -> None:
+    async def playing(self, ctx: Context) -> None:
         """Show the current song"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client # type: ignore
         if not player.is_playing():
             await ctx.reply("Nothing is playing")
             return
@@ -124,26 +128,26 @@ class Music(commands.Cog, name="Music"):
     @music.command(description="Pause the current song")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def pause(self, ctx: commands.Context) -> None:
+    async def pause(self, ctx: Context) -> None:
         """
         Pause the player.
         """
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client # type: ignore
         await player.pause()
         await ctx.send(content="Paused! ⏸️")
 
     @music.command(name="resume", description="Resume the current song")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def resume(self, ctx: commands.Context) -> None:
+    async def resume(self, ctx: Context) -> None:
         """
         Resume the player.
         """
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client # type: ignore
         await player.resume()
         await ctx.send(content="Resumed! ⏯️")
 
@@ -151,13 +155,13 @@ class Music(commands.Cog, name="Music"):
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(volume="The volume to play at.")
-    async def volume(self, ctx: commands.Context, volume: Optional[int]) -> None:
+    async def volume(self, ctx: Context, volume: Optional[int]) -> None:
         """
         Set the player volume.
         """
         if await self.check_author(ctx) is False:
             return
-        if volume > 100 or volume < 0:
+        if volume > 100 or volume < 0:  # type: ignore
             await ctx.send("Volume must be between 0 and 100", ephemeral=True)
             return
         player: wavelink.Player = ctx.voice_client
@@ -169,26 +173,26 @@ class Music(commands.Cog, name="Music"):
 
     @music.command(name="queue", description="Show the current queue")
     @app_commands.guild_only()
-    async def queue(self, ctx: commands.Context) -> None:
+    async def queue(self, ctx: Context) -> None:
         """Show the current queue"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client # type: ignore
         if player.queue.is_empty:
             await ctx.send("Queue is empty")
             return
         embed = discord.Embed(title="Queue ", description="", color=0x00FF00)
         for i, track in enumerate(player.queue, start=1):
-            embed.description += f"{i}) {track.title}\n"
+            embed.description += f"{i}) {track.title}\n"  # type: ignore
         await ctx.send(embed=embed)
 
     @music.command(name="remove", description="Remove a song from queue")
     @app_commands.guild_only()
-    async def remove(self, ctx: commands.Context, index: int) -> None:
+    async def remove(self, ctx: Context, index: int) -> None:
         """Remove a song from queue"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client # type: ignore
         if player.queue.is_empty:
             await ctx.send("Queue is empty")
             return
@@ -198,12 +202,12 @@ class Music(commands.Cog, name="Music"):
         del player.queue[index - 1]
         await ctx.send("Removed! ✅")
 
-    async def check_author(self, ctx: commands.Context) -> bool:
-        if ctx.author.voice is None:
+    async def check_author(self, ctx: Context) -> bool:
+        if ctx.author.voice is None: # type: ignore
             await ctx.reply("Join a voice channel first..", ephemeral=True)
             return False
         return True
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Music(client))

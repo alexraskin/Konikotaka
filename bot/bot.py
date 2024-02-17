@@ -5,17 +5,17 @@ import random
 import time
 
 import discord
-import psutil
-import wavelink
+import psutil  # type: ignore
+import wavelink  # type: ignore
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
-from cogs.utils.consts import activities
 from discord.ext import tasks
-from discord.ext.commands import Bot, NoEntryPointError
+from discord.ext.commands import Bot
 from dotenv import load_dotenv
 from models.db import Base
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine  # type: ignore
+from sqlalchemy.orm import sessionmaker  # type: ignore
+from utils.consts import activities
 
 load_dotenv()
 
@@ -29,14 +29,14 @@ class Konikotaka(Bot):
     def __init__(self, *args, **options) -> None:
         super().__init__(*args, **options)
         self.log = log
-        self.session = None
+        self.session = None  # type: ignore
         self.pid = os.getpid()
         self.start_time = time.time()
         self.main_guild: int = 1020830000104099860
         self.general_channel: int = 1145087802141315093
         self.version: str = "1.0.6"
-        self.lavalink_uri: str = os.getenv("LAVALINK_URI")
-        self.lavalink_password: str = os.getenv("LAVALINK_PASSWORD")
+        self.lavalink_uri: str = os.environ["LAVALINK_URI"]
+        self.lavalink_password: str = os.environ["LAVALINK_PASSWORD"]
         self.engine: create_async_engine = create_async_engine(
             os.getenv("POSTGRES_URL"),
             echo=False,
@@ -70,10 +70,6 @@ class Konikotaka(Bot):
             try:
                 await self.load_extension(cog)
                 self.log.info(f"Loaded extension: {cog}")
-            except NoEntryPointError:
-                self.log.error(
-                    f"Could not load extension: {cog} due to NoEntryPointError"
-                )
             except Exception as exc:
                 self.log.error(
                     f"Could not load extension: {cog} due to {exc.__class__.__name__}: {exc}"
@@ -111,7 +107,7 @@ class Konikotaka(Bot):
     def git_revision(self) -> str:
         latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
         if latest_revision is None:
-            return None
+            return None # type: ignore
         url = f"<https://github.com/alexraskin/Konikotaka/commit/{(short := latest_revision[:7])}>"
         return f"[{short}]({url})"
 
@@ -141,10 +137,10 @@ async def init_database() -> None:
 
 @client.event
 async def on_ready() -> None:
-    client.log.info(f"{client.user.name} has connected to Discord!")
+    client.log.info(f"{client.user.name} has connected to Discord!") # type: ignore
     change_activity.start()
     init_database.start()
 
 
-client.run(token=os.getenv("DISCORD_TOKEN"), reconnect=True, log_handler=None)
-client.log.info(f"{client.user.name} has disconnected from Discord!")
+client.run(token=os.environ["DISCORD_TOKEN"], reconnect=True, log_handler=None)
+client.log.info(f"{client.user.name} has disconnected from Discord!") # type: ignore

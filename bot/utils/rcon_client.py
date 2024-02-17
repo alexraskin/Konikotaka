@@ -1,7 +1,8 @@
 # https://github.com/KOOKIIEStudios/PalCON-Discord
 
-from rcon import Console
 from typing import Optional, Union
+
+from rcon import Console
 
 
 class RconClient:
@@ -11,7 +12,7 @@ class RconClient:
         self.host: str = host
         self.password: str = password
         self.port: int = port
-        self.timeout: int = timeout
+        self.timeout: int = timeout  # type: ignore
 
     def open(self) -> Console:
         return Console(
@@ -31,7 +32,7 @@ class RconClient:
         console.close()
         return res if res else False
 
-    def online(self) -> Union[list, str, bool]:
+    def online(self) -> Union[tuple[list, str], tuple[bool, bool]]:
         # Response is of format `name,playerid,steamid`
         console = self.open()
         res = console.command("ShowPlayers")
