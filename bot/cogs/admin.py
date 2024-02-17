@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
-from discord import Colour, Embed, Emoji, HTTPException, app_commands
+from discord import Colour, Embed, Emoji, HTTPException, app_commands, Guild
 from discord.ext import commands
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
-class Admin(commands.Cog, name="Admin"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+
+class Admin(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     @commands.command(name="reload", hidden=True)
     @commands.is_owner()
@@ -17,7 +21,7 @@ class Admin(commands.Cog, name="Admin"):
         Reloads all the cogs or a specified cog.
         """
         if extension is None:
-            for cog in self.client.extensions.copy():
+            for cog in self.client.extensions.copy():  # type: ignore
                 try:
                     await self.client.unload_extension(cog)
                     await self.client.load_extension(cog)
@@ -50,7 +54,7 @@ class Admin(commands.Cog, name="Admin"):
 
     @commands.command(name="sync", hidden=True)
     @commands.is_owner()
-    async def sync(self, ctx: commands.Context) -> None:
+    async def sync(self, ctx: Context) -> None:
         """
         Sync app commands with Discord.
         """
@@ -74,7 +78,7 @@ class Admin(commands.Cog, name="Admin"):
     @app_commands.describe(name="The name of the emoji")
     @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
     async def add_emoji(
-        self, ctx: commands.Context, emoji: Emoji, name: str = None
+        self, ctx: Context, emoji: Emoji, name: Optional[str] = None
     ) -> None:
         """
         Adds an emoji to the server.
@@ -83,7 +87,7 @@ class Admin(commands.Cog, name="Admin"):
             name = emoji.name
         guild: Guild = ctx.guild  # type: ignore
         try:
-            res = await self.client.get(emoji.url)
+            res = await self.client.session.get(emoji.url)
             if res.status == 200:
                 image_data = await res.read()
                 new_emoji = await guild.create_custom_emoji(name=name, image=image_data)
@@ -106,12 +110,12 @@ class Admin(commands.Cog, name="Admin"):
 
     @commands.command(name="git", aliases=["gr"], hidden=True)
     @commands.guild_only()
-    async def git_revision(self, ctx: commands.Context) -> None:
+    async def git_revision(self, ctx: Context) -> None:
         """
         Get the current git revision.
         """
         await ctx.send(f"Git Revision: {self.client.git_revision}")
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Admin(client))

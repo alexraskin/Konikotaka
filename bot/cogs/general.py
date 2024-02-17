@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
-import validators
+import validators  # type: ignore
 from discord import PartialEmoji, app_commands
 from discord.ext import commands, tasks
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
-class General(commands.Cog, name="General"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+
+class General(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -17,7 +22,7 @@ class General(commands.Cog, name="General"):
 
     @tasks.loop(hours=1)
     async def health_check(self) -> None:
-        check = await self.client.session.get(os.getenv("HEALTHCHECK_URL"))
+        check = await self.client.session.get(os.getenv("HEALTHCHECK_URL", ""))
         if check.status != 200:
             self.client.log.error("Health check failed.")
         else:
@@ -30,7 +35,7 @@ class General(commands.Cog, name="General"):
     @commands.hybrid_command("shorten_url", description="Shorten a URL")
     @app_commands.guild_only()
     @commands.guild_only()
-    async def shorten_url(self, ctx: commands.Context, url: str) -> None:
+    async def shorten_url(self, ctx: Context, url: str) -> None:
         api_url: str = "https://edgesnip.dev/"
         validate_url = validators.url(url)
         if validate_url:
@@ -45,15 +50,15 @@ class General(commands.Cog, name="General"):
             await ctx.send("Invalid URL")
 
     @commands.Cog.listener()
-    async def on_command_completion(self, ctx: commands.Context) -> None:
+    async def on_command_completion(self, ctx: Context) -> None:
         self.client.log.info(
-            f"Executed {ctx.command.qualified_name} command in {ctx.guild.name}"
+            f"Executed {ctx.command.qualified_name} command in {ctx.guild.name}"  # type: ignore
             + f"(ID: {ctx.message.guild.id}) by {ctx.message.author} (ID: {ctx.message.author.id})"
         )
 
     @commands.Cog.listener()
     async def on_command_error(
-        self, ctx: commands.Context, error: commands.errors
+        self, ctx: Context, error: commands.errors  # type: ignore
     ) -> None:
         errors = {
             "CheckFailure": "Fact: Only those who possess the true spirit of a samurai can access this command. You, unfortunately, do not.",
@@ -63,9 +68,9 @@ class General(commands.Cog, name="General"):
             "CommandOnCooldown": "Like a warrior after an intense battle, this command needs time to recover. Patience is a virtue of the samurai.",
             "generic_error_message": "This is an error unknown to even the most ancient anime scrolls. Consult the Schrute Codex for guidance, or simply try again.",
         }
-        self.client.log.error(error.__class__.__name__ + ": " + str(error))
+        self.client.log.error(error.__class__.__name__ + ": " + str(error))  # type: ignore
         try:
-            message = "Error: " + errors[error.__class__.__name__]
+            message = "Error: " + errors[error.__class__.__name__]  # type: ignore
             await ctx.send(message)
         except AttributeError:
             await ctx.send(errors["generic_error_message"])
@@ -73,5 +78,5 @@ class General(commands.Cog, name="General"):
             await ctx.send(errors["generic_error_message"])
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(General(client))

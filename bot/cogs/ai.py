@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import time
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 from discord import (
     Attachment,
@@ -15,10 +16,13 @@ from discord import (
     ui,
 )
 from discord.ext import commands
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI # type: ignore
+from utils.consts import ai_ban_words
+from utils.gpt import about_text
 
-from .utils import gpt
-from .utils.consts import ai_ban_words
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
 
 class Download(ui.View):
@@ -27,17 +31,16 @@ class Download(ui.View):
         self.add_item(ui.Button(label="Download your image here!", url=url))
 
 
-class Ai(commands.Cog, name="Ai"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
-        self.openai_token: str = os.getenv("OPENAI_TOKEN")
-        self.openai_gateway_url: str = os.getenv("CLOUDFLARE_AI_GATEWAY_URL")
+class Ai(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
+        self.openai_token: str = os.environ["OPENAI_TOKEN"]
+        self.openai_gateway_url: str = os.environ["CLOUDFLARE_AI_GATEWAY_URL"]
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         if message.author == self.client.user:
             return
-
         if self.client.user.mentioned_in(message):  # type: ignore
             name = message.author.nick if message.author.nick else message.author.name  # type: ignore
             client = AsyncOpenAI(
@@ -47,7 +50,7 @@ class Ai(commands.Cog, name="Ai"):
                 messages=[
                     {
                         "role": "system",
-                        "content": gpt.about_text
+                        "content": about_text
                         + f"when you answer someone, answer them by {name}",
                     },
                     {
@@ -69,7 +72,7 @@ class Ai(commands.Cog, name="Ai"):
         await interaction.response.defer()
         if any(word in prompt for word in ai_ban_words):
             await interaction.edit_original_response(
-                "Your prompt contains a banned word. Please try again."
+                content="Your prompt contains a banned word. Please try again."
             )
             return
 
@@ -81,7 +84,7 @@ class Ai(commands.Cog, name="Ai"):
         except Exception as e:
             self.client.log.error(f"Error generating image: {e}")
             await interaction.edit_original_response(
-                f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
+                content="An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
             )
             return
 
@@ -100,7 +103,7 @@ class Ai(commands.Cog, name="Ai"):
             except Exception as e:
                 self.client.log.error(f"Error generating image: {e}")
                 await interaction.edit_original_response(
-                    f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
+                    content="An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
                 )
                 return
             elapsed_time = time.time() - start_time
@@ -180,5 +183,5 @@ class Ai(commands.Cog, name="Ai"):
             )
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Ai(client))

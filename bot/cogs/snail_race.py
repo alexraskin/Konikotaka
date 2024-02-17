@@ -2,23 +2,38 @@ from __future__ import annotations
 
 import asyncio
 import random
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 import discord
-from discord import Colour, Interaction, Member, app_commands
+from discord import Colour, Interaction, Member, User, app_commands
 from discord.ext import commands
 from models.races import Races
-from sqlalchemy.future import select
+from sqlalchemy.future import select  # type: ignore
 
-shuffled_participants: List = []
-running_guilds: List = []
-snail_positions: Dict = {}
+guilds: dict = {}
+snail_positions: dict = {}
+
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+
+
+def add_guild(guild_id: int) -> None:
+    if guild_id not in guilds:
+        guilds[guild_id] = {}
+
+
+def add_user_to_guild(guild_id: int, user_id: int) -> None:
+    if guild_id in guilds:
+        guilds[guild_id][user_id] = True
+    else:
+        add_guild(guild_id)
+        guilds[guild_id][user_id] = True
 
 
 class RaceButton(discord.ui.View):
     def __init__(self, *, timeout: int = 45):
         super().__init__(timeout=timeout)
-        global shuffled_participants
+        global guilds
 
     @discord.ui.button(label="Join Race", style=discord.ButtonStyle.blurple, emoji="🐌")
     async def join_race(
@@ -26,11 +41,11 @@ class RaceButton(discord.ui.View):
     ):
         await interaction.response.defer()
 
-        if interaction.user.id not in shuffled_participants:
+        if interaction.user.id not in guilds[interaction.guild.id]:
             await interaction.followup.send(
                 "You've entered into the race!", ephemeral=True
             )
-            shuffled_participants.append(interaction.user.id)
+            add_user_to_guild(interaction.guild.id, interaction.user.id)
         else:
             await interaction.followup.send(
                 content="You already joined the race! 🐌", ephemeral=True
@@ -42,26 +57,25 @@ class RaceButton(discord.ui.View):
     ):
         await interaction.response.defer()
 
-        if interaction.user.id not in shuffled_participants:
+        if interaction.user.id not in guilds[interaction.guild.id]:
             await interaction.followup.send(
                 content="You need to join the race first!", ephemeral=True
             )
         else:
-            shuffled_participants.remove(interaction.user.id)
+            del guilds[interaction.guild.id][interaction.user.id]
             await interaction.followup.send(
                 content="You have left the race! 🚫", ephemeral=True
             )
 
 
-class SnailRace(commands.Cog, name="Snail Racing"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+class SnailRace(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     async def randomize_snails(self) -> None:
         global shuffled_participants
-        shuffled_participants = random.sample(
-            shuffled_participants, len(shuffled_participants)
-        )
+        participants = list(guilds[self.client.guild.id].keys())
+        shuffled_participants = random.sample(participants, len(participants))
         return shuffled_participants
 
     async def update_leaderboard(self, winner: Member) -> None:
@@ -99,9 +113,9 @@ class SnailRace(commands.Cog, name="Snail Racing"):
     async def simulate_race(self, interaction: Interaction) -> None:
         global snail_positions
         global shuffled_participants
-        winner: Member = None
+        winner: Union[Member, User] = None
         race_length: int = 10
-        if len(shuffled_participants) <= 0:
+        if len(shuffled_participants) == 0:
             await interaction.channel.send(content="No one joined the race! 😢")
             return
         message = await interaction.channel.send("The Race is starting! 🚩")
@@ -117,7 +131,7 @@ class SnailRace(commands.Cog, name="Snail Racing"):
                     break
             race_progress: str = ""
             for user_id, position in snail_positions.items():
-                user = self.client.get_user(user_id)
+                user: Union[Member, User] = self.client.get_user(user_id)
                 race_progress += f"[{user.name}]: {'🐌' * position}\n"
             await asyncio.sleep(random.randint(1, 3))
             await message.edit(

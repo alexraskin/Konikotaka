@@ -1,22 +1,25 @@
 from __future__ import annotations
 
 import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from discord import Embed, Interaction, Member, TextChannel, app_commands
 from discord.ext import commands
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
 
-class Mod(commands.Cog, name="Mod"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+
+class Mod(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     @app_commands.command(name="amimod", description="Check if you are a mod")
     @app_commands.guild_only()
     async def _amimod(self, interaction: Interaction) -> None:
         if (
-            interaction.user.guild_permissions.administrator
-            or interaction.user.guild_permissions.manage_guild
+            interaction.user.guild_permissions.administrator  # type: ignore
+            or interaction.user.guild_permissions.manage_guild # type: ignore
         ):
             await interaction.response.send_message(
                 "Yes", ephemeral=True, delete_after=5
@@ -32,7 +35,7 @@ class Mod(commands.Cog, name="Mod"):
     @app_commands.describe(reason="The reason for the ban")
     @app_commands.checks.has_permissions(ban_members=True)
     async def _ban(self, interaction: Interaction, member: Member, reason: str) -> None:
-        await interaction.guild.ban(member, reason=reason)
+        await interaction.guild.ban(member, reason=reason)  # type: ignore
         await interaction.response.send_message(f"Banned {member.name}", ephemeral=True)
 
     @app_commands.command(name="softban", description="Softban a user")
@@ -43,8 +46,8 @@ class Mod(commands.Cog, name="Mod"):
     async def _softban(
         self, interaction: Interaction, member: Member, reason: str
     ) -> None:
-        await interaction.guild.ban(member, reason=reason)
-        await interaction.guild.unban(member, reason=reason)
+        await interaction.guild.ban(member, reason=reason)  # type: ignore
+        await interaction.guild.unban(member, reason=reason)  # type: ignore
         await interaction.response.send_message(
             f"Softbanned {member.name}", ephemeral=True
         )
@@ -57,7 +60,7 @@ class Mod(commands.Cog, name="Mod"):
     async def _kick(
         self, interaction: Interaction, member: Member, reason: str
     ) -> None:
-        await interaction.guild.kick(member, reason=reason)
+        await interaction.guild.kick(member, reason=reason)  # type: ignore
         await interaction.response.send_message(f"Kicked {member.name}", ephemeral=True)
 
     @app_commands.command(name="timeout", description="Timeout a user")
@@ -70,7 +73,14 @@ class Mod(commands.Cog, name="Mod"):
         self, interaction: Interaction, member: Member, reason: str, duration: int
     ) -> None:
         unmute_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
-        await member.timeout(until=unmute_time, reason=reason)
+        try:
+            await member.timeout(until=unmute_time, reason=reason)  # type: ignore
+        except Exception as e:
+            self.client.log.error(f"Error: {e}")
+            await interaction.response.send_message(
+                "An error occurred while timing out the member.", ephemeral=True
+            )
+            return
         await interaction.response.send_message(
             f"Timed out {member.name}", ephemeral=True
         )
@@ -83,7 +93,7 @@ class Mod(commands.Cog, name="Mod"):
     async def _unban(
         self, interaction: Interaction, member: Member, reason: str
     ) -> None:
-        await interaction.guild.unban(member, reason=reason)
+        await interaction.guild.unban(member, reason=reason)  # type: ignore
         await interaction.response.send_message(
             f"Unbanned {member.name}", ephemeral=True
         )
@@ -107,12 +117,12 @@ class Mod(commands.Cog, name="Mod"):
         try:
             amount += 1
             await interaction.response.defer()
-            await interaction.channel.purge(limit=amount, reason=reason)
+            await interaction.channel.purge(limit=amount, reason=reason)  # type: ignore
             embed = Embed(
                 title="Purge 🗑️",
                 description=f"Purged {amount} messages.",
                 color=0x00FF00,
-                timestamp=interaction.message.created_at,
+                timestamp=interaction.message.created_at,  # type: ignore
             )
             await interaction.followup.send(embed=embed)
         except Exception as e:
@@ -143,7 +153,7 @@ class Mod(commands.Cog, name="Mod"):
         """
         Lockdowns a specified channel.
         """
-        channel = channel or ctx.channel
+        channel: TextChannel = channel or ctx.channel  # type: ignore
         try:
             await channel.set_permissions(ctx.guild.default_role, send_messages=False)
             embed = Embed(
@@ -182,11 +192,11 @@ class Mod(commands.Cog, name="Mod"):
         """
         Unlocks a specified channel.
         """
-        channel = channel or ctx.channel
+        channel: TextChannel = channel or ctx.channel
         try:
             await channel.set_permissions(
                 ctx.guild.default_role, send_messages=True, reason=reason
-            )
+            )  # type: ignore
             embed = Embed(
                 title="Lockdown Ended 🔓",
                 description="The lockdown has been lifted.",
@@ -205,5 +215,5 @@ class Mod(commands.Cog, name="Mod"):
             return
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Mod(client))

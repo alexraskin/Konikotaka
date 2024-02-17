@@ -1,16 +1,20 @@
 from __future__ import annotations
 
-from discord import Colour, Embed, Interaction, Message, User, app_commands
+from typing import TYPE_CHECKING, Optional, Union
+
+from discord import Colour, Embed, Interaction, Message, User, Member, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
-from sqlalchemy.future import select
+from sqlalchemy.future import select  # type: ignore
 
-from typing import Optional
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
 
-class Levels(commands.Cog, name="Levels"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+class Levels(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     def get_xp_needed(self, level) -> int:
         """
@@ -38,7 +42,7 @@ class Levels(commands.Cog, name="Levels"):
                         DiscordUser.discord_id == str(message.author.id)
                     )
                 )
-                user = query.scalar_one_or_none()
+                user: DiscordUser = query.scalar_one_or_none()
                 if user:
                     xp, level = user.xp, user.level
                     new_xp = xp + 5
@@ -51,7 +55,7 @@ class Levels(commands.Cog, name="Levels"):
                     await session.commit()
                     await session.flush()
                 else:
-                    user = DiscordUser(
+                    user: DiscordUser = DiscordUser(
                         discord_id=str(message.author.id),
                         username=message.author.name,
                         joined=message.author.joined_at,  # type: ignore
@@ -65,10 +69,13 @@ class Levels(commands.Cog, name="Levels"):
 
     @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of")
+
     async def rank(self, interaction: Interaction, user: Optional[Union[Member, User]] = None) -> None:  # type: ignore
         """
         Sends a user's rank
         """
+        if user is None:
+            user: Union[Member, User] = interaction # type: ignore
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -76,7 +83,7 @@ class Levels(commands.Cog, name="Levels"):
                         DiscordUser.discord_id == str(interaction.user.id)
                     )
                 )
-                user = query.scalar_one_or_none()
+                user: DiscordUser = query.scalar_one_or_none()
                 embed = Embed()
                 embed.title = "Level"
                 embed.color = Colour.blurple()
@@ -84,7 +91,9 @@ class Levels(commands.Cog, name="Levels"):
                     embed.description = f"You are level {user.level} with {user.xp} xp."
                     await interaction.response.send_message(embed=embed)
                 else:
-                    return
+                    return await interaction.response.send_message(
+                        "You are not in the database."
+                    )
 
     @app_commands.command(name="levelsboard")
     async def levelsboard(self, interaction: Interaction) -> None:
@@ -96,7 +105,7 @@ class Levels(commands.Cog, name="Levels"):
                 query = await session.execute(
                     select(DiscordUser).order_by(DiscordUser.level.desc())
                 )
-                users = query.scalars().all()
+                users: DiscordUser = query.scalars().all()
                 embed = Embed()
                 embed.title = "Levels Leaderboard - Sorted by Level"
                 embed.color = Colour.blurple()
@@ -107,8 +116,10 @@ class Levels(commands.Cog, name="Levels"):
                     embed.description = leaderboard
                     await interaction.response.send_message(embed=embed)
                 else:
-                    return
+                    return await interaction.response.send_message(
+                        "There are no users in the database."
+                    )
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Levels(client))

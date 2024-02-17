@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import itertools
+from typing import TYPE_CHECKING
 
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import DefaultHelpCommand, HelpCommand
+
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
 
 
 class myHelpCommand(HelpCommand):
@@ -92,8 +96,8 @@ class myHelpCommand(HelpCommand):
 
 
 class Help(commands.Cog):
-    def __init__(self, client: commands.Bot):
-        self.client = client
+    def __init__(self, client: Konikotaka):
+        self.client: Konikotaka = client
         self.client.help_command = myHelpCommand(
             command_attrs={
                 "aliases": ["halp"],
@@ -116,5 +120,5 @@ class Help(commands.Cog):
         self.client.help_command = myHelpCommand()
 
 
-async def setup(client: commands.Bot):
+async def setup(client: Konikotaka):
     await client.add_cog(Help(client))

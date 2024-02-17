@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import BIGINT, VARCHAR, Column, Integer, String
+from sqlalchemy import BIGINT, VARCHAR, Column, Integer, String  # type: ignore
 
 
 class CustomTags(Base):

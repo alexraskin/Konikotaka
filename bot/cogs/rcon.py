@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import os
 import asyncio
+import os
 
 import discord
-from discord import app_commands, Interaction, Embed, Colour
+from discord import Colour, Embed, Interaction, app_commands
+from discord.app_commands import command
 from discord.ext import commands
 from discord.ext.commands import GroupCog
-from discord.app_commands import command
-
-from .utils.rcon_client import RconClient
+from utils.rcon_client import RconClient
 
 
 class Rcon(
@@ -20,9 +19,9 @@ class Rcon(
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
         self.rcon_client: RconClient = RconClient(
-            host=os.getenv("RCON_HOST"),
-            password=os.getenv("RCON_PASSWORD"),
-            port=int(os.getenv("RCON_PORT")),
+            host=os.environ["RCON_HOST"],
+            password=os.environ["RCON_PASSWORD"],
+            port=int(os.environ["RCON_PORT"]),
         )
         self.steam_profile = "https://steamcommunity.com/profiles/{steam_id}/"
 

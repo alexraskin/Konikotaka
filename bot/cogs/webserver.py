@@ -2,27 +2,30 @@ import asyncio
 import os
 import time
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-import aiohttp_cors
+import aiohttp_cors  # type: ignore
 from aiohttp import web
 from discord.ext import commands
 from models.users import DiscordUser
-from sqlalchemy.future import select
+from sqlalchemy.future import select  # type: ignore
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
 
-class WebServer(commands.Cog, name="WebServer"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
-        self.api_key: str = os.getenv("X-API-KEY")
+class WebServer(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
+        self.api_key: str = os.environ["X-API-KEY"]
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.client.log.info("Webserver is started successfully.")
 
     async def get_api_latency(self) -> int:
-        start_time: time = time.time()
+        start_time = time.time()
         await self.client.session.get("https://api.twizy.sh/")
-        end_time: time = time.time()
+        end_time = time.time()
         latency: int = round((end_time - start_time) * 1000)
         return latency
 
@@ -33,7 +36,7 @@ class WebServer(commands.Cog, name="WebServer"):
                 commands.append({"name": command.name, "description": command.help})
         return commands
 
-    async def index_handler(self, request: web.Request) -> web.json_response:
+    async def index_handler(self, request: web.Request) -> web.Response:
         return web.json_response(
             {
                 "last_fetch": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
@@ -50,19 +53,19 @@ class WebServer(commands.Cog, name="WebServer"):
             }
         )
 
-    async def leaderboard_handler(self, request: web.Request) -> web.json_response:
+    async def leaderboard_handler(self, request: web.Request) -> web.Response:
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
                     select(DiscordUser).order_by(DiscordUser.level.desc())
                 )
-                users = query.scalars().all()
+                users: DiscordUser = query.scalars().all()
                 leaderboard = []
                 for user in users:
                     leaderboard.append({"username": user.username, "level": user.level})
                 return web.json_response(leaderboard)
 
-    async def health_check(self, request: web.Request) -> web.json_response:
+    async def health_check(self, request: web.Request) -> web.Response:
         return web.json_response({"status": "healthy"})
 
     async def webserver(self) -> None:
@@ -70,7 +73,7 @@ class WebServer(commands.Cog, name="WebServer"):
         app.router.add_get("/", self.index_handler)
         app.router.add_get("/leaderboard", self.leaderboard_handler)
         app.router.add_get("/health", self.health_check)
-        cors: aiohttp_cors = aiohttp_cors.setup(
+        cors = aiohttp_cors.setup(
             app,
             defaults={
                 "*": aiohttp_cors.ResourceOptions(
@@ -94,7 +97,7 @@ class WebServer(commands.Cog, name="WebServer"):
         asyncio.ensure_future(self.site.stop())
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     server: WebServer = WebServer(client)
     client.loop.create_task(server.webserver())
     await client.add_cog(WebServer(client))

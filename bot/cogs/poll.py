@@ -1,6 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from discord.ext import commands
+
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
 
 class Polls(commands.Cog):
@@ -10,8 +16,8 @@ class Polls(commands.Cog):
     https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/poll.py
     """
 
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
 
     def to_emoji(self, c: int) -> str:
         base = 0x1F1E6
@@ -34,7 +40,7 @@ class Polls(commands.Cog):
         if not (perms.read_message_history or perms.add_reactions):
             return await ctx.send(
                 "Need Read Message History and Add Reactions permissions."
-            )
+            )  # type: ignore
 
         question = questions_and_choices[0]
         choices = [
@@ -52,5 +58,5 @@ class Polls(commands.Cog):
             await poll.add_reaction(emoji)
 
 
-async def setup(client: commands.Bot):
+async def setup(client: Konikotaka):
     await client.add_cog(Polls(client))
