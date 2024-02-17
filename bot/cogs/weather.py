@@ -1,21 +1,27 @@
 from __future__ import annotations
 
 import os
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from discord import Colour, Embed
 from discord.ext import commands
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
-class Weather(commands.Cog, name="Weather"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
-        self.api_key: str = os.getenv("TOMORROW_API_KEY")
+
+class Weather(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
+        self.api_key: str = os.environ["TOMORROW_API_KEY"]
+        if not self.api_key:
+            raise ValueError("TOMORROW_API_KEY is not set")
 
     @commands.hybrid_command(name="weather", aliases=["w"])
     async def weather(
         self,
-        ctx: commands.Context,
+        ctx: Context,
         location: str,
         unit: Literal["metric", "imperial"] = "imperial",
     ) -> None:
@@ -62,5 +68,5 @@ class Weather(commands.Cog, name="Weather"):
         await ctx.send(embed=embed)
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Weather(client))

@@ -3,21 +3,24 @@ from __future__ import annotations
 import asyncio
 import random
 import urllib.parse
-from typing import Literal, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
-import upsidedown
+import upsidedown  # type: ignore
 from async_foaas import Fuck
-from discord import Colour, Embed, Member, Message, User, app_commands
+from discord import Colour, Embed, Member, User, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
-from sqlalchemy.future import select
+from sqlalchemy.future import select  # type: ignore
+from utils.utils import get_year_round, progress_bar
 
-from .utils.utils import get_year_round, progress_bar
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
 
 class Fun(commands.Cog, name="Fun"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
         self.fuck: Fuck = Fuck()
 
     @commands.hybrid_command(
@@ -25,7 +28,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def cosmo_photo(self, ctx: commands.Context) -> None:
+    async def cosmo_photo(self, ctx: Context) -> None:
         """
         Get a random photo of my cat Cosmo!
         """
@@ -42,7 +45,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="fuckoff", help="Tell Someone to Fuck Off")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def fuck_off(self, ctx: commands.Context, user: Union[Member, User]):
+    async def fuck_off(self, ctx: Context, user: Union[Member, User]):
         _fuck = await self.fuck.random(name=user.mention, from_=ctx.author.name).json
         await ctx.send(_fuck["message"])
 
@@ -53,7 +56,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def bczs_photos(self, ctx: commands.Context) -> Message:
+    async def bczs_photos(self, ctx: Context):
         """
         Get a random photo of Pat and Ash's cats from the twizy.dev API
         """
@@ -74,7 +77,7 @@ class Fun(commands.Cog, name="Fun"):
         name="meme", help="Get a random meme!", with_app_command=True
     )
     @commands.guild_only()
-    async def get_meme(self, ctx: commands.Context) -> Message:
+    async def get_meme(self, ctx: Context):
         """
         Get a random meme from the meme-api.com API
         """
@@ -90,7 +93,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def gcat_talk(self, ctx: commands.Context, *, message: str) -> Message:
+    async def gcat_talk(self, ctx: Context, *, message: str):
         """
         Translate your message into G Cat's language
         """
@@ -102,9 +105,9 @@ class Fun(commands.Cog, name="Fun"):
     @app_commands.guild_only()
     async def get_waifu(
         self,
-        ctx: commands.Context,
+        ctx: Context,
         category: Literal["waifu", "neko", "shinobu", "megumin", "bully", "cuddle"],
-    ) -> Message:
+    ):
         """
         Get a random waifu image from the waifu API
         """
@@ -119,7 +122,7 @@ class Fun(commands.Cog, name="Fun"):
 
     @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.command(name="cat", description="Get a random cat image")
-    async def cat(self, ctx: commands.Context) -> Message:
+    async def cat(self, ctx: Context):
         """
         Get a random cat image from the catapi
         """
@@ -134,7 +137,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="roll", description="Roll a dice with NdN")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def roll(self, ctx: commands.Context, dice: str) -> Embed:
+    async def roll(self, ctx: Context, dice: str):
         """
         Roll a dice
         """
@@ -155,7 +158,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="8ball", description="Ask the magic 8ball a question")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def eight_ball(self, ctx: commands.Context, *, question: str) -> Embed:
+    async def eight_ball(self, ctx: Context, *, question: str):
         """
         Ask the magic 8ball a question
         """
@@ -174,7 +177,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="fact", description="Get a random fact")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def fact(self, ctx: commands.Context) -> Embed:
+    async def fact(self, ctx: Context):
         """
         Get a random fact
         """
@@ -192,7 +195,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="reverse", description="Reverse a string")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def reverse(self, ctx: commands.Context, string: str) -> Embed:
+    async def reverse(self, ctx: Context, string: str):
         """
         Reverse a string
         """
@@ -208,7 +211,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="say", description="Make the bot say something")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def say(self, ctx: commands.Context, message: str) -> Message:
+    async def say(self, ctx: Context, message: str):
         """
         Make the bot say something
         """
@@ -219,7 +222,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def _embed(self, ctx: commands.Context, message: str) -> Embed:
+    async def _embed(self, ctx: Context, message: str):
         """
         Make the bot say something in an embed
         """
@@ -235,7 +238,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="hug", description="Hug someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def hug(self, ctx: commands.Context, member: Member) -> Embed:
+    async def hug(self, ctx: Context, member: Union[Member, User]):
         """
         Hug someone
         """
@@ -253,7 +256,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="slap", description="Slap someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def slap(self, ctx: commands.Context, member: Member) -> Embed:
+    async def slap(self, ctx: Context, member: Union[Member, User]):
         """
         Slap someone
         """
@@ -271,7 +274,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="kiss", description="Kiss someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def kiss(self, ctx: commands.Context, member: Member) -> Embed:
+    async def kiss(self, ctx: Context, member: Union[Member, User]):
         """
         Kiss someone
         """
@@ -289,7 +292,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="pat", description="Pat someone")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def pat(self, ctx: commands.Context, member: Member) -> Embed:
+    async def pat(self, ctx: Context, member: Union[Member, User]):
         """
         Pat someone
         """
@@ -307,7 +310,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="textcat")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def textcat(self, ctx: commands.Context) -> Message:
+    async def textcat(self, ctx: Context):
         """
         Get a random text cat
         """
@@ -318,7 +321,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="coffee", description="Get a random coffee image")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def coffee(self, ctx: commands.Context) -> Message:
+    async def coffee(self, ctx: Context):
         """
         Get a random coffee image from the twizy.dev API
         """
@@ -332,10 +335,13 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="slots", description="Play the slots")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def slots(self, ctx: commands.Context) -> Embed:
+    async def slots(self, ctx: Context):
         """
         Play the slots
         """
+        slot1 = ""
+        slot2 = ""
+        slot3 = ""
         emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
         embed = Embed(title="🎰 Slot Machine", timestamp=ctx.message.created_at)
         embed.colour = Colour.blurple()
@@ -374,7 +380,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="coinflip", description="Flip a coin")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def coinflip(self, ctx: commands.Context) -> Embed:
+    async def coinflip(self, ctx: Context):
         """
         Flip a coin
         """
@@ -392,9 +398,9 @@ class Fun(commands.Cog, name="Fun"):
     @app_commands.guild_only()
     async def rps(
         self,
-        ctx: commands.Context,
+        ctx: Context,
         choice: Optional[Literal["rock", "paper", "scissors"]],
-    ) -> Embed:
+    ):
         """
         Play rock paper scissors
         """
@@ -423,7 +429,7 @@ class Fun(commands.Cog, name="Fun"):
                 result = "You won! 🎉"
         embed = Embed(
             title="✂️ Rock Paper Scissors",
-            description=f"{ctx.author.mention} chose **{choice}** and {self.client.user.mention} chose **{bot_choice}**\n\n{result}",
+            description=f"{ctx.author.mention} chose **{choice}** and {self.client.user.mention} chose **{bot_choice}**\n\n{result}",  # type: ignore
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
@@ -434,27 +440,27 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def kira(self, ctx: commands.Context, member: Member = None) -> Embed:
+    async def kira(self, ctx: Context, member: Union[Member, User] = None):  # type: ignore
         """
         Likelihood of you or someone being Kira
         """
         result = random.randint(0, 100)
         if member is None:
-            member: Member = ctx.author
+            member: Member = ctx.author  # type: ignore
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
                     select(DiscordUser).where(DiscordUser.discord_id == str(member.id))
                 )
-                user = query.scalar_one_or_none()
+                user: DiscordUser = query.scalar_one_or_none()
                 if user is None:
                     new_user = DiscordUser(
                         discord_id=str(member.id),
                         username=member.name,
-                        joined=member.joined_at,
+                        joined=member.joined_at,  # type: ignore
                         kira_percentage=result,
                         guild_id=str(
-                            member.guild.id,
+                            member.guild.id,  # type: ignore
                         ),
                     )
                     session.add(new_user)
@@ -508,7 +514,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="xkcd", description="Get a Todays XKCD comic")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def xkcd(self, ctx: commands.Context) -> Union[Embed, Message]:
+    async def xkcd(self, ctx: Context):
         """
         Get a random xkcd comic
         """
@@ -530,7 +536,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="year", description="Show the year progress")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def year(self, ctx: commands.Context):
+    async def year(self, ctx: Context):
         embed: Embed = Embed(timestamp=ctx.message.created_at)
         embed.colour = Colour.blurple()
         embed.set_author(
@@ -544,7 +550,7 @@ class Fun(commands.Cog, name="Fun"):
 
     @commands.command("f", description="Press F to pay respects")
     @commands.guild_only()
-    async def f(self, ctx: commands.Context):
+    async def f(self, ctx: Context):
         """
         Press F to pay respects
         """
@@ -562,7 +568,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="inspiro", description="Get a random inspiro quote")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def inspiro(self, ctx: commands.Context) -> Message:
+    async def inspiro(self, ctx: Context):
         """
         Get a random inspiro quote
         """
@@ -576,7 +582,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="dog", description="Get a random dog image")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def dog(self, ctx: commands.Context) -> Message:
+    async def dog(self, ctx: Context):
         """
         Get a random dog image
         """
@@ -589,7 +595,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="supreme", description="Make a supreme image")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def supreme(self, ctx: commands.Context, *, text: str) -> Message:
+    async def supreme(self, ctx: Context, *, text: str):
         """
         Make a supreme image
         """
@@ -600,9 +606,7 @@ class Fun(commands.Cog, name="Fun"):
     @commands.hybrid_command(name="didyoumean", description="Make a did you mean image")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def didyoumean(
-        self, ctx: commands.Context, *, top: str, bottom: str
-    ) -> Message:
+    async def didyoumean(self, ctx: Context, *, top: str, bottom: str):
         """
         Make a did you mean image
         """
@@ -615,7 +619,7 @@ class Fun(commands.Cog, name="Fun"):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def the_office(self, ctx: commands.Context) -> Message:
+    async def the_office(self, ctx: Context):
         """
         Get a random Quote from The Office
         """
@@ -632,13 +636,15 @@ class Fun(commands.Cog, name="Fun"):
                 embed.set_image(url=quote["character_avatar_url"])
                 embed.set_footer(text="https://theoffice.foo/")
                 await ctx.reply(embed=embed)
+            else:
+                await ctx.reply("Error getting The Office quote!", ephemeral=True)
 
     @commands.hybrid_command(
         "officeclip", description="Get a random clip from The Office"
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def officeclip(self, ctx: commands.Context) -> Message:
+    async def officeclip(self, ctx: Context):
         """
         Get a random clip from The Office
         """
@@ -647,11 +653,13 @@ class Fun(commands.Cog, name="Fun"):
                 data = await response.json()
                 random_clip = random.choice(data)
                 await ctx.reply(random_clip["video_url"])
+            else:
+                await ctx.reply("Error getting The Office clip!", ephemeral=True)
 
     @commands.hybrid_command(name="anime", description="Get a random anime quote")
     @commands.guild_only()
     @app_commands.guild_only()
-    async def anime(self, ctx: commands.Context) -> Message:
+    async def anime(self, ctx: Context):
         """
         Get a random anime quote
         """
@@ -669,5 +677,5 @@ class Fun(commands.Cog, name="Fun"):
                 await ctx.reply(embed=embed)
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Fun(client))

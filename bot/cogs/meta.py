@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import random
 from io import BytesIO
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from discord import Colour, Embed, File, Guild, Member, User
 from discord.abc import GuildChannel
@@ -11,16 +11,20 @@ from discord.ext import commands
 from models.users import DiscordUser
 from PIL import Image, ImageDraw, ImageFont
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+    from utils.context import Context
 
-class Meta(commands.Cog, name="Meta"):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+
+class Meta(commands.Cog):
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
         self.sex: str = random.choice(["M", "F", "Never"])
         self.random_number: int = random.randint(10**9, (10**10) - 1)
         self.file_path: str = os.path.dirname(os.path.abspath(__file__))
         self.rand_number: int = (
             f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"
-        )
+        )  # type: ignore
         self.visa_image = Image.open(f"{self.file_path}/files/visa.jpg")
         self.width, self.height = self.visa_image.size
         self.background_color = (255, 255, 255)
@@ -77,12 +81,12 @@ class Meta(commands.Cog, name="Meta"):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id == self.client.main_guild:
+        if member.guild.id == self.client.main_guild: # type: ignore
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
-                joined=member.joined_at,
-                guild_id=str(member.guild.id),
+                joined=member.joined_at, # type: ignore
+                guild_id=str(member.guild.id), # type: ignore
                 xp=0,
                 level=0,
             )
@@ -97,9 +101,9 @@ class Meta(commands.Cog, name="Meta"):
                         await session.rollback()
 
         image = await self.create_image(member)
-        channel = await self.client.fetch_channel(member.guild.system_channel.id)
-        await channel.send(
-            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",
+        channel = await self.client.fetch_channel(member.guild.system_channel.id) # type: ignore
+        await channel.send(  # type: ignore
+            content=f"Welcome {member.mention} to the {member.guild.name} discord server!", # type: ignore
             file=File(image),
         )
         os.remove(image)
@@ -123,9 +127,9 @@ class Meta(commands.Cog, name="Meta"):
                     embed.colour = Colour.blurple()
                     embed.add_field(name="User:", value=user.mention, inline=False)
                     channel: GuildChannel = self.client.get_channel(
-                        self.general_channel
+                        self.general_channel # type: ignore
                     )
-                    await channel.send(embed=embed)
+                    await channel.send(embed=embed)  # type: ignore
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
@@ -137,7 +141,7 @@ class Meta(commands.Cog, name="Meta"):
         async with self.client.async_session() as session:
             async with session.begin():
                 try:
-                    user = await session.query(DiscordUser, before.id)
+                    user: DiscordUser = await session.query(DiscordUser, before.id)
                     if user is None:
                         return
                     user.username = after.name
@@ -148,5 +152,5 @@ class Meta(commands.Cog, name="Meta"):
                     await session.rollback()
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Meta(client))

@@ -3,14 +3,16 @@ from __future__ import annotations
 import os
 import random
 import urllib.parse
-
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import discord
 from discord import app_commands
-from discord.ext import commands, menus
-from discord.ext.commands import GroupCog
 from discord.app_commands import command
+from discord.ext import commands, menus # type: ignore
+from discord.ext.commands import GroupCog
+
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
 
 
 class PalPages(menus.ListPageSource):
@@ -34,10 +36,10 @@ class PalMenu(menus.MenuPages):
 
 
 class Palworld(GroupCog, name="palworld"):
-    def __init__(self, client: commands.Bot):
-        self.client = client
+    def __init__(self, client: Konikotaka):
+        self.client: Konikotaka = client
         self.base_url: str = "https://palapi.world"
-        self.server_ip: str = os.getenv("PALWORLD_SERVER_IP")
+        self.server_ip: str = os.environ["PALWORLD_SERVER_IP"]
 
     def build_url(self, **kwargs) -> str:
         url = self.base_url
@@ -171,5 +173,5 @@ class Palworld(GroupCog, name="palworld"):
             await interaction.response.send_message(embed=embed)
 
 
-async def setup(client):
+async def setup(client: Konikotaka):
     await client.add_cog(Palworld(client))
