@@ -13,7 +13,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 if TYPE_CHECKING:
     from ..bot import Konikotaka
-    from utils.context import Context
 
 
 class Meta(commands.Cog):

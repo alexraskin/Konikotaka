@@ -22,7 +22,6 @@ from utils.gpt import about_text
 
 if TYPE_CHECKING:
     from ..bot import Konikotaka
-    from utils.context import Context
 
 
 class Download(ui.View):
