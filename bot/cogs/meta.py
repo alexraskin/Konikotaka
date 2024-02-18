@@ -101,9 +101,9 @@ class Meta(commands.Cog):
                         await session.rollback()
 
         image = await self.create_image(member)
-        channel = await self.client.fetch_channel(member.guild.system_channel.id) # type: ignore
+        channel = await self.client.fetch_channel(member.guild.system_channel.id)  # type: ignore
         await channel.send(  # type: ignore
-            content=f"Welcome {member.mention} to the {member.guild.name} discord server!", # type: ignore
+            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",  # type: ignore
             file=File(image),
         )
         os.remove(image)

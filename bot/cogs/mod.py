@@ -19,7 +19,7 @@ class Mod(commands.Cog):
     async def _amimod(self, interaction: Interaction) -> None:
         if (
             interaction.user.guild_permissions.administrator  # type: ignore
-            or interaction.user.guild_permissions.manage_guild # type: ignore
+            or interaction.user.guild_permissions.manage_guild  # type: ignore
         ):
             await interaction.response.send_message(
                 "Yes", ephemeral=True, delete_after=5

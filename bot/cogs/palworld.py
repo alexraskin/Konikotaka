@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Optional
 import discord
 from discord import app_commands
 from discord.app_commands import command
-from discord.ext import commands, menus # type: ignore
+from discord.ext import commands, menus  # type: ignore
 from discord.ext.commands import GroupCog
 
 if TYPE_CHECKING:

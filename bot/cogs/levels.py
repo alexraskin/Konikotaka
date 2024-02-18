@@ -69,13 +69,12 @@ class Levels(commands.Cog):
 
     @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of")
-
     async def rank(self, interaction: Interaction, user: Optional[Union[Member, User]] = None) -> None:  # type: ignore
         """
         Sends a user's rank
         """
         if user is None:
-            user: Union[Member, User] = interaction # type: ignore
+            user: Union[Member, User] = interaction  # type: ignore
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(

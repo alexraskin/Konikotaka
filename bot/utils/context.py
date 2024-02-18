@@ -1,7 +1,16 @@
 from __future__ import annotations
 
 import io
-from typing import TYPE_CHECKING, Any, Callable, Generic, Iterable, TypeVar, Union, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Generic,
+    Iterable,
+    TypeVar,
+    Union,
+    Optional,
+)
 
 import discord
 from discord.ext import commands
@@ -11,10 +20,13 @@ if TYPE_CHECKING:
     from aiohttp import ClientSession
 
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class Context(commands.Context):
-    channel: Union[discord.VoiceChannel, discord.TextChannel, discord.Thread, discord.DMChannel]
+    channel: Union[
+        discord.VoiceChannel, discord.TextChannel, discord.Thread, discord.DMChannel
+    ]
     prefix: str
     command: commands.Command[Any, ..., Any]
     client: Konikotaka
@@ -24,19 +36,19 @@ class Context(commands.Context):
 
     async def entry_to_code(self, entries: Iterable[tuple[str, str]]) -> None:
         width = max(len(a) for a, b in entries)
-        output = ['```']
+        output = ["```"]
         for name, entry in entries:
-            output.append(f'{name:<{width}}: {entry}')
-        output.append('```')
-        await self.send('\n'.join(output))
+            output.append(f"{name:<{width}}: {entry}")
+        output.append("```")
+        await self.send("\n".join(output))
 
     async def indented_entry_to_code(self, entries: Iterable[tuple[str, str]]) -> None:
         width = max(len(a) for a, b in entries)
-        output = ['```']
+        output = ["```"]
         for name, entry in entries:
-            output.append(f'\u200b{name:>{width}}: {entry}')
-        output.append('```')
-        await self.send('\n'.join(output))
+            output.append(f"\u200b{name:>{width}}: {entry}")
+        output.append("```")
+        await self.send("\n".join(output))
 
     @property
     def session(self) -> ClientSession:
@@ -62,11 +74,13 @@ class Context(commands.Context):
         If no command is given, then it'll show help for the current
         command.
         """
-        cmd = self.client.get_command('help')
+        cmd = self.client.get_command("help")
         command = command or self.command.qualified_name
         await self.invoke(cmd, command=command)  # type: ignore
 
-    async def safe_send(self, content: str, *, escape_mentions: Optional[bool] = True, **kwargs) -> discord.Message:
+    async def safe_send(
+        self, content: str, *, escape_mentions: Optional[bool] = True, **kwargs
+    ) -> discord.Message:
         """Same as send except with some safe guards.
 
         1) If the message is too long then it sends a file with the results instead.
@@ -77,7 +91,9 @@ class Context(commands.Context):
 
         if len(content) > 2000:
             fp = io.BytesIO(content.encode())
-            kwargs.pop('file', None)
-            return await self.send(file=discord.File(fp, filename='message_too_long.txt'), **kwargs)
+            kwargs.pop("file", None)
+            return await self.send(
+                file=discord.File(fp, filename="message_too_long.txt"), **kwargs
+            )
         else:
             return await self.send(content)

@@ -141,7 +141,7 @@ class Info(commands.Cog):
     @commands.guild_only()
     @app_commands.guild_only()
     async def joinedate(
-        self, ctx: Context, *, user: Union[Member, User] = None # type: ignore
+        self, ctx: Context, *, user: Union[Member, User] = None  # type: ignore
     ) -> None:
         """Check when a user joined the current server"""
         user = user or ctx.author
