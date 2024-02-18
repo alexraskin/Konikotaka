@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from utils.context import Context
 
 
-class Music(commands.Cog, name="Music"):
+class Music(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client
 
