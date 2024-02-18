@@ -9,7 +9,6 @@ from sqlalchemy.future import select  # type: ignore
 
 if TYPE_CHECKING:
     from ..bot import Konikotaka
-    from utils.context import Context
 
 
 class Levels(commands.Cog):

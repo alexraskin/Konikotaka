@@ -4,8 +4,6 @@ import io
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Generic,
     Iterable,
     TypeVar,
     Union,
