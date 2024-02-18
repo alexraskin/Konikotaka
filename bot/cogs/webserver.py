@@ -2,7 +2,6 @@ import asyncio
 import os
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 import aiohttp_cors  # type: ignore
 from aiohttp import web
@@ -10,13 +9,10 @@ from discord.ext import commands
 from models.users import DiscordUser
 from sqlalchemy.future import select  # type: ignore
 
-if TYPE_CHECKING:
-    from ..bot import Konikotaka
-
 
 class WebServer(commands.Cog):
-    def __init__(self, client: Konikotaka) -> None:
-        self.client: Konikotaka = client
+    def __init__(self, client: commands.Bot) -> None:
+        self.client: commands.Bot = client
         self.api_key: str = os.environ["X-API-KEY"]
 
     @commands.Cog.listener()
@@ -98,7 +94,7 @@ class WebServer(commands.Cog):
         asyncio.ensure_future(self.site.stop())
 
 
-async def setup(client: Konikotaka) -> None:
+async def setup(client: commands.Bot) -> None:
     server: WebServer = WebServer(client)
     client.loop.create_task(server.webserver())
     await client.add_cog(WebServer(client))

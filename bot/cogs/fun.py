@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from utils.context import Context
 
 
-class Fun(commands.Cog, name="Fun"):
+class Fun(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client
         self.fuck: Fuck = Fuck()
