@@ -143,4 +143,4 @@ async def on_ready() -> None:
 
 
 client.run(token=os.environ["DISCORD_TOKEN"], reconnect=True, log_handler=None)
-client.log.info(f"{client.user.name} has disconnected from Discord!") # type: ignore
+client.log.info(f"{client.user.name} has disconnected from Discord!")  # type: ignore

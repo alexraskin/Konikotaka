@@ -13,6 +13,7 @@ from sqlalchemy.future import select  # type: ignore
 if TYPE_CHECKING:
     from ..bot import Konikotaka
 
+
 class WebServer(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client

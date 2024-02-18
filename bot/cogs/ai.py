@@ -16,7 +16,7 @@ from discord import (
     ui,
 )
 from discord.ext import commands
-from openai import AsyncOpenAI # type: ignore
+from openai import AsyncOpenAI  # type: ignore
 from utils.consts import ai_ban_words
 from utils.gpt import about_text
 

@@ -201,7 +201,7 @@ class Music(commands.Cog, name="Music"):
         await ctx.send("Removed! ✅")
 
     async def check_author(self, ctx: Context) -> bool:
-        if ctx.author.voice is None: # type: ignore
+        if ctx.author.voice is None:  # type: ignore
             await ctx.reply("Join a voice channel first..", ephemeral=True)
             return False
         return True

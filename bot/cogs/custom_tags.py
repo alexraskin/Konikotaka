@@ -153,6 +153,7 @@ class Tags(commands.Cog):
                     await ctx.reply(
                         "An error occurred while adding the tag.", ephemeral=True
                     )
+
     async def edit_tag(self, ctx: Context, tag_name: str, tag_content: str) -> None:
         async with self.client.async_session() as session:
             async with session.begin():
@@ -442,7 +443,6 @@ class Tags(commands.Cog):
                 )
                 tags = query.scalars().all()
                 if tags:
-
                     await ctx.safe_send(
                         content="Here are all the tags:\n"
                         + "\n".join(
@@ -482,7 +482,7 @@ class Tags(commands.Cog):
                                 [
                                     f"`{tag.name}`"
                                     for tag in tags
-                                    if tag.location_id == ctx.guild.id # type: ignore
+                                    if tag.location_id == ctx.guild.id  # type: ignore
                                 ]
                             )
                         )
