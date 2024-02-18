@@ -29,7 +29,7 @@ class Levels(commands.Cog):
         """
         if message.author == self.client.user:
             return
-        if message.guild.id != self.client.main_guild: # type: ignore
+        if message.guild.id != self.client.main_guild:  # type: ignore
             return
         if message.author.bot:
             return
@@ -58,8 +58,8 @@ class Levels(commands.Cog):
                     user: DiscordUser = DiscordUser(
                         discord_id=str(message.author.id),
                         username=message.author.name,
-                        joined=message.author.joined_at, # type: ignore
-                        guild_id=str(message.guild.id), # type: ignore
+                        joined=message.author.joined_at,  # type: ignore
+                        guild_id=str(message.guild.id),  # type: ignore
                         xp=5,
                         level=1,
                     )
@@ -69,7 +69,8 @@ class Levels(commands.Cog):
 
     @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of")
-    async def rank(self, interaction: Interaction, user: Optional[Union[Member, User]] = None) -> None: # type: ignore
+
+    async def rank(self, interaction: Interaction, user: Optional[Union[Member, User]] = None) -> None:  # type: ignore
         """
         Sends a user's rank
         """

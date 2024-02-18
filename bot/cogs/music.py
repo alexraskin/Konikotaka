@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Annotated
+from typing import TYPE_CHECKING, Optional
 
 import discord
 import wavelink  # type: ignore
@@ -37,9 +37,7 @@ class Music(commands.Cog, name="Music"):
     @app_commands.guild_only()
     @app_commands.describe(search="The search query to use.")
     @app_commands.describe(volume="The volume to play at.")
-    async def play(
-        self, ctx: Context, search: str, volume: Optional[int] = 30
-    ) -> None:
+    async def play(self, ctx: Context, search: str, volume: Optional[int] = 30) -> None:
         """
         Play a song from YouTube.
         """
@@ -103,7 +101,7 @@ class Music(commands.Cog, name="Music"):
         """Stop the current song"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
         if player.queue.is_empty is not True:
             player.queue.clear()
         await player.disconnect()
@@ -116,7 +114,7 @@ class Music(commands.Cog, name="Music"):
         """Show the current song"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
         if not player.is_playing():
             await ctx.reply("Nothing is playing")
             return
@@ -134,7 +132,7 @@ class Music(commands.Cog, name="Music"):
         """
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
         await player.pause()
         await ctx.send(content="Paused! ⏸️")
 
@@ -147,7 +145,7 @@ class Music(commands.Cog, name="Music"):
         """
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
         await player.resume()
         await ctx.send(content="Resumed! ⏯️")
 
@@ -177,7 +175,7 @@ class Music(commands.Cog, name="Music"):
         """Show the current queue"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
         if player.queue.is_empty:
             await ctx.send("Queue is empty")
             return
@@ -192,7 +190,7 @@ class Music(commands.Cog, name="Music"):
         """Remove a song from queue"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
         if player.queue.is_empty:
             await ctx.send("Queue is empty")
             return

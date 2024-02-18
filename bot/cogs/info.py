@@ -119,8 +119,7 @@ class Info(commands.Cog):
     async def serverinfo(self, ctx: Context) -> None:
         """Check info about current server"""
         if ctx.invoked_subcommand is None:
-            find_bots = sum(1 for member in ctx.guild.members if member.bot) # type: ignore
-
+            find_bots = sum(1 for member in ctx.guild.members if member.bot)  # type: ignore
             embed: Embed = Embed()
             embed.colour = Colour.blurple()
             embed.title = f"{ctx.guild.name}"  # type: ignore

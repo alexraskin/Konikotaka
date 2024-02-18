@@ -119,9 +119,7 @@ class Tags(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client
 
-    async def add_tag(
-        self, ctx: Context, tag_name: str, tag_content: str
-    ) -> None:
+    async def add_tag(self, ctx: Context, tag_name: str, tag_content: str) -> None:
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -142,7 +140,7 @@ class Tags(commands.Cog):
                     date_added=ctx.message.created_at.strftime(
                         "%Y-%m-%d %H:%M:%S %Z%z"
                     ),
-                    location_id=ctx.guild.id, # type: ignore
+                    location_id=ctx.guild.id,  # type: ignore
                 )
                 try:
                     session.add(new_tag)
@@ -155,16 +153,13 @@ class Tags(commands.Cog):
                     await ctx.reply(
                         "An error occurred while adding the tag.", ephemeral=True
                     )
-
-    async def edit_tag(
-        self, ctx: Context, tag_name: str, tag_content: str
-    ) -> None:
+    async def edit_tag(self, ctx: Context, tag_name: str, tag_content: str) -> None:
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
                     select(CustomTags).filter(
                         CustomTags.name == tag_name
-                        and CustomTags.location_id == ctx.guild.id # type: ignore
+                        and CustomTags.location_id == ctx.guild.id  # type: ignore
                     )
                 )
                 tag = query.scalar_one_or_none()
@@ -227,7 +222,7 @@ class Tags(commands.Cog):
                 query = await session.execute(
                     select(CustomTags).filter(
                         CustomTags.name == tag_name.lower()
-                        and CustomTags.location_id == ctx.guild.id # type: ignore
+                        and CustomTags.location_id == ctx.guild.id  # type: ignore
                     )
                 )
                 tag: CustomTags = query.scalar_one_or_none()
@@ -253,7 +248,7 @@ class Tags(commands.Cog):
                                 [
                                     f"{tag.name}"
                                     for tag in tags
-                                    if tag.location_id == ctx.guild.id # type: ignore
+                                    if tag.location_id == ctx.guild.id  # type: ignore
                                 ]
                             )
                         )
@@ -454,7 +449,7 @@ class Tags(commands.Cog):
                             [
                                 f"`{tag.name}`"
                                 for tag in tags
-                                if tag.location_id == ctx.guild.id # type: ignore
+                                if tag.location_id == ctx.guild.id  # type: ignore
                             ]
                         )
                     )
@@ -504,7 +499,7 @@ class Tags(commands.Cog):
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
-                    select(CustomTags).filter(CustomTags.location_id == ctx.guild.id) # type: ignore
+                    select(CustomTags).filter(CustomTags.location_id == ctx.guild.id)  # type: ignore
                 )
                 tags = query.scalars().all()
                 if tags:
