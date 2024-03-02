@@ -68,7 +68,9 @@ class Levels(commands.Cog):
 
     @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of")
-    async def rank(self, interaction: Interaction, user: Optional[Union[Member, User]] = None) -> None:
+    async def rank(
+        self, interaction: Interaction, user: Optional[Union[Member, User]] = None
+    ) -> None:
         """
         Sends a user's rank
         """
