@@ -16,7 +16,7 @@ from discord import (
     ui,
 )
 from discord.ext import commands
-from openai import AsyncOpenAI  # type: ignore
+from openai import AsyncOpenAI
 from utils.consts import ai_ban_words
 from utils.gpt import about_text
 
@@ -78,7 +78,7 @@ class Ai(commands.Cog):
         start_time = time.time()
         try:
             image_data = await self.client.session.post(
-                url="https://api.twizy.sh/image-gen", json={"prompt": prompt}
+                url="https://api.00z.sh/image-gen", json={"prompt": prompt}
             )
         except Exception as e:
             self.client.log.error(f"Error generating image: {e}")

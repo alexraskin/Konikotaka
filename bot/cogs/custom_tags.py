@@ -10,7 +10,7 @@ from discord import Colour, Embed, TextStyle, app_commands
 from discord.ext import commands
 from discord.interactions import Interaction
 from models.tags import CustomTags
-from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.future import select
 
 if TYPE_CHECKING:
     from ..bot import Konikotaka
@@ -34,14 +34,14 @@ class TagName(commands.clean_content):
 
         first_word, _, _ = lower.partition(" ")
 
-        root: commands.GroupMixin = ctx.bot.get_command("tag")  # type: ignore
+        root: commands.GroupMixin = ctx.bot.get_command("tag")
         if first_word in root.all_commands:
             raise commands.BadArgument("This tag name starts with a reserved word.")
 
         return converted.strip() if not self.lower else lower
 
 
-class CreateTagModel(discord.ui.Modal, title="Create New Tag"):
+class CreateTagModel(discord.ui.Modal):
     tag_name = discord.ui.TextInput(
         label="Tag Name",
         style=TextStyle.short,
@@ -75,10 +75,10 @@ class CreateTagModel(discord.ui.Modal, title="Create New Tag"):
             await interaction.response.send_message(
                 "Tag content is a maximum of 2000 characters.", ephemeral=True
             )
-        await self.cog.add_tag(self.ctx, name, content)  # type: ignore
+        await self.cog.add_tag(self.ctx, name, content)
 
 
-class EditTagModel(discord.ui.Modal, title="Edit Tag"):
+class EditTagModel(discord.ui.Modal):
     tag_name = discord.ui.TextInput(
         label="Tag Name",
         style=TextStyle.short,
@@ -112,7 +112,7 @@ class EditTagModel(discord.ui.Modal, title="Edit Tag"):
             await interaction.response.send_message(
                 "Tag content is a maximum of 2000 characters.", ephemeral=True
             )
-        await self.cog.edit_tag(self.ctx, name, content)  # type: ignore
+        await self.cog.edit_tag(self.ctx, name, content)
 
 
 class Tags(commands.Cog):
@@ -140,7 +140,7 @@ class Tags(commands.Cog):
                     date_added=ctx.message.created_at.strftime(
                         "%Y-%m-%d %H:%M:%S %Z%z"
                     ),
-                    location_id=ctx.guild.id,  # type: ignore
+                    location_id=ctx.guild.id,
                 )
                 try:
                     session.add(new_tag)
@@ -160,14 +160,14 @@ class Tags(commands.Cog):
                 query = await session.execute(
                     select(CustomTags).filter(
                         CustomTags.name == tag_name
-                        and CustomTags.location_id == ctx.guild.id  # type: ignore
+                        and CustomTags.location_id == ctx.guild.id
                     )
                 )
                 tag = query.scalar_one_or_none()
                 if tag is None:
                     return await ctx.reply(
                         f"Tag `{tag_name}` does not exist 👎", ephemeral=True
-                    )  # type: ignore
+                    )
                 if tag:
                     if int(str(tag.discord_id).strip()) != ctx.author.id:
                         return await ctx.reply(
@@ -223,7 +223,7 @@ class Tags(commands.Cog):
                 query = await session.execute(
                     select(CustomTags).filter(
                         CustomTags.name == tag_name.lower()
-                        and CustomTags.location_id == ctx.guild.id  # type: ignore
+                        and CustomTags.location_id == ctx.guild.id
                     )
                 )
                 tag: CustomTags = query.scalar_one_or_none()
@@ -249,7 +249,7 @@ class Tags(commands.Cog):
                                 [
                                     f"{tag.name}"
                                     for tag in tags
-                                    if tag.location_id == ctx.guild.id  # type: ignore
+                                    if tag.location_id == ctx.guild.id
                                 ]
                             )
                         )
@@ -279,7 +279,7 @@ class Tags(commands.Cog):
         try:
             name = await self.client.wait_for("message", timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            return await ctx.send("You took long. Goodbye.")  # type: ignore
+            return await ctx.send("You took long. Goodbye.")
 
         try:
             ctx.message = name
@@ -299,10 +299,10 @@ class Tags(commands.Cog):
         try:
             msg = await self.client.wait_for("message", check=check, timeout=300.0)
         except asyncio.TimeoutError:
-            return await ctx.send("You took too long. Goodbye.")  # type: ignore
+            return await ctx.send("You took too long. Goodbye.")
 
         if msg.content == f"{ctx.prefix}abort":
-            return await ctx.send("Aborting...")  # type: ignore
+            return await ctx.send("Aborting...")
 
         elif msg.content:
             try:
@@ -310,7 +310,7 @@ class Tags(commands.Cog):
             except Exception as e:
                 return await ctx.send(
                     f'{e}. Redo the command "{ctx.prefix}tag make" to retry.'
-                )  # type: ignore
+                )
         else:
             clean_content = msg.content
 
@@ -318,7 +318,7 @@ class Tags(commands.Cog):
             clean_content = f"{clean_content}\n{msg.attachments[0].url}"
 
         if len(clean_content) > 2000:
-            return await ctx.send("Tag content is a maximum of 2000 characters.")  # type: ignore
+            return await ctx.send("Tag content is a maximum of 2000 characters.")
 
         await self.add_tag(ctx, name, clean_content)
 
@@ -345,7 +345,7 @@ class Tags(commands.Cog):
         try:
             name = await self.client.wait_for("message", timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            return await ctx.send("You took long. Goodbye.")  # type: ignore
+            return await ctx.send("You took long. Goodbye.")
 
         try:
             ctx.message = name
@@ -353,7 +353,7 @@ class Tags(commands.Cog):
         except commands.BadArgument as e:
             return await ctx.send(
                 f'{e}. Redo the command "{ctx.prefix}tag edit" to retry.'
-            )  # type: ignore
+            )
         finally:
             ctx.message = original
 
@@ -365,10 +365,10 @@ class Tags(commands.Cog):
         try:
             msg = await self.client.wait_for("message", check=check, timeout=300.0)
         except asyncio.TimeoutError:
-            return await ctx.send("You took too long. Goodbye.")  # type: ignore
+            return await ctx.send("You took too long. Goodbye.")
 
         if msg.content == f"{ctx.prefix}abort":
-            return await ctx.send("Aborting...")  # type: ignore
+            return await ctx.send("Aborting...")
 
         elif msg.content:
             try:
@@ -376,7 +376,7 @@ class Tags(commands.Cog):
             except Exception as e:
                 return await ctx.send(
                     f'{e}. Redo the command "{ctx.prefix}tag edit" to retry.'
-                )  # type: ignore
+                )
         else:
             clean_content = msg.content
 
@@ -384,7 +384,7 @@ class Tags(commands.Cog):
             clean_content = f"{clean_content}\n{msg.attachments[0].url}"
 
         if len(clean_content) > 2000:
-            return await ctx.send("Tag content is a maximum of 2000 characters.")  # type: ignore
+            return await ctx.send("Tag content is a maximum of 2000 characters.")
 
         await self.edit_tag(ctx, name, clean_content)
 
@@ -449,7 +449,7 @@ class Tags(commands.Cog):
                             [
                                 f"`{tag.name}`"
                                 for tag in tags
-                                if tag.location_id == ctx.guild.id  # type: ignore
+                                if tag.location_id == ctx.guild.id
                             ]
                         )
                     )
@@ -482,7 +482,7 @@ class Tags(commands.Cog):
                                 [
                                     f"`{tag.name}`"
                                     for tag in tags
-                                    if tag.location_id == ctx.guild.id  # type: ignore
+                                    if tag.location_id == ctx.guild.id
                                 ]
                             )
                         )
@@ -499,7 +499,7 @@ class Tags(commands.Cog):
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
-                    select(CustomTags).filter(CustomTags.location_id == ctx.guild.id)  # type: ignore
+                    select(CustomTags).filter(CustomTags.location_id == ctx.guild.id)
                 )
                 tags = query.scalars().all()
                 if tags:

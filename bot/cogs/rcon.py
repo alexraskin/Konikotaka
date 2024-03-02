@@ -13,8 +13,6 @@ from utils.rcon_client import RconClient
 
 class Rcon(
     GroupCog,
-    group_name="palserver",
-    group_description="Avaliable commands to interact with the Palworld Server",
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client: commands.Bot = client
