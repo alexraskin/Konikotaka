@@ -22,7 +22,7 @@ class myHelpCommand(HelpCommand):
         embed = Embed(color=0x2ECC71, timestamp=self.context.message.created_at)
         if header:
             embed.set_author(name=self.context.bot.description)
-        for category, entries in self.paginator:
+        for category, entries in self.paginator:  # type: ignore
             embed.add_field(name=category, value=entries, inline=False)
         if footer:
             embed.set_footer(text="Use !help <command/category> for more information.")
@@ -66,7 +66,7 @@ class myHelpCommand(HelpCommand):
             + f"**{command.name}** → {command.short_doc or command.description}"
             for command in filtered
         )
-        self.paginator.append((category, entries))
+        self.paginator.append((category, entries))  # type: ignore
         await self.send_pages(footer=True)
 
     async def send_group_help(self, group: commands.group):
@@ -81,13 +81,13 @@ class myHelpCommand(HelpCommand):
             self.spacer + f"**{command.name}** → {command.short_doc}"
             for command in filtered
         )
-        self.paginator.append((category, entries))
+        self.paginator.append((category, entries))  # type: ignore
         await self.send_pages(footer=True)
 
     async def send_command_help(self, command: commands.Command):
         signature = self.get_command_signature(command)
         helptext = command.help or command.description or "No help Text"
-        self.paginator.append((signature, helptext))
+        self.paginator.append((signature, helptext))  # type: ignore
         await self.send_pages()
 
     async def prepare_help_command(self, ctx: commands.Context, command=None):

@@ -3,18 +3,19 @@ import logging
 import os
 import random
 import time
+from typing import Union
 
 import discord
-import psutil  # type: ignore
-import wavelink  # type: ignore
+import psutil
+import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from discord.ext import tasks
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 from models.db import Base
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine  # type: ignore
-from sqlalchemy.orm import sessionmaker  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 from utils.consts import activities
 
 load_dotenv()
@@ -29,7 +30,7 @@ class Konikotaka(Bot):
     def __init__(self, *args, **options) -> None:
         super().__init__(*args, **options)
         self.log = log
-        self.session = None  # type: ignore
+        self.session = None
         self.pid = os.getpid()
         self.start_time = time.time()
         self.main_guild: int = 1020830000104099860
@@ -104,10 +105,10 @@ class Konikotaka(Bot):
         return self.bot_app_info.owner
 
     @property
-    def git_revision(self) -> str:
+    def git_revision(self) -> Union[str, None]:
         latest_revision = os.getenv("RAILWAY_GIT_COMMIT_SHA")
         if latest_revision is None:
-            return None  # type: ignore
+            return None
         url = f"<https://github.com/alexraskin/Konikotaka/commit/{(short := latest_revision[:7])}>"
         return f"[{short}]({url})"
 
@@ -137,10 +138,10 @@ async def init_database() -> None:
 
 @client.event
 async def on_ready() -> None:
-    client.log.info(f"{client.user.name} has connected to Discord!")  # type: ignore
-    change_activity.start()
-    init_database.start()
+    client.log.info(f"{client.user.name} has connected to Discord!")
+    change_activity.start()  # type: ignore
+    init_database.start()  # type: ignore
 
 
 client.run(token=os.environ["DISCORD_TOKEN"], reconnect=True, log_handler=None)
-client.log.info(f"{client.user.name} has disconnected from Discord!")  # type: ignore
+client.log.info(f"{client.user.name} has disconnected from Discord!")

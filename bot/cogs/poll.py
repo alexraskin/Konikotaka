@@ -32,15 +32,14 @@ class Polls(commands.Cog):
         """
 
         if len(questions_and_choices) < 3:
-            return await ctx.send("Need at least 1 question with 2 choices.")  # type: ignore
+            return await ctx.send("Need at least 1 question with 2 choices.")
         elif len(questions_and_choices) > 21:
-            return await ctx.send("You can only have up to 20 choices.")  # type: ignore
-
+            return await ctx.send("You can only have up to 20 choices.")
         perms = ctx.channel.permissions_for(ctx.me)
         if not (perms.read_message_history or perms.add_reactions):
             return await ctx.send(
                 "Need Read Message History and Add Reactions permissions."
-            )  # type: ignore
+            )
 
         question = questions_and_choices[0]
         choices = [

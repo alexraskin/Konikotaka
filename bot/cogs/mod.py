@@ -18,8 +18,8 @@ class Mod(commands.Cog):
     @app_commands.guild_only()
     async def _amimod(self, interaction: Interaction) -> None:
         if (
-            interaction.user.guild_permissions.administrator  # type: ignore
-            or interaction.user.guild_permissions.manage_guild  # type: ignore
+            interaction.user.guild_permissions.administrator
+            or interaction.user.guild_permissions.manage_guild
         ):
             await interaction.response.send_message(
                 "Yes", ephemeral=True, delete_after=5
@@ -35,7 +35,7 @@ class Mod(commands.Cog):
     @app_commands.describe(reason="The reason for the ban")
     @app_commands.checks.has_permissions(ban_members=True)
     async def _ban(self, interaction: Interaction, member: Member, reason: str) -> None:
-        await interaction.guild.ban(member, reason=reason)  # type: ignore
+        await interaction.guild.ban(member, reason=reason)
         await interaction.response.send_message(f"Banned {member.name}", ephemeral=True)
 
     @app_commands.command(name="softban", description="Softban a user")
@@ -46,8 +46,8 @@ class Mod(commands.Cog):
     async def _softban(
         self, interaction: Interaction, member: Member, reason: str
     ) -> None:
-        await interaction.guild.ban(member, reason=reason)  # type: ignore
-        await interaction.guild.unban(member, reason=reason)  # type: ignore
+        await interaction.guild.ban(member, reason=reason)
+        await interaction.guild.unban(member, reason=reason)
         await interaction.response.send_message(
             f"Softbanned {member.name}", ephemeral=True
         )
@@ -60,7 +60,7 @@ class Mod(commands.Cog):
     async def _kick(
         self, interaction: Interaction, member: Member, reason: str
     ) -> None:
-        await interaction.guild.kick(member, reason=reason)  # type: ignore
+        await interaction.guild.kick(member, reason=reason)
         await interaction.response.send_message(f"Kicked {member.name}", ephemeral=True)
 
     @app_commands.command(name="timeout", description="Timeout a user")
@@ -74,7 +74,7 @@ class Mod(commands.Cog):
     ) -> None:
         unmute_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
         try:
-            await member.timeout(until=unmute_time, reason=reason)  # type: ignore
+            await member.timeout(until=unmute_time, reason=reason)
         except Exception as e:
             self.client.log.error(f"Error: {e}")
             await interaction.response.send_message(
@@ -93,7 +93,7 @@ class Mod(commands.Cog):
     async def _unban(
         self, interaction: Interaction, member: Member, reason: str
     ) -> None:
-        await interaction.guild.unban(member, reason=reason)  # type: ignore
+        await interaction.guild.unban(member, reason=reason)
         await interaction.response.send_message(
             f"Unbanned {member.name}", ephemeral=True
         )
@@ -117,12 +117,12 @@ class Mod(commands.Cog):
         try:
             amount += 1
             await interaction.response.defer()
-            await interaction.channel.purge(limit=amount, reason=reason)  # type: ignore
+            await interaction.channel.purge(limit=amount, reason=reason)
             embed = Embed(
                 title="Purge 🗑️",
                 description=f"Purged {amount} messages.",
                 color=0x00FF00,
-                timestamp=interaction.message.created_at,  # type: ignore
+                timestamp=interaction.message.created_at,
             )
             await interaction.followup.send(embed=embed)
         except Exception as e:
@@ -153,7 +153,7 @@ class Mod(commands.Cog):
         """
         Lockdowns a specified channel.
         """
-        channel: TextChannel = channel or ctx.channel  # type: ignore
+        channel: TextChannel = channel or ctx.channel
         try:
             await channel.set_permissions(ctx.guild.default_role, send_messages=False)
             embed = Embed(
@@ -196,7 +196,7 @@ class Mod(commands.Cog):
         try:
             await channel.set_permissions(
                 ctx.guild.default_role, send_messages=True, reason=reason
-            )  # type: ignore
+            )
             embed = Embed(
                 title="Lockdown Ended 🔓",
                 description="The lockdown has been lifted.",

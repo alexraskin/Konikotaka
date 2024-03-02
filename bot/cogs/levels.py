@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from discord import Colour, Embed, Interaction, Message, User, Member, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
-from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.future import select
 
 if TYPE_CHECKING:
     from ..bot import Konikotaka
@@ -28,7 +28,7 @@ class Levels(commands.Cog):
         """
         if message.author == self.client.user:
             return
-        if message.guild.id != self.client.main_guild:  # type: ignore
+        if message.guild.id != self.client.main_guild:
             return
         if message.author.bot:
             return
@@ -57,8 +57,8 @@ class Levels(commands.Cog):
                     user: DiscordUser = DiscordUser(
                         discord_id=str(message.author.id),
                         username=message.author.name,
-                        joined=message.author.joined_at,  # type: ignore
-                        guild_id=str(message.guild.id),  # type: ignore
+                        joined=message.author.joined_at,
+                        guild_id=str(message.guild.id),
                         xp=5,
                         level=1,
                     )
@@ -68,12 +68,14 @@ class Levels(commands.Cog):
 
     @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of")
-    async def rank(self, interaction: Interaction, user: Optional[Union[Member, User]] = None) -> None:  # type: ignore
+    async def rank(
+        self, interaction: Interaction, user: Optional[Union[Member, User]] = None
+    ) -> None:
         """
         Sends a user's rank
         """
         if user is None:
-            user: Union[Member, User] = interaction  # type: ignore
+            user: Union[Member, User] = interaction
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(

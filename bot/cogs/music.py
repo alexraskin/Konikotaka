@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 import discord
-import wavelink  # type: ignore
+import wavelink
 from discord import Colour, app_commands
 from discord.ext import commands
 
@@ -46,7 +46,7 @@ class Music(commands.Cog):
             await ctx.reply("Please provide a search query.", ephemeral=True)
             return
 
-        if volume > 100 or volume < 0:  # type: ignore
+        if volume > 100 or volume < 0:
             await ctx.reply("Volume must be between 0 and 100", ephemeral=True)
             return
 
@@ -56,8 +56,8 @@ class Music(commands.Cog):
         author_voice = ctx.author.voice
 
         player: wavelink.Player = (
-            ctx.guild.voice_client  # type: ignore
-            or await author_voice.channel.connect(cls=wavelink.Player)  # type: ignore
+            ctx.guild.voice_client
+            or await author_voice.channel.connect(cls=wavelink.Player)
         )
         player.autoplay = True
 
@@ -101,7 +101,7 @@ class Music(commands.Cog):
         """Stop the current song"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client
         if player.queue.is_empty is not True:
             player.queue.clear()
         await player.disconnect()
@@ -114,7 +114,7 @@ class Music(commands.Cog):
         """Show the current song"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client
         if not player.is_playing():
             await ctx.reply("Nothing is playing")
             return
@@ -132,7 +132,7 @@ class Music(commands.Cog):
         """
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client
         await player.pause()
         await ctx.send(content="Paused! ⏸️")
 
@@ -145,7 +145,7 @@ class Music(commands.Cog):
         """
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client
         await player.resume()
         await ctx.send(content="Resumed! ⏯️")
 
@@ -159,7 +159,7 @@ class Music(commands.Cog):
         """
         if await self.check_author(ctx) is False:
             return
-        if volume > 100 or volume < 0:  # type: ignore
+        if volume > 100 or volume < 0:
             await ctx.send("Volume must be between 0 and 100", ephemeral=True)
             return
         player: wavelink.Player = ctx.voice_client
@@ -175,13 +175,13 @@ class Music(commands.Cog):
         """Show the current queue"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client
         if player.queue.is_empty:
             await ctx.send("Queue is empty")
             return
         embed = discord.Embed(title="Queue ", description="", color=0x00FF00)
         for i, track in enumerate(player.queue, start=1):
-            embed.description += f"{i}) {track.title}\n"  # type: ignore
+            embed.description += f"{i}) {track.title}\n"
         await ctx.send(embed=embed)
 
     @music.command(name="remove", description="Remove a song from queue")
@@ -190,7 +190,7 @@ class Music(commands.Cog):
         """Remove a song from queue"""
         if await self.check_author(ctx) is False:
             return
-        player: wavelink.Player = ctx.guild.voice_client  # type: ignore
+        player: wavelink.Player = ctx.guild.voice_client
         if player.queue.is_empty:
             await ctx.send("Queue is empty")
             return
@@ -201,7 +201,7 @@ class Music(commands.Cog):
         await ctx.send("Removed! ✅")
 
     async def check_author(self, ctx: Context) -> bool:
-        if ctx.author.voice is None:  # type: ignore
+        if ctx.author.voice is None:
             await ctx.reply("Join a voice channel first..", ephemeral=True)
             return False
         return True

@@ -5,7 +5,7 @@ import random
 import urllib.parse
 from typing import TYPE_CHECKING, Literal, Optional, Union
 
-import upsidedown  # type: ignore
+import upsidedown
 from async_foaas import Fuck
 from discord import Colour, Embed, Member, User, app_commands
 from discord.ext import commands
@@ -446,7 +446,7 @@ class Fun(commands.Cog):
         """
         result = random.randint(0, 100)
         if member is None:
-            member: Member = ctx.author  # type: ignore
+            member: Member = ctx.author
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -457,10 +457,10 @@ class Fun(commands.Cog):
                     new_user = DiscordUser(
                         discord_id=str(member.id),
                         username=member.name,
-                        joined=member.joined_at,  # type: ignore
+                        joined=member.joined_at,
                         kira_percentage=result,
                         guild_id=str(
-                            member.guild.id,  # type: ignore
+                            member.guild.id,
                         ),
                     )
                     session.add(new_user)

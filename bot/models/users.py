@@ -1,5 +1,5 @@
 from models.db import Base
-from sqlalchemy import DATE, VARCHAR, Column, Integer  # type: ignore
+from sqlalchemy import DATE, VARCHAR, Column, Integer
 
 
 class DiscordUser(Base):
