@@ -18,7 +18,7 @@ class General(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.health_check.start()
+        self.health_check.start()  # type: ignore
 
     @tasks.loop(hours=1)
     async def health_check(self) -> None:
@@ -36,7 +36,7 @@ class General(commands.Cog):
     @app_commands.guild_only()
     @commands.guild_only()
     async def shorten_url(self, ctx: Context, url: str) -> None:
-        api_url: str = "https://edgesnip.dev/"
+        api_url: str = "https://i.00z.sh/"
         validate_url = validators.url(url)
         if validate_url:
             data = {"url": url}

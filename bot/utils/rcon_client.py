@@ -12,7 +12,7 @@ class RconClient:
         self.host: str = host
         self.password: str = password
         self.port: int = port
-        self.timeout: int = timeout  # type: ignore
+        self.timeout: int = timeout if timeout else 5
 
     def open(self) -> Console:
         return Console(
@@ -32,8 +32,7 @@ class RconClient:
         console.close()
         return res if res else False
 
-    def online(self) -> Union[tuple[list, str], tuple[bool, bool]]:
-        # Response is of format `name,playerid,steamid`
+    def online(self) -> Union[tuple[str, list], tuple[bool, bool]]:
         console = self.open()
         res = console.command("ShowPlayers")
         console.close()
@@ -83,5 +82,4 @@ class RconClient:
         console = self.open()
         res = console.command("DoExit")
         console.close()
-        # TODO: Check if this is supposed to give a response (and alter accordingly)
         return res if res else False

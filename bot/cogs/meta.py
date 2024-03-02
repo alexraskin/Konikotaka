@@ -80,12 +80,12 @@ class Meta(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id == self.client.main_guild:  # type: ignore
+        if member.guild.id == self.client.main_guild:
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
-                joined=member.joined_at,  # type: ignore
-                guild_id=str(member.guild.id),  # type: ignore
+                joined=member.joined_at,
+                guild_id=str(member.guild.id),
                 xp=0,
                 level=0,
             )
@@ -100,9 +100,9 @@ class Meta(commands.Cog):
                         await session.rollback()
 
         image = await self.create_image(member)
-        channel = await self.client.fetch_channel(member.guild.system_channel.id)  # type: ignore
+        channel = await self.client.fetch_channel(member.guild.system_channel.id)
         await channel.send(  # type: ignore
-            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",  # type: ignore
+            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",
             file=File(image),
         )
         os.remove(image)
@@ -126,9 +126,9 @@ class Meta(commands.Cog):
                     embed.colour = Colour.blurple()
                     embed.add_field(name="User:", value=user.mention, inline=False)
                     channel: GuildChannel = self.client.get_channel(
-                        self.general_channel  # type: ignore
+                        self.general_channel
                     )
-                    await channel.send(embed=embed)  # type: ignore
+                    await channel.send(embed=embed)
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()

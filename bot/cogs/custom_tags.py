@@ -172,7 +172,7 @@ class Tags(commands.Cog):
                     if int(str(tag.discord_id).strip()) != ctx.author.id:
                         return await ctx.reply(
                             "You are not the owner of this tag.", ephemeral=True
-                        )  # type: ignore
+                        )
                     new_tag = CustomTags(
                         name=tag_name.strip().lower(),
                         content=tag_content,
@@ -287,7 +287,7 @@ class Tags(commands.Cog):
         except commands.BadArgument as e:
             return await ctx.send(
                 f'{e}. Redo the command "{ctx.prefix}tag make" to retry.'
-            )  # type: ignore
+            )
         finally:
             ctx.message = original
 
@@ -571,7 +571,7 @@ class Tags(commands.Cog):
                     if int(str(tag.discord_id).strip()) != ctx.author.id:
                         return await ctx.reply(
                             "You are not the owner of this tag.", ephemeral=True
-                        )  # type: ignore
+                        )
                     try:
                         await session.delete(tag)
                         await session.flush()

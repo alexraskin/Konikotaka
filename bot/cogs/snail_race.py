@@ -8,7 +8,7 @@ import discord
 from discord import Colour, Interaction, Member, User, app_commands
 from discord.ext import commands
 from models.races import Races
-from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.future import select
 
 guilds: dict = {}
 snail_positions: dict = {}
@@ -41,11 +41,11 @@ class RaceButton(discord.ui.View):
     ):
         await interaction.response.defer()
 
-        if interaction.user.id not in guilds[interaction.guild.id]:  # type: ignore
+        if interaction.user.id not in guilds[interaction.guild.id]:
             await interaction.followup.send(
                 "You've entered into the race!", ephemeral=True
             )
-            add_user_to_guild(interaction.guild.id, interaction.user.id)  # type: ignore
+            add_user_to_guild(interaction.guild.id, interaction.user.id)
         else:
             await interaction.followup.send(
                 content="You already joined the race! 🐌", ephemeral=True
@@ -57,12 +57,12 @@ class RaceButton(discord.ui.View):
     ):
         await interaction.response.defer()
 
-        if interaction.user.id not in guilds[interaction.guild.id]:  # type: ignore
+        if interaction.user.id not in guilds[interaction.guild.id]:
             await interaction.followup.send(
                 content="You need to join the race first!", ephemeral=True
             )
         else:
-            del guilds[interaction.guild.id][interaction.user.id]  # type: ignore
+            del guilds[interaction.guild.id][interaction.user.id]
             await interaction.followup.send(
                 content="You have left the race! 🚫", ephemeral=True
             )
@@ -73,8 +73,8 @@ class SnailRace(commands.Cog):
         self.client: Konikotaka = client
 
     def randomize_snails(self) -> None:
-        participants = list(guilds[self.client.guild.id].keys())  # type: ignore
-        return random.sample(participants, len(participants))  # type: ignore
+        participants = list(guilds[self.client.guild.id].keys())
+        return random.sample(participants, len(participants))
 
     async def update_leaderboard(self, winner: Member) -> None:
         updated_racer = Races(
@@ -109,26 +109,26 @@ class SnailRace(commands.Cog):
                     )
 
     async def simulate_race(self, interaction: Interaction) -> None:
-        winner: Union[Member, User] = None  # type: ignore
+        winner: Union[Member, User] = None
         race_length: int = 10
-        if guilds[interaction.guild.id] == {}:  # type: ignore
-            await interaction.channel.send(  # type: ignore
+        if guilds[interaction.guild.id] == {}:
+            await interaction.channel.send(
                 "No one joined the Race! 🐌\nBetter luck next time!"
             )
             return
-        message = await interaction.channel.send("The Race is starting! 🚩")  # type: ignore
+        message = await interaction.channel.send("The Race is starting! 🚩")
         randomize_snail = self.randomize_snails()
-        snail_positions = {user_id: 0 for user_id in randomize_snail}  # type: ignore
+        snail_positions = {user_id: 0 for user_id in randomize_snail}
         while not winner:
             for user_id in snail_positions:
                 snail_positions[user_id] += random.randint(1, 3)
 
                 if snail_positions[user_id] >= race_length:
-                    winner = self.client.get_user(user_id)  # type: ignore
+                    winner = self.client.get_user(user_id)
                     break
             race_progress: str = ""
             for user_id, position in snail_positions.items():
-                user: Union[Member, User] = self.client.get_user(user_id)  # type: ignore
+                user: Union[Member, User] = self.client.get_user(user_id)
                 race_progress += f"[{user.name}]: {'🐌' * position}\n"
             await asyncio.sleep(random.randint(1, 3))
             await message.edit(
@@ -141,33 +141,33 @@ class SnailRace(commands.Cog):
             timestamp=interaction.created_at,
         )
         embed.set_thumbnail(url=winner.display_avatar.url)
-        await interaction.channel.send(embed=embed)  # type: ignore
-        if winner.name != self.client.user.name:  # type: ignore
-            await self.update_leaderboard(winner)  # type: ignore
+        await interaction.channel.send(embed=embed)
+        if winner.name != self.client.user.name:
+            await self.update_leaderboard(winner)
 
     @app_commands.command(name="race", description="Start a Snail Race")
     @app_commands.guild_only()
     async def race(self, interaction: Interaction, delay: Optional[int] = 10) -> None:
-        view: RaceButton = RaceButton(timeout=delay)  # type: ignore
-        if interaction.guild.id in guilds:  # type: ignore
+        view: RaceButton = RaceButton(timeout=delay if delay else 10)
+        if interaction.guild.id in guilds:
             await interaction.response.send_message(
                 content="There is already a race running in this server.",
             )
 
             return
 
-        if delay > 30 or delay < 5:  # type: ignore
+        if delay > 30 or delay < 5:
             await interaction.response.send_message(
                 content="Please specify a delay between 5 and 30 seconds.",
                 ephemeral=True,
             )
             return
-        add_guild(interaction.guild.id)  # type: ignore
+        add_guild(interaction.guild.id)
         await interaction.response.send_message(
             content=f"{interaction.user.mention} has started a race.\nRace will start in {delay} seconds.",
             view=view,
         )
-        await asyncio.sleep(delay)  # type: ignore
+        await asyncio.sleep(delay if delay else 10)
         await self.simulate_race(interaction)
 
     @commands.Cog.listener()
@@ -178,7 +178,7 @@ class SnailRace(commands.Cog):
     ) -> None:
         try:
             snail_positions.clear()
-            del guilds[interaction.guild.id]  # type: ignore
+            del guilds[interaction.guild.id]
         except ValueError:
             pass
 
@@ -196,7 +196,7 @@ class SnailRace(commands.Cog):
                     racer_info = self.client.get_user(
                         int(str(racer.discord_id).strip())
                     )
-                    leaderboard += f"{racer_info.mention}: {racer.points} points 🏅\n"  # type: ignore
+                    leaderboard += f"{racer_info.mention}: {racer.points} points 🏅\n"
 
                 embed = discord.Embed(
                     title="Snail Racing Leaderboard 🏆",

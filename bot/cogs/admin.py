@@ -21,7 +21,7 @@ class Admin(commands.Cog):
         Reloads all the cogs or a specified cog.
         """
         if extension is None:
-            for cog in self.client.extensions.copy():  # type: ignore
+            for cog in self.client.extensions.copy():
                 try:
                     await self.client.unload_extension(cog)
                     await self.client.load_extension(cog)
@@ -85,7 +85,7 @@ class Admin(commands.Cog):
         """
         if name is None:
             name = emoji.name
-        guild: Guild = ctx.guild  # type: ignore
+        guild: Guild = ctx.guild
         try:
             res = await self.client.session.get(emoji.url)
             if res.status == 200:
