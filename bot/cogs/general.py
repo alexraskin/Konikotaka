@@ -57,9 +57,7 @@ class General(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_command_error(
-        self, ctx: Context, error: commands.errors
-    ) -> None:
+    async def on_command_error(self, ctx: Context, error: commands.errors) -> None:
         errors = {
             "CheckFailure": "Fact: Only those who possess the true spirit of a samurai can access this command. You, unfortunately, do not.",
             "CommandNotFound": "This command is like a Dragon Ball - mythical and not found in this realm. Try something within your power level.",
