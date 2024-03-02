@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-import validators  # type: ignore
+import validators
 from discord import PartialEmoji, app_commands
 from discord.ext import commands, tasks
 
@@ -52,13 +52,13 @@ class General(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: Context) -> None:
         self.client.log.info(
-            f"Executed {ctx.command.qualified_name} command in {ctx.guild.name}"  # type: ignore
+            f"Executed {ctx.command.qualified_name} command in {ctx.guild.name}"
             + f"(ID: {ctx.message.guild.id}) by {ctx.message.author} (ID: {ctx.message.author.id})"
         )
 
     @commands.Cog.listener()
     async def on_command_error(
-        self, ctx: Context, error: commands.errors  # type: ignore
+        self, ctx: Context, error: commands.errors
     ) -> None:
         errors = {
             "CheckFailure": "Fact: Only those who possess the true spirit of a samurai can access this command. You, unfortunately, do not.",
@@ -68,9 +68,9 @@ class General(commands.Cog):
             "CommandOnCooldown": "Like a warrior after an intense battle, this command needs time to recover. Patience is a virtue of the samurai.",
             "generic_error_message": "This is an error unknown to even the most ancient anime scrolls. Consult the Schrute Codex for guidance, or simply try again.",
         }
-        self.client.log.error(error.__class__.__name__ + ": " + str(error))  # type: ignore
+        self.client.log.error(error.__class__.__name__ + ": " + str(error))
         try:
-            message = "Error: " + errors[error.__class__.__name__]  # type: ignore
+            message = "Error: " + errors[error.__class__.__name__]
             await ctx.send(message)
         except AttributeError:
             await ctx.send(errors["generic_error_message"])

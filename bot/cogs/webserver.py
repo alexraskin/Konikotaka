@@ -3,11 +3,11 @@ import os
 import time
 from datetime import datetime
 
-import aiohttp_cors  # type: ignore
+import aiohttp_cors
 from aiohttp import web
 from discord.ext import commands
 from models.users import DiscordUser
-from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.future import select
 
 
 class WebServer(commands.Cog):
@@ -21,7 +21,7 @@ class WebServer(commands.Cog):
 
     async def get_api_latency(self) -> int:
         start_time = time.time()
-        await self.client.session.get("https://api.twizy.sh/")
+        await self.client.session.get("https://api.00z.sh/")
         end_time = time.time()
         latency: int = round((end_time - start_time) * 1000)
         return latency

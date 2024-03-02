@@ -10,7 +10,7 @@ from async_foaas import Fuck
 from discord import Colour, Embed, Member, User, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
-from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.future import select
 from utils.utils import get_year_round, progress_bar
 
 if TYPE_CHECKING:
@@ -440,7 +440,7 @@ class Fun(commands.Cog):
     )
     @commands.guild_only()
     @app_commands.guild_only()
-    async def kira(self, ctx: Context, member: Union[Member, User] = None):  # type: ignore
+    async def kira(self, ctx: Context, member: Union[Member, User] = None):
         """
         Likelihood of you or someone being Kira
         """

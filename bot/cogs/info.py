@@ -57,7 +57,7 @@ class Info(commands.Cog):
             text=f"Made with discord.py v{version}",
             icon_url="http://i.imgur.com/5BFecvA.png",
         )
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)  # type: ignore
+        embed.set_thumbnail(url=self.client.user.display_avatar.url)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command("join", with_app_command=True)
@@ -95,21 +95,21 @@ class Info(commands.Cog):
             show_roles = ", ".join(
                 [
                     f"<@&{x.id}>"
-                    for x in sorted(user.roles, key=lambda x: x.position, reverse=True)  # type: ignore
-                    if x.id != ctx.guild.default_role.id  # type: ignore
+                    for x in sorted(user.roles, key=lambda x: x.position, reverse=True)
+                    if x.id != ctx.guild.default_role.id
                 ]
             )
 
-        embed = Embed(colour=user.top_role.colour.value)  # type: ignore
+        embed = Embed(colour=user.top_role.colour.value)
         embed.title = f"{user.name}#{user.discriminator}"
         embed.set_thumbnail(url=user.avatar)
 
         embed.add_field(name="Full name", value=user)
         embed.add_field(
-            name="Nickname", value=user.nick if hasattr(user, "nick") else "None"  # type: ignore
+            name="Nickname", value=user.nick if hasattr(user, "nick") else "None"
         )
         embed.add_field(name="Account created", value=date(user.created_at, ago=True))
-        embed.add_field(name="Joined this server", value=date(user.joined_at, ago=True))  # type: ignore
+        embed.add_field(name="Joined this server", value=date(user.joined_at, ago=True))
         embed.add_field(name="Roles", value=show_roles, inline=False)
 
         await ctx.send(embed=embed)
@@ -119,37 +119,37 @@ class Info(commands.Cog):
     async def serverinfo(self, ctx: Context) -> None:
         """Check info about current server"""
         if ctx.invoked_subcommand is None:
-            find_bots = sum(1 for member in ctx.guild.members if member.bot)  # type: ignore
+            find_bots = sum(1 for member in ctx.guild.members if member.bot)
             embed: Embed = Embed()
             embed.colour = Colour.blurple()
-            embed.title = f"{ctx.guild.name}"  # type: ignore
+            embed.title = f"{ctx.guild.name}"
 
-            if ctx.guild.icon:  # type: ignore
+            if ctx.guild.icon:
                 embed.set_thumbnail(url=ctx.guild.icon)
-            if ctx.guild.banner:  # type: ignore
-                embed.set_image(url=ctx.guild.banner.with_format("png").with_size(1024))  # type: ignore
+            if ctx.guild.banner:
+                embed.set_image(url=ctx.guild.banner.with_format("png").with_size(1024))
 
-            embed.add_field(name="Server Name", value=ctx.guild.name)  # type: ignore
-            embed.add_field(name="Server ID", value=ctx.guild.id)  # type: ignore
-            embed.add_field(name="Members", value=ctx.guild.member_count)  # type: ignore
+            embed.add_field(name="Server Name", value=ctx.guild.name)
+            embed.add_field(name="Server ID", value=ctx.guild.id)
+            embed.add_field(name="Members", value=ctx.guild.member_count)
             embed.add_field(name="Bots", value=find_bots)
-            embed.add_field(name="Owner", value=ctx.guild.owner)  # type: ignore
-            embed.add_field(name="Created", value=date(ctx.guild.created_at, ago=True))  # type: ignore
+            embed.add_field(name="Owner", value=ctx.guild.owner)
+            embed.add_field(name="Created", value=date(ctx.guild.created_at, ago=True))
             await ctx.send(embed=embed)
 
     @commands.hybrid_command(aliases=["joined"])
     @commands.guild_only()
     @app_commands.guild_only()
     async def joinedate(
-        self, ctx: Context, *, user: Union[Member, User] = None  # type: ignore
+        self, ctx: Context, *, user: Union[Member, User] = None
     ) -> None:
         """Check when a user joined the current server"""
         user = user or ctx.author
         await ctx.send(
             "\n".join(
                 [
-                    f"**{user}** joined **{ctx.guild.name}**",  # type: ignore
-                    f"{date(user.joined_at, ago=True)}",  # type: ignore
+                    f"**{user}** joined **{ctx.guild.name}**",
+                    f"{date(user.joined_at, ago=True)}",
                 ]
             )
         )
@@ -167,7 +167,7 @@ class Info(commands.Cog):
             "offline": {"users": [], "emoji": "⚫"},
         }
 
-        for user in ctx.guild.members:  # type: ignore
+        for user in ctx.guild.members:
             user_perm = ctx.channel.permissions_for(user)
             if user_perm.kick_members or user_perm.ban_members:
                 if not user.bot:
@@ -178,7 +178,7 @@ class Info(commands.Cog):
                 message += (
                     f"{all_status[g]['emoji']} {', '.join(all_status[g]['users'])}\n"
                 )
-        embed = Embed(title=f"Mods in {ctx.guild.name}")  # type: ignore
+        embed = Embed(title=f"Mods in {ctx.guild.name}")
         embed.colour = Colour.blurple()
         embed.description = message
         embed.set_footer(text=f"Requested by {ctx.author}")
@@ -207,7 +207,7 @@ class Info(commands.Cog):
             timestamp=ctx.message.created_at,
         )
         embed.colour = Colour.blurple()
-        embed.set_thumbnail(url=self.client.user.avatar.url)  # type: ignore
+        embed.set_thumbnail(url=self.client.user.avatar.url)
         await ctx.send(embed=embed)
 
 
