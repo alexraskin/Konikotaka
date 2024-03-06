@@ -1,17 +1,14 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 import random
 
-if TYPE_CHECKING:
-    from ..bot import Konikotaka
-
 
 class RandomChoiceCog(commands.Cog):
-    def __init__(self, client: Konikotaka) -> None:
-        self.client: Konikotaka = client
+    def __init__(self, client: discord.Bot) -> None:
+        self.client: discord.Bot = client
 
     @app_commands.command(name="choose", description="Choose between multiple options")
     async def choose_command(
