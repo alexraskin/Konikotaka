@@ -11,6 +11,16 @@ class RandomChoiceCog(commands.Cog):
         self.client: commands.Bot = client
 
     @app_commands.command(name="choose", description="Choose between multiple options")
+    @app_commands.describe(choice_1="The first choice")
+    @app_commands.describe(choice_2="The second choice")
+    @app_commands.describe(choice_3="The third choice")
+    @app_commands.describe(choice_4="The fourth choice")
+    @app_commands.describe(choice_5="The fifth choice")
+    @app_commands.describe(choice_6="The sixth choice")
+    @app_commands.describe(choice_7="The seventh choice")
+    @app_commands.describe(choice_8="The eighth choice")
+    @app_commands.describe(choice_9="The ninth choice")
+    @app_commands.describe(choice_10="The tenth choice")
     async def choose_command(
         self,
         interaction: discord.Interaction,
@@ -44,7 +54,11 @@ class RandomChoiceCog(commands.Cog):
             )
             return
         choice = random.choice(choices)
-        await interaction.response.send_message(f"I choose {choice}")
+        embed = discord.Embed()
+        embed.title = "Random Choice"
+        embed.description = f"I choose {choice}"
+        embed.color = discord.Colour.blurple()
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(client: commands.Bot) -> None:
