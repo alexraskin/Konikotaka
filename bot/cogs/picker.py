@@ -47,5 +47,5 @@ class RandomChoiceCog(commands.Cog):
         await interaction.response.send_message(choice)
 
 
-async def setup(client: Konikotaka) -> None:
+async def setup(client: discord.Bot) -> None:
     await client.add_cog(RandomChoiceCog(client))
