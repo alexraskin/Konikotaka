@@ -44,7 +44,7 @@ class RandomChoiceCog(commands.Cog):
             )
             return
         choice = random.choice(choices)
-        await interaction.response.send_message(choice)
+        await interaction.response.send_message(f"I choose {choice}")
 
 
 async def setup(client: commands.Bot) -> None:
