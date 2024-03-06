@@ -7,8 +7,8 @@ import random
 
 
 class RandomChoiceCog(commands.Cog):
-    def __init__(self, client: discord.Bot) -> None:
-        self.client: discord.Bot = client
+    def __init__(self, client: commands.Bot) -> None:
+        self.client: commands.Bot = client
 
     @app_commands.command(name="choose", description="Choose between multiple options")
     async def choose_command(
@@ -47,5 +47,5 @@ class RandomChoiceCog(commands.Cog):
         await interaction.response.send_message(choice)
 
 
-async def setup(client: discord.Bot) -> None:
+async def setup(client: commands.Bot) -> None:
     await client.add_cog(RandomChoiceCog(client))
