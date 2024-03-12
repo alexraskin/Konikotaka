@@ -56,7 +56,7 @@ class RandomChoiceCog(commands.Cog):
         choice = random.choice(choices)
         embed = discord.Embed()
         embed.title = "Random Choice"
-        embed.description = f"I choose {choice}"
+        embed.description = f"From the choices {', '.join(choices)}, I choose {choice}"
         embed.color = discord.Colour.blurple()
         await interaction.response.send_message(embed=embed)
 
