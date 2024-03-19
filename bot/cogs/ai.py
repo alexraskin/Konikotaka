@@ -40,6 +40,8 @@ class Ai(commands.Cog):
     async def on_message(self, message: Message):
         if message.author == self.client.user:
             return
+        if message.mention_everyone:
+            return
         if self.client.user.mentioned_in(message):
             name = message.author.nick if message.author.nick else message.author.name
             client = AsyncOpenAI(
