@@ -64,7 +64,7 @@ rcon = { git = "https://github.com/ttk1/py-rcon.git", rev = "034dcae666c864a666e
 discord-ext-menus = { git = "https://github.com/Rapptz/discord-ext-menus", rev = "8686b5d1bbc1d3c862292eb436ab630d6e9c9b53" }
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.2.0"
+black = "^24.3.0"
 
 [build-system]
 requires = ["poetry-core"]
