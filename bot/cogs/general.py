@@ -18,7 +18,7 @@ class General(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.health_check.start()  # type: ignore
+        self.health_check.start()
 
     @tasks.loop(hours=1)
     async def health_check(self) -> None:

@@ -21,9 +21,7 @@ class Meta(commands.Cog):
         self.sex: str = random.choice(["M", "F", "Never"])
         self.random_number: int = random.randint(10**9, (10**10) - 1)
         self.file_path: str = os.path.dirname(os.path.abspath(__file__))
-        self.rand_number: int = (
-            f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"
-        )  # type: ignore
+        self.rand_number: int = f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"  # type: ignore
         self.visa_image = Image.open(f"{self.file_path}/files/visa.jpg")
         self.width, self.height = self.visa_image.size
         self.background_color = (255, 255, 255)
@@ -62,7 +60,7 @@ class Meta(commands.Cog):
         return f"{month}.{day}.{year}"
 
     async def create_image(self, member: Union[Member, User]) -> str:
-        discord_avatar = await self.client.session.get(member.avatar.url)
+        discord_avatar = await self.client.session.get(member.avatar.url)  # type: ignore
         discord_avatar = Image.open(BytesIO(await discord_avatar.read()))
         discord_avatar = discord_avatar.resize((150, 200))
         draw = ImageDraw.Draw(self.image)
@@ -80,12 +78,12 @@ class Meta(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id == self.client.main_guild:
+        if member.guild.id == self.client.main_guild:  # type: ignore
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
-                joined=member.joined_at,
-                guild_id=str(member.guild.id),
+                joined=member.joined_at,  # type: ignore
+                guild_id=str(member.guild.id),  # type: ignore
                 xp=0,
                 level=0,
             )
@@ -100,9 +98,9 @@ class Meta(commands.Cog):
                         await session.rollback()
 
         image = await self.create_image(member)
-        channel = await self.client.fetch_channel(member.guild.system_channel.id)
+        channel = await self.client.fetch_channel(member.guild.system_channel.id)  # type: ignore
         await channel.send(  # type: ignore
-            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",
+            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",  # type: ignore
             file=File(image),
         )
         os.remove(image)
@@ -126,9 +124,9 @@ class Meta(commands.Cog):
                     embed.colour = Colour.blurple()
                     embed.add_field(name="User:", value=user.mention, inline=False)
                     channel: GuildChannel = self.client.get_channel(
-                        self.general_channel
+                        self.general_channel  # type: ignore
                     )
-                    await channel.send(embed=embed)
+                    await channel.send(embed=embed)  # type: ignore
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
@@ -143,7 +141,7 @@ class Meta(commands.Cog):
                     user: DiscordUser = await session.query(DiscordUser, before.id)
                     if user is None:
                         return
-                    user.username = after.name
+                    user.username = after.name  # type: ignore
                     await session.flush()
                     await session.commit()
                 except Exception as e:

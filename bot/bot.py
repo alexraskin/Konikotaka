@@ -14,6 +14,7 @@ from discord.ext import tasks
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 from models.db import Base
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from utils.consts import activities
@@ -38,8 +39,16 @@ class Konikotaka(Bot):
         self.version: str = "1.0.6"
         self.lavalink_uri: str = os.environ["LAVALINK_URI"]
         self.lavalink_password: str = os.environ["LAVALINK_PASSWORD"]
+        self.db_url: URL = URL.create(
+            drivername="postgresql+asyncpg",
+            username=os.getenv("POSTGRES_USER"),
+            password=os.getenv("POSTGRES_PASSWORD"),
+            host=os.getenv("POSTGRES_HOST"),
+            port=os.getenv("POSTGRES_PORT"),
+            database=os.getenv("POSTGRES_DB"),
+        )
         self.engine: create_async_engine = create_async_engine(
-            os.getenv("POSTGRES_URL"),
+            self.db_url,
             echo=False,
             future=True,
             connect_args={"server_settings": {"application_name": "Konikotaka"}},
@@ -133,14 +142,15 @@ async def change_activity() -> None:
 async def init_database() -> None:
     async with client.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        client.log.info("Database initialized!")
         await conn.close()
 
 
 @client.event
 async def on_ready() -> None:
     client.log.info(f"{client.user.name} has connected to Discord!")
-    change_activity.start()  # type: ignore
-    init_database.start()  # type: ignore
+    change_activity.start()
+    init_database.start()
 
 
 client.run(token=os.environ["DISCORD_TOKEN"], reconnect=True, log_handler=None)

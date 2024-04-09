@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 import os
 
+from typing import TYPE_CHECKING
+
 import discord
 from discord import Colour, Embed, Interaction, app_commands
 from discord.app_commands import command
@@ -10,12 +12,15 @@ from discord.ext import commands
 from discord.ext.commands import GroupCog
 from utils.rcon_client import RconClient
 
+if TYPE_CHECKING:
+    from ..bot import Konikotaka
+
 
 class Rcon(
     GroupCog,
 ):
-    def __init__(self, client: commands.Bot) -> None:
-        self.client: commands.Bot = client
+    def __init__(self, client: Konikotaka) -> None:
+        self.client: Konikotaka = client
         self.rcon_client: RconClient = RconClient(
             host=os.environ["RCON_HOST"],
             password=os.environ["RCON_PASSWORD"],
@@ -226,5 +231,5 @@ class Rcon(
                 await interaction.followup.send("Server force stop cancelled.")
 
 
-async def setup(client: commands.Bot) -> None:
+async def setup(client: Konikotaka) -> None:
     await client.add_cog(Rcon(client))
