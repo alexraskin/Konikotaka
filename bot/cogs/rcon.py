@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import discord
 from discord import Colour, Embed, Interaction, app_commands
 from discord.app_commands import command
-from discord.ext import commands
 from discord.ext.commands import GroupCog
 from utils.rcon_client import RconClient
 
