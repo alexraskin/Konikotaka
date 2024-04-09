@@ -170,16 +170,16 @@ class SnailRace(commands.Cog):
         await asyncio.sleep(delay if delay else 10)
         await self.simulate_race(interaction)
 
-    @commands.Cog.listener()
-    async def on_app_command_completion(
-        self,
-        interaction: discord.Interaction,
-        command: app_commands.Command,
-    ) -> None:
-        try:
-            del guilds[interaction.guild.id]
-        except ValueError:
-            pass
+    # @commands.Cog.listener()
+    # async def on_app_command_completion(
+    #     self,
+    #     interaction: discord.Interaction,
+    #     command: app_commands.Command,
+    # ) -> None:
+    #     try:
+    #         del guilds[interaction.guild.id]
+    #     except ValueError:
+    #         pass
 
     @app_commands.command(name="leaderboard", description="Get Race Leaderboard")
     @app_commands.guild_only()
