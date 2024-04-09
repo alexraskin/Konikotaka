@@ -25,7 +25,7 @@ class Polls(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def quickpoll(self, ctx: Context, *questions_and_choices: str) -> None:
+    async def quickpoll(self, ctx: Context, *questions_and_choices: str):
         """Makes a poll quickly.
 
         The first argument is the question and the rest are the choices.
@@ -35,7 +35,7 @@ class Polls(commands.Cog):
             return await ctx.send("Need at least 1 question with 2 choices.")
         elif len(questions_and_choices) > 21:
             return await ctx.send("You can only have up to 20 choices.")
-        perms = ctx.channel.permissions_for(ctx.me)
+        perms = ctx.channel.permissions_for(ctx.me)  # type: ignore
         if not (perms.read_message_history or perms.add_reactions):
             return await ctx.send(
                 "Need Read Message History and Add Reactions permissions."

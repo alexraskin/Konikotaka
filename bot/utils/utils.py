@@ -1,9 +1,10 @@
 import time
 from datetime import datetime as dt
+from datetime import timezone
 
 
 def get_time_string() -> str:
-    return dt.utcnow().__str__()
+    return dt.now(tz=timezone.utc).__str__()
 
 
 def progress_bar(percent) -> str:
@@ -17,7 +18,7 @@ def progress_bar(percent) -> str:
 
 
 def get_year_round() -> float:
-    now = dt.utcnow()
+    now = dt.now(tz=timezone.utc)
     year_end = dt(now.year + 1, 1, 1)
     year_start = dt(now.year, 1, 1)
     year_percent = (now - year_start) / (year_end - year_start) * 100
@@ -27,7 +28,7 @@ def get_year_round() -> float:
 def date(target, clock: bool = True, ago: bool = False, only_ago: bool = False) -> str:
     """Converts a timestamp to a Discord timestamp format"""
     if isinstance(target, int) or isinstance(target, float):
-        target = dt.utcfromtimestamp(target)
+        target = dt.fromtimestamp(target)
 
     unix = int(time.mktime(target.timetuple()))
     timestamp = f"<t:{unix}:{'f' if clock else 'D'}>"

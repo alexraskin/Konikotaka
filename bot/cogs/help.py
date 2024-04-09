@@ -50,7 +50,7 @@ class myHelpCommand(HelpCommand):
                     entries += " | ".join([cmd.name for cmd in cmds[0:8]])
                     cmds = cmds[8:]
                     entries += "\n" if cmds else ""
-            self.paginator.append((category, entries))
+            self.paginator.append((category, entries))  # type: ignore
         await self.send_pages(header=True, footer=True)
 
     async def send_cog_help(self, cog: commands.Cog):
@@ -69,7 +69,7 @@ class myHelpCommand(HelpCommand):
         self.paginator.append((category, entries))  # type: ignore
         await self.send_pages(footer=True)
 
-    async def send_group_help(self, group: commands.group):
+    async def send_group_help(self, group: commands.group):  # type: ignore
         filtered = await self.filter_commands(group.commands, sort=True)
         if not filtered:
             await self.context.send(
@@ -106,7 +106,7 @@ class Help(commands.Cog):
         )
 
     def cog_unload(self):
-        self.client.get_command("help").hidden = False
+        self.client.get_command("help").hidden = False  # type: ignore
         self.client.help_command = DefaultHelpCommand()
 
     @commands.command(hidden=True)

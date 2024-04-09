@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=alex
+      - POSTGRES_PASSWORD=alex
+      - POSTGRES_DB=konikotaka
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=alex
+      - POSTGRES_PASSWORD=alex
+      - POSTGRES_DB=konikotaka
+
+volumes:
+  postgres_data:

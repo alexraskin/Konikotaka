@@ -41,11 +41,11 @@ class RaceButton(discord.ui.View):
     ):
         await interaction.response.defer()
 
-        if interaction.user.id not in guilds[interaction.guild.id]:
+        if interaction.user.id not in guilds[interaction.guild.id]:  # type: ignore
             await interaction.followup.send(
                 "You've entered into the race!", ephemeral=True
             )
-            add_user_to_guild(interaction.guild.id, interaction.user.id)
+            add_user_to_guild(interaction.guild.id, interaction.user.id)  # type: ignore
         else:
             await interaction.followup.send(
                 content="You already joined the race! 🐌", ephemeral=True
@@ -57,12 +57,12 @@ class RaceButton(discord.ui.View):
     ):
         await interaction.response.defer()
 
-        if interaction.user.id not in guilds[interaction.guild.id]:
+        if interaction.user.id not in guilds[interaction.guild.id]:  # type: ignore
             await interaction.followup.send(
                 content="You need to join the race first!", ephemeral=True
             )
         else:
-            del guilds[interaction.guild.id][interaction.user.id]
+            del guilds[interaction.guild.id][interaction.user.id]  # type: ignore
             await interaction.followup.send(
                 content="You have left the race! 🚫", ephemeral=True
             )
@@ -72,8 +72,8 @@ class SnailRace(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client
 
-    def randomize_snails(self) -> None:
-        participants = list(guilds[self.client.guild.id].keys())
+    def randomize_snails(self) -> list:
+        participants = list(guilds[self.client.guild.id].keys())  # type: ignore
         return random.sample(participants, len(participants))
 
     async def update_leaderboard(self, winner: Member) -> None:
@@ -124,7 +124,7 @@ class SnailRace(commands.Cog):
                 snail_positions[user_id] += random.randint(1, 3)
 
                 if snail_positions[user_id] >= race_length:
-                    winner = self.client.get_user(user_id)
+                    winner = self.client.get_user(user_id)  # type: ignore
                     break
             race_progress: str = ""
             for user_id, position in snail_positions.items():
@@ -177,7 +177,6 @@ class SnailRace(commands.Cog):
         command: app_commands.Command,
     ) -> None:
         try:
-            snail_positions.clear()
             del guilds[interaction.guild.id]
         except ValueError:
             pass

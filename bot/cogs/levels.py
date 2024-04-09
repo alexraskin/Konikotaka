@@ -34,6 +34,8 @@ class Levels(commands.Cog):
             return
         if message.webhook_id:
             return
+        if message.mention_everyone:
+            return
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -75,12 +77,12 @@ class Levels(commands.Cog):
         Sends a user's rank
         """
         if user is None:
-            user: Union[Member, User] = interaction
+            user = interaction.user
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
                     select(DiscordUser).where(
-                        DiscordUser.discord_id == str(interaction.user.id)
+                        DiscordUser.discord_id == str(user.id)
                     )
                 )
                 user: DiscordUser = query.scalar_one_or_none()

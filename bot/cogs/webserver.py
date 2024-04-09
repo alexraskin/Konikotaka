@@ -34,9 +34,10 @@ class WebServer(commands.Cog):
         return commands
 
     async def index_handler(self, request: web.Request) -> web.Response:
+        self.client.log.info(f"Request from {request.remote}")
         return web.json_response(
             {
-                "last_fetch": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+                "lastFetch": datetime.now().isoformat(),
                 "@me": {"botStatus": 200, "upTime": str(self.client.get_uptime)},
                 "gitRevision": self.client.git_revision,
                 "ram": f"{self.client.memory_usage}MB",
@@ -47,10 +48,15 @@ class WebServer(commands.Cog):
                     "rest": await self.get_api_latency(),
                 },
                 "botCommands": await self.get_all_commands(),
-            }
+            },
+            status=200,
+            reason="OK",
+            content_type="application/json",
         )
 
     async def leaderboard_handler(self, request: web.Request) -> web.Response:
+        if request.headers.get("X-API-KEY") != self.api_key:
+            return web.json_response({"error": "Invalid API Key"}, status=401, reason="Unauthorized")
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -60,10 +66,10 @@ class WebServer(commands.Cog):
                 leaderboard = []
                 for user in users:
                     leaderboard.append({"username": user.username, "level": user.level})
-                return web.json_response(leaderboard)
+                return web.json_response(leaderboard, status=200, reason="OK", content_type="application/json")
 
     async def health_check(self, request: web.Request) -> web.Response:
-        return web.json_response({"status": "healthy"})
+        return web.json_response({"status": "healthy"}, status=200, reason="OK", content_type="application/json")
 
     async def webserver(self) -> None:
         app: web.Application = web.Application()

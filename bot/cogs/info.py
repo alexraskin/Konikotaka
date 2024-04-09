@@ -91,7 +91,7 @@ class Info(commands.Cog):
         user: Union[Member, User] = user or ctx.author
 
         show_roles = "None"
-        if len(user.roles) > 1:  # type: ignore
+        if len(user.roles) > 1:
             show_roles = ", ".join(
                 [
                     f"<@&{x.id}>"

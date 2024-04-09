@@ -57,10 +57,10 @@ class CreateTagModel(discord.ui.Modal):
         max_length=2000,
     )
 
-    def __init__(self, ctx: commands.Context, cog: Tags) -> None:
+    def __init__(self, ctx: Context, cog: Tags) -> None:
         super().__init__(timeout=60.0)
-        self.cog: commands.Cog = cog
-        self.ctx: commands.Context = ctx
+        self.cog: Tags = cog
+        self.ctx: Context = ctx
 
     async def on_submit(self, interaction: Interaction) -> None:
         name = str(self.tag_name.value)
@@ -94,10 +94,10 @@ class EditTagModel(discord.ui.Modal):
         max_length=2000,
     )
 
-    def __init__(self, ctx: commands.Context, cog: Tags) -> None:
+    def __init__(self, ctx: Context, cog: Tags) -> None:
         super().__init__(timeout=60.0)
-        self.cog: commands.Cog = cog
-        self.ctx: commands.Context = ctx
+        self.cog: Tags = cog
+        self.ctx: Context = ctx
 
     async def on_submit(self, interaction: Interaction) -> None:
         name = str(self.tag_name.value)
@@ -119,7 +119,7 @@ class Tags(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client
 
-    async def add_tag(self, ctx: Context, tag_name: str, tag_content: str) -> None:
+    async def add_tag(self, ctx: Context, tag_name: str, tag_content: str):
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -132,7 +132,7 @@ class Tags(commands.Cog):
                 if tag:
                     return await ctx.reply(
                         f"Tag `{tag_name}` already exists 👎", ephemeral=True
-                    )  # type: ignore
+                    )
                 new_tag = CustomTags(
                     name=tag_name.strip().lower(),
                     content=tag_content,
@@ -154,7 +154,7 @@ class Tags(commands.Cog):
                         "An error occurred while adding the tag.", ephemeral=True
                     )
 
-    async def edit_tag(self, ctx: Context, tag_name: str, tag_content: str) -> None:
+    async def edit_tag(self, ctx: Context, tag_name: str, tag_content: str):
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -259,7 +259,7 @@ class Tags(commands.Cog):
     @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
-    async def add(self, ctx: Context) -> None:
+    async def add(self, ctx: Context):
         """
         Add a new tag
         """
@@ -325,7 +325,7 @@ class Tags(commands.Cog):
     @tag.command()
     @commands.guild_only()
     @app_commands.guild_only()
-    async def edit(self, ctx: Context) -> None:
+    async def edit(self, ctx: Context):
         """
         Edit a tag
         """
@@ -554,7 +554,7 @@ class Tags(commands.Cog):
     @commands.guild_only()
     @app_commands.guild_only()
     @app_commands.describe(tag_name="The tag to remove")
-    async def delete(self, ctx: Context, tag_name: str) -> None:
+    async def delete(self, ctx: Context, tag_name: str):
         """
         Delete a tag
         """
