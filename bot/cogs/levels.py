@@ -81,9 +81,7 @@ class Levels(commands.Cog):
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
-                    select(DiscordUser).where(
-                        DiscordUser.discord_id == str(user.id)
-                    )
+                    select(DiscordUser).where(DiscordUser.discord_id == str(user.id))
                 )
                 user: DiscordUser = query.scalar_one_or_none()
                 embed = Embed()

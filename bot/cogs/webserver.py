@@ -56,7 +56,9 @@ class WebServer(commands.Cog):
 
     async def leaderboard_handler(self, request: web.Request) -> web.Response:
         if request.headers.get("X-API-KEY") != self.api_key:
-            return web.json_response({"error": "Invalid API Key"}, status=401, reason="Unauthorized")
+            return web.json_response(
+                {"error": "Invalid API Key"}, status=401, reason="Unauthorized"
+            )
         async with self.client.async_session() as session:
             async with session.begin():
                 query = await session.execute(
@@ -66,10 +68,20 @@ class WebServer(commands.Cog):
                 leaderboard = []
                 for user in users:
                     leaderboard.append({"username": user.username, "level": user.level})
-                return web.json_response(leaderboard, status=200, reason="OK", content_type="application/json")
+                return web.json_response(
+                    leaderboard,
+                    status=200,
+                    reason="OK",
+                    content_type="application/json",
+                )
 
     async def health_check(self, request: web.Request) -> web.Response:
-        return web.json_response({"status": "healthy"}, status=200, reason="OK", content_type="application/json")
+        return web.json_response(
+            {"status": "healthy"},
+            status=200,
+            reason="OK",
+            content_type="application/json",
+        )
 
     async def webserver(self) -> None:
         app: web.Application = web.Application()
