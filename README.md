@@ -52,17 +52,21 @@ RCON_PORT=
 RCON_PASSWORD=
 ```
 
-Run the bot:
+Build the docker image:
 
 ```bash
-./run.sh
+docker build -t konikotaka .
 ```
 
-This script will activate the virtual environment, install the dependencies, and run the bot.
+```bash
+docker run --env-file ./.env -p 8000:8000 konikotaka
+```
 
-## Notes
+or pull the docker image:
 
-The Bot is hosted on [Railway](https://railway.app/). I have plans to set this up using terraform, but for now, it's a manual process.
+```bash
+docker pull ghcr.io/alexraskin/konikotaka:latest
+```
 
 ## Contributing
 
