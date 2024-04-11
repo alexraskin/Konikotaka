@@ -1,10 +1,13 @@
-FROM python:3.10.8
+FROM python:3.10.8-alpine
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && \
-    apt-get install -y git && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update
+
+RUN apk update \
+&& apk --no-cache --update add libffi-dev 
+
+RUN apk add gcc musl-dev linux-headers python3-dev git
 
 COPY . .
 
