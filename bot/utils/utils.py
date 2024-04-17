@@ -18,7 +18,7 @@ def progress_bar(percent) -> str:
 
 
 def get_year_round() -> float:
-    now = dt.now(tz=timezone.utc)
+    now = dt.now()
     year_end = dt(now.year + 1, 1, 1)
     year_start = dt(now.year, 1, 1)
     year_percent = (now - year_start) / (year_end - year_start) * 100
