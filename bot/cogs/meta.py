@@ -106,8 +106,11 @@ class Meta(commands.Cog):
         )
         os.remove(image)
         if member.guild.id == self.client.main_guild:
-            await member.add_roles(self.client.get_guild(self.client.main_guild).get_role(1159304816531623976))
-        
+            await member.add_roles(
+                self.client.get_guild(self.client.main_guild).get_role(
+                    1159304816531623976
+                )
+            )
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: Guild, user: Member) -> None:
@@ -151,13 +154,15 @@ class Meta(commands.Cog):
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()
-    
+
     @commands.Cog.listener()
     async def on_member_remove(self, member: Union[Member, User]) -> None:
         if member.guild.id != self.client.main_guild:
             return
-        
-        await self.client.get_channel(self.log_channel).send(f"{member.name} has left the server.")
+
+        await self.client.get_channel(self.log_channel).send(
+            f"{member.name} has left the server."
+        )
 
         async with self.client.async_session() as session:
             async with session.begin():
