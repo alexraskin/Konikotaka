@@ -44,6 +44,7 @@ class Meta(commands.Cog):
                 "Tsunkeido",
             ]
         )
+        self.log_channel = 1145086136142811249
 
     def random_birthday(self) -> str:
         """Generates a random birthday."""
@@ -78,12 +79,12 @@ class Meta(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
-        if member.guild.id == self.client.main_guild:  # type: ignore
+        if member.guild.id == self.client.main_guild:
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
-                joined=member.joined_at,  # type: ignore
-                guild_id=str(member.guild.id),  # type: ignore
+                joined=member.joined_at,
+                guild_id=str(member.guild.id),
                 xp=0,
                 level=0,
             )
@@ -98,12 +99,15 @@ class Meta(commands.Cog):
                         await session.rollback()
 
         image = await self.create_image(member)
-        channel = await self.client.fetch_channel(member.guild.system_channel.id)  # type: ignore
-        await channel.send(  # type: ignore
-            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",  # type: ignore
+        channel = await self.client.fetch_channel(member.guild.system_channel.id)
+        await channel.send(
+            content=f"Welcome {member.mention} to the {member.guild.name} discord server!",
             file=File(image),
         )
         os.remove(image)
+        if member.guild.id == self.client.main_guild:
+            await member.add_roles(self.client.get_guild(self.client.main_guild).get_role(1159304816531623976))
+        
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: Guild, user: Member) -> None:
@@ -141,7 +145,27 @@ class Meta(commands.Cog):
                     user: DiscordUser = await session.query(DiscordUser, before.id)
                     if user is None:
                         return
-                    user.username = after.name  # type: ignore
+                    user.username = after.name
+                    await session.flush()
+                    await session.commit()
+                except Exception as e:
+                    self.client.log.error(e)
+                    await session.rollback()
+    
+    @commands.Cog.listener()
+    async def on_member_remove(self, member: Union[Member, User]) -> None:
+        if member.guild.id != self.client.main_guild:
+            return
+        
+        await self.client.get_channel(self.log_channel).send(f"{member.name} has left the server.")
+
+        async with self.client.async_session() as session:
+            async with session.begin():
+                try:
+                    user: DiscordUser = await session.query(DiscordUser, member.id)
+                    if user is None:
+                        return
+                    await session.delete(user)
                     await session.flush()
                     await session.commit()
                 except Exception as e:
