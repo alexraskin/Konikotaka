@@ -5,14 +5,15 @@ import platform
 from typing import TYPE_CHECKING, Optional, Union
 
 import pkg_resources
-from discord import Colour, Embed, Member, User, Permissions, app_commands
+from discord import Colour, Embed, Member, Permissions, User, app_commands
 from discord.ext import commands
 from discord.utils import oauth_url
 from utils.utils import date
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from utils.context import Context
+
+    from ..bot import Konikotaka
 
 
 class Info(commands.Cog):

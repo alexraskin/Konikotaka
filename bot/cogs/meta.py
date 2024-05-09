@@ -21,7 +21,9 @@ class Meta(commands.Cog):
         self.sex: str = random.choice(["M", "F", "Never"])
         self.random_number: int = random.randint(10**9, (10**10) - 1)
         self.file_path: str = os.path.dirname(os.path.abspath(__file__))
-        self.rand_number: int = f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"  # type: ignore
+        self.rand_number: int = (
+            f"{str(self.random_number)[:-4]}-{str(self.random_number)[-4:]}"
+        )
         self.visa_image = Image.open(f"{self.file_path}/files/visa.jpg")
         self.width, self.height = self.visa_image.size
         self.background_color = (255, 255, 255)
@@ -61,7 +63,7 @@ class Meta(commands.Cog):
         return f"{month}.{day}.{year}"
 
     async def create_image(self, member: Union[Member, User]) -> str:
-        discord_avatar = await self.client.session.get(member.avatar.url)  # type: ignore
+        discord_avatar = await self.client.session.get(member.avatar.url)
         discord_avatar = Image.open(BytesIO(await discord_avatar.read()))
         discord_avatar = discord_avatar.resize((150, 200))
         draw = ImageDraw.Draw(self.image)
@@ -131,9 +133,9 @@ class Meta(commands.Cog):
                     embed.colour = Colour.blurple()
                     embed.add_field(name="User:", value=user.mention, inline=False)
                     channel: GuildChannel = self.client.get_channel(
-                        self.general_channel  # type: ignore
+                        self.general_channel
                     )
-                    await channel.send(embed=embed)  # type: ignore
+                    await channel.send(embed=embed)
                 except Exception as e:
                     self.client.log.error(e)
                     await session.rollback()

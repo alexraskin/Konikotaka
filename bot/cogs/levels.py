@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Union
 
-from discord import Colour, Embed, Interaction, Message, User, Member, app_commands
+from discord import Colour, Embed, Interaction, Member, Message, User, app_commands
 from discord.ext import commands
 from models.users import DiscordUser
 from sqlalchemy.future import select

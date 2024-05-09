@@ -14,8 +14,9 @@ from sqlalchemy.future import select
 from utils.utils import get_year_round, progress_bar
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from utils.context import Context
+
+    from ..bot import Konikotaka
 
 
 class Fun(commands.Cog):

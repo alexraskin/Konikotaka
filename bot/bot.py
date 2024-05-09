@@ -7,7 +7,6 @@ from typing import Union
 
 import discord
 import psutil
-import wavelink
 from aiohttp import ClientSession, ClientTimeout
 from cogs import EXTENSIONS
 from discord.ext import tasks
@@ -37,8 +36,6 @@ class Konikotaka(Bot):
         self.main_guild: int = 1020830000104099860
         self.general_channel: int = 1145087802141315093
         self.version: str = "1.0.6"
-        self.lavalink_uri: str = os.environ["LAVALINK_URI"]
-        self.lavalink_password: str = os.environ["LAVALINK_PASSWORD"]
         self.db_url: URL = URL.create(
             drivername="postgresql+asyncpg",
             username=os.getenv("POSTGRES_USER"),
@@ -70,10 +67,6 @@ class Konikotaka(Bot):
         self.log.info(f"Ready: {self.user} ID: {self.user.id}")
 
     async def setup_hook(self) -> None:
-        node: wavelink.Node = wavelink.Node(
-            uri=self.lavalink_uri, password=self.lavalink_password
-        )
-        await wavelink.NodePool.connect(client=self, nodes=[node])
         self.bot_app_info = await self.application_info()
         self.owner_id = self.bot_app_info.owner.id
         for cog in EXTENSIONS:
