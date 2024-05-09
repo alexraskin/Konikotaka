@@ -13,8 +13,9 @@ from models.tags import CustomTags
 from sqlalchemy.future import select
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from utils.context import Context
+
+    from ..bot import Konikotaka
 
 
 class TagName(commands.clean_content):

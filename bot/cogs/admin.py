@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from discord import Colour, Embed, Emoji, HTTPException, app_commands, Guild
+from discord import Colour, Embed, Emoji, Guild, HTTPException, app_commands
 from discord.ext import commands
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from utils.context import Context
+
+    from ..bot import Konikotaka
 
 
 class Admin(commands.Cog):

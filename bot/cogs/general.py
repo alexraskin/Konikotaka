@@ -8,8 +8,9 @@ from discord import PartialEmoji, app_commands
 from discord.ext import commands, tasks
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from utils.context import Context
+
+    from ..bot import Konikotaka
 
 
 class General(commands.Cog):

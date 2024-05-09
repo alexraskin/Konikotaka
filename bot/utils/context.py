@@ -1,21 +1,15 @@
 from __future__ import annotations
 
 import io
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Iterable,
-    TypeVar,
-    Union,
-    Optional,
-)
+from typing import TYPE_CHECKING, Any, Iterable, Optional, TypeVar, Union
 
 import discord
 from discord.ext import commands
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from aiohttp import ClientSession
+
+    from ..bot import Konikotaka
 
 
 T = TypeVar("T")

@@ -7,8 +7,9 @@ from discord import Colour, Embed
 from discord.ext import commands
 
 if TYPE_CHECKING:
-    from ..bot import Konikotaka
     from utils.context import Context
+
+    from ..bot import Konikotaka
 
 
 class Weather(commands.Cog):
