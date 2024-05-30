@@ -59,7 +59,7 @@ class Ai(commands.Cog):
                         "content": message.content.strip(f"<@!{self.client.user.id}>"),
                     },
                 ],
-                model="gpt-4-1106-preview",
+                model="gpt4o",
             )
             await message.channel.typing()
             await message.channel.send(chat_completion.choices[0].message.content)

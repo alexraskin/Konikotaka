@@ -340,40 +340,28 @@ class Fun(commands.Cog):
         """
         Play the slots
         """
-        slot1 = ""
-        slot2 = ""
-        slot3 = ""
         emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
-        embed = Embed(title="🎰 Slot Machine", timestamp=ctx.message.created_at)
-        embed.colour = Colour.blurple()
+        embed = Embed(title="🎰 Slot Machine", timestamp=ctx.message.created_at, colour=Colour.blurple())
         embed.add_field(
             name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n",
             value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n",
         )
         embed.set_footer(text=f"{ctx.author}")
         message = await ctx.reply(embed=embed)
-        # Spin the slots
-        for _ in range(3):
-            await asyncio.sleep(1)  # Delay for a second to simulate spinning
-            slot1 = random.choice(emojis)
-            slot2 = random.choice(emojis)
-            slot3 = random.choice(emojis)
 
-            # Update the embed with spinning slots
+        slots = [random.choice(emojis) for _ in range(3)]
+        for _ in range(3):
+            await asyncio.sleep(1)
+            slots = [random.choice(emojis) for _ in range(3)]
             embed.set_field_at(
-                0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{slot1} {slot2} {slot3}\n\n"
+                0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"{' '.join(slots)}\n\n"
             )
             await message.edit(embed=embed)
 
-        # Check if the player wins or loses
-        if slot1 == slot2 == slot3:
-            result = "You won! 🎉"
-        else:
-            result = "You lost. ☠️"
+        result = "You won! 🎉" if slots[0] == slots[1] == slots[2] else "You lost. ☠️"
 
-        # Update the embed with the final result
         embed.set_field_at(
-            0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{slot1} {slot2} {slot3}\n\n"
+            0, name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n", value=f"\n{' '.join(slots)}\n\n"
         )
         embed.add_field(name="Result:", value=f"**{result}**", inline=False)
         await message.edit(embed=embed)
