@@ -38,10 +38,10 @@ class Konikotaka(Bot):
         self.version: str = "1.0.6"
         self.db_url: URL = URL.create(
             drivername="postgresql+asyncpg",
-            username=os.getenv("POSTGRES_USER"),
-            password=os.getenv("POSTGRES_PASSWORD"),
-            host=os.getenv("POSTGRES_HOST"),
-            port=os.getenv("POSTGRES_PORT"),
+            username=os.getenv("PGUSER"),
+            password=os.getenv("PGPASSWORD"),
+            host=os.getenv("PGHOST"),
+            port=os.getenv("PGPORT"),
             database=os.getenv("POSTGRES_DB"),
         )
         self.engine: create_async_engine = create_async_engine(
