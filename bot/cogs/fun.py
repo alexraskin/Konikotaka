@@ -606,7 +606,7 @@ class Fun(commands.Cog):
         Get a random Quote from The Office
         """
         async with self.client.session.get(
-            "https://theoffice.foo/quote/random"
+            "https://officeapi.twizy.workers.dev/quote/random"
         ) as response:
             if response.status == 200:
                 quote = await response.json()
@@ -630,7 +630,7 @@ class Fun(commands.Cog):
         """
         Get a random clip from The Office
         """
-        async with self.client.session.get("https://theoffice.foo/extras") as response:
+        async with self.client.session.get("https://officeapi.twizy.workers.dev/extras") as response:
             if response.status == 200:
                 data = await response.json()
                 random_clip = random.choice(data)
