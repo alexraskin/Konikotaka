@@ -200,14 +200,7 @@ class Fun(commands.Cog):
         """
         Reverse a string
         """
-        embed = Embed(
-            title="🔁 Reverse",
-            description=f"String: {string}\nReversed: {string[::-1]}",
-            timestamp=ctx.message.created_at,
-        )
-        embed.colour = Colour.blurple()
-        embed.set_footer(text=f"{ctx.author}")
-        await ctx.send(embed=embed)
+        await ctx.reply(string[::-1])
 
     @commands.hybrid_command(name="say", description="Make the bot say something")
     @commands.guild_only()
