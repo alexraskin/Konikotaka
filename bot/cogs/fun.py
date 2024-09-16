@@ -132,8 +132,8 @@ class Fun(commands.Cog):
         if response.status != 200:
             return await ctx.reply("Error getting cat!", ephemeral=True)
         response = await response.json()
-        url = response["url"]
-        await ctx.reply(f"{base_url}{url}")
+        id = response["_id"]
+        await ctx.reply(f"{base_url}/cat/{id}")
 
     @commands.hybrid_command(name="roll", description="Roll a dice with NdN")
     @commands.guild_only()
