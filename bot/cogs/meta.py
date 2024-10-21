@@ -82,6 +82,12 @@ class Meta(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: Union[Member, User]) -> None:
         if member.guild.id == self.client.main_guild:
+            role = member.guild.get_role(1159304816531623976)
+            if role is not None:
+                await member.add_roles(role)
+                self.client.log.info(f"Added {role.name} to {member.name}")
+            else:
+                self.client.log.error("Role not found.")
             user = DiscordUser(
                 discord_id=str(member.id),
                 username=member.name,
