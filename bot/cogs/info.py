@@ -31,7 +31,7 @@ class Info(commands.Cog):
 
         description = str(
             "My personal bot, provides some useful and fun commands. "
-            "The name **Konikotaka** comes from the [The Office](https://api.konikotaka.dev/video)"
+            "The name **Konikotaka** comes from the [The Office](https://www.youtube.com/watch?v=Qr2LQILdXD0)"
         )
 
         embed = Embed(
@@ -39,7 +39,7 @@ class Info(commands.Cog):
             timestamp=ctx.message.created_at,
         )
         embed.title = "Konikotaka"
-        embed.url = "https://konikotaka.dev/"
+        embed.url = "https://www.youtube.com/watch?v=Qr2LQILdXD0"
         embed.colour = Colour.blurple()
         embed.set_author(
             name=str(self.client.owner), icon_url=self.client.owner.display_avatar.url
