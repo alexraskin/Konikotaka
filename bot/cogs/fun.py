@@ -334,7 +334,11 @@ class Fun(commands.Cog):
         Play the slots
         """
         emojis = ["🍒", "🍊", "🍋", "🍇", "🍉", "🍎"]
-        embed = Embed(title="🎰 Slot Machine", timestamp=ctx.message.created_at, colour=Colour.blurple())
+        embed = Embed(
+            title="🎰 Slot Machine",
+            timestamp=ctx.message.created_at,
+            colour=Colour.blurple(),
+        )
         embed.add_field(
             name="⠀★彡 𝚂𝙻𝙾𝚃 𝙼𝙰𝙲𝙷𝙸𝙽𝙴 ★彡\n",
             value=f"{random.choice(emojis)} {random.choice(emojis)} {random.choice(emojis)}\n\n",
@@ -630,33 +634,15 @@ class Fun(commands.Cog):
         """
         Get a random clip from The Office
         """
-        async with self.client.session.get("https://officeapi.twizy.workers.dev/extras") as response:
+        async with self.client.session.get(
+            "https://officeapi.twizy.workers.dev/extras"
+        ) as response:
             if response.status == 200:
                 data = await response.json()
                 random_clip = random.choice(data)
                 await ctx.reply(random_clip["video_url"])
             else:
                 await ctx.reply("Error getting The Office clip!", ephemeral=True)
-
-    @commands.hybrid_command(name="anime", description="Get a random anime quote")
-    @commands.guild_only()
-    @app_commands.guild_only()
-    async def anime(self, ctx: Context):
-        """
-        Get a random anime quote
-        """
-        async with self.client.session.get(
-            "https://animechan.xyz/api/random"
-        ) as response:
-            if response.status == 200:
-                quote = await response.json()
-                embed = Embed(
-                    description=f'"{quote["quote"]}" - {quote["character"]} ({quote["anime"]})',
-                    timestamp=ctx.message.created_at,
-                )
-                embed.colour = Colour.blurple()
-                embed.set_footer(text="https://animechan.xyz/")
-                await ctx.reply(embed=embed)
 
 
 async def setup(client: Konikotaka) -> None:
