@@ -8,13 +8,10 @@ _Name and Photo [Konikotaka](https://youtu.be/Qr2LQILdXD0?si=WwoM0emUIa_8dBfJ)_
 
 ## Features
 
-- [Music](https://github.com/lavalink-devs/Lavalink)
 - Moderation
 - Fun
 - Utility
 - Games
-- RCON (Palworld)
-- [Tomorrow.io Weather](https://www.tomorrow.io/)
 - [OpenAI](https://openai.com/)
 - [Cloudflare AI](https://ai.cloudflare.com/)
 - Anime Waifus (SFW)
@@ -37,8 +34,6 @@ BOT_CHANNEL_ID=
 AWS_ACCESS_KEY=
 AWS_SECRET_ACCESS_KEY=
 PREFIX=
-LAVALINK_URI=
-LAVALINK_PASSWORD=
 HEALTHCHECK_URL=
 X-API-KEY=
 CLIENT_ID=
@@ -46,7 +41,6 @@ OPENAI_TOKEN=
 CLOUDFLARE_AI_GATEWAY_URL=
 CLOUDFLARE_AI_URL=
 CLOUDFLARE_AI_TOKEN=
-TOMORROW_API_KEY=
 ```
 
 Build the docker image:
