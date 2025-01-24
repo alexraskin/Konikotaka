@@ -96,7 +96,7 @@ class Ai(commands.Cog):
         except Exception as e:
             self.client.log.error(f"Error generating image: {e}")
             await interaction.edit_original_response(
-                content="An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
+                content=f"An error occurred during generation. This has been reported to the developers - {interaction.user.mention}"
             )
             return
 
