@@ -32,9 +32,8 @@ class Ai(commands.Cog):
     def __init__(self, client: Konikotaka) -> None:
         self.client: Konikotaka = client
         self.openai_token: str = os.environ["OPENAI_TOKEN"]
-        self.openai_gateway_url: str = os.environ["CLOUDFLARE_AI_GATEWAY_URL"]
         self.openai_client = AsyncOpenAI(
-            api_key=self.openai_token, base_url=self.openai_gateway_url
+            api_key=self.openai_token
         )
 
     @commands.Cog.listener()
